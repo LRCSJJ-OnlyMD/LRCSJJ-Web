@@ -1,0 +1,181 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("admins")
+}
+
+model Club {
+  id        String   @id @default(cuid())
+  name      String
+  address   String?
+  phone     String?
+  email     String?
+  president String?
+  coach     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  athletes     Athlete[]
+  teamMembers  LeagueTeamMember[]
+  championships ClubChampionship[]
+
+  @@map("clubs")
+}
+
+model Season {
+  id        String   @id @default(cuid())
+  name      String   @unique // e.g., "2024-2025"
+  startDate DateTime
+  endDate   DateTime
+  isActive  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  insurances   Insurance[]
+  championships Championship[]
+
+  @@map("seasons")
+}
+
+model Athlete {
+  id           String    @id @default(cuid())
+  firstName    String
+  lastName     String
+  dateOfBirth  DateTime
+  passportNo   String?   @unique
+  nationalId   String?   @unique
+  phone        String?
+  email        String?
+  address      String?
+  photoUrl     String?
+  belt         String?   // White, Blue, Purple, Brown, Black
+  weight       Float?
+  category     String?   // Age/weight category
+  clubId       String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  club         Club                @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  insurances   Insurance[]
+  teamMembers  LeagueTeamMember[]
+
+  @@map("athletes")
+}
+
+model Insurance {
+  id        String   @id @default(cuid())
+  athleteId String
+  seasonId  String
+  amount    Float
+  paidAt    DateTime?
+  isPaid    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  athlete Athlete @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+  season  Season  @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+
+  @@unique([athleteId, seasonId])
+  @@map("insurances")
+}
+
+model Championship {
+  id          String   @id @default(cuid())
+  name        String
+  seasonId    String
+  entryFee    Float
+  startDate   DateTime
+  endDate     DateTime
+  location    String?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  season Season              @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  clubs  ClubChampionship[]
+
+  @@map("championships")
+}
+
+model ClubChampionship {
+  id             String   @id @default(cuid())
+  clubId         String
+  championshipId String
+  paidAt         DateTime?
+  isPaid         Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  club         Club         @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  championship Championship @relation(fields: [championshipId], references: [id], onDelete: Cascade)
+
+  @@unique([clubId, championshipId])
+  @@map("club_championships")
+}
+
+model LeagueTeam {
+  id          String   @id @default(cuid())
+  name        String   // "1st League Team", "2nd League Team"
+  division    String   // "First Division", "Second Division"
+  category    String?  // Age/weight category
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members LeagueTeamMember[]
+
+  @@map("league_teams")
+}
+
+model LeagueTeamMember {
+  id           String   @id @default(cuid())
+  teamId       String
+  athleteId    String
+  clubId       String
+  position     String?  // Captain, Member, etc.
+  assignedAt   DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  team    LeagueTeam @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  athlete Athlete    @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+  club    Club       @relation(fields: [clubId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, athleteId])
+  @@map("league_team_members")
+}
+
+model MapConfiguration {
+  id           String   @id @default(cuid())
+  latitude     Float    @default(33.5731)  // Default to Casablanca
+  longitude    Float    @default(-7.5898)  // Default to Casablanca
+  locationName String   @default("Casablanca-Settat Ju-Jitsu League")
+  zoom         Int      @default(12)
+  address      String?  // Optional full address
+  isActive     Boolean  @default(true)
+  updatedBy    String?  // Admin who updated
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("map_configurations")
+}

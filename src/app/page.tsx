@@ -1,103 +1,292 @@
-import Image from "next/image";
+'use client'
 
-export default function Home() {
+import { FederationLogo, LeagueLogo } from "@/components/logos"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { ThemeToggle } from "@/components/ui/theme-toggle"
+import Link from "next/link"
+import { 
+  Trophy, 
+  Users, 
+  Shield, 
+  ArrowRight
+} from "lucide-react"
+import { useEffect, useState } from 'react'
+
+export default function HomePage() {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) return null
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="min-h-screen bg-background">
+      {/* Navigation */}
+      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b transition-all duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-4">
+              <LeagueLogo size="sm" />
+              <div className="hidden md:block">
+                <h1 className="text-lg font-semibold text-foreground">LRCSJJ</h1>
+                <p className="text-xs text-muted-foreground">Ligue Régionale Casablanca-Settat</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-6">
+              <nav className="hidden md:flex space-x-6">
+                <Link href="/" className="text-foreground font-medium hover:text-primary transition-colors duration-200">
+                  Accueil
+                </Link>
+                <Link href="/about" className="text-muted-foreground hover:text-primary transition-colors duration-200">
+                  À Propos
+                </Link>
+                <Link href="/contact" className="text-muted-foreground hover:text-primary transition-colors duration-200">
+                  Contact
+                </Link>
+              </nav>
+              
+              <div className="flex items-center space-x-3">
+                <ThemeToggle />
+                <Link href="/login">
+                  <Button className="btn-smooth bg-primary text-primary-foreground hover:bg-primary/90">
+                    Connexion
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+      </header>
+
+      {/* Hero Section */}
+      <section className="pt-16 pb-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16 animate-fade-in">
+            {/* Badge */}
+            <div className="inline-flex items-center justify-center px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium mb-6">
+              <Trophy className="h-4 w-4 mr-2" />
+              Excellence en Ju-Jitsu Traditionnel
+            </div>
+            
+            {/* Main heading */}
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-tight">
+              Ligue Régionale<br />
+              <span className="text-primary">Casablanca-Settat</span>
+            </h1>
+            
+            {/* Subtitle */}
+            <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
+              La référence du Ju-Jitsu Traditionnel au Maroc. Rejoignez notre communauté d&apos;excellence 
+              et découvrez l&apos;art martial qui transforme des vies.
+            </p>
+            
+            {/* CTA buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button className="btn-smooth text-lg px-8 py-3 bg-primary text-primary-foreground hover:bg-primary/90">
+                Découvrir nos Clubs
+              </Button>
+              <Button variant="outline" className="btn-smooth text-lg px-8 py-3">
+                Nos Championnats
+              </Button>
+            </div>
+          </div>
+
+          {/* Logos showcase */}
+          <div className="flex justify-center items-center space-x-12 mb-16 animate-slide-up">
+            <div className="opacity-60 hover:opacity-100 transition-all duration-300 hover-lift">
+              <LeagueLogo size="lg" />
+            </div>
+            <div className="opacity-60 hover:opacity-100 transition-all duration-300 hover-lift">
+              <FederationLogo type="main" size="lg" />
+            </div>
+            <div className="opacity-60 hover:opacity-100 transition-all duration-300 hover-lift">
+              <FederationLogo type="jjif" size="lg" />
+            </div>
+          </div>
+
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <Card className="card-smooth animate-fade-in">
+              <CardContent className="p-8 text-center">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Users className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="text-3xl font-bold text-foreground mb-2">500+</h3>
+                <p className="text-muted-foreground">Athlètes Licenciés</p>
+              </CardContent>
+            </Card>
+
+            <Card className="card-smooth animate-fade-in">
+              <CardContent className="p-8 text-center">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Shield className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="text-3xl font-bold text-foreground mb-2">25+</h3>
+                <p className="text-muted-foreground">Clubs Affiliés</p>
+              </CardContent>
+            </Card>
+
+            <Card className="card-smooth animate-fade-in">
+              <CardContent className="p-8 text-center">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Trophy className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="text-3xl font-bold text-foreground mb-2">100+</h3>
+                <p className="text-muted-foreground">Compétitions Organisées</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 bg-card">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Nos Réalisations
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Représentant le Maroc avec fierté sur la scène internationale
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <Card className="card-smooth animate-fade-in">
+              <CardContent className="p-8 text-center">
+                <div className="w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Trophy className="h-10 w-10 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold text-foreground mb-3">
+                  Champions Nationaux
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Multiples titres de champion national dans diverses catégories de poids et groupes d&apos;âge.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="card-smooth animate-fade-in">
+              <CardContent className="p-8 text-center">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Shield className="h-10 w-10 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold text-foreground mb-3">
+                  Reconnaissance Internationale
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Représentant le Maroc dans les compétitions africaines et internationales de Ju-Jitsu.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="card-smooth animate-fade-in">
+              <CardContent className="p-8 text-center">
+                <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Users className="h-10 w-10 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold text-foreground mb-3">
+                  Développement Jeunesse
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Former la prochaine génération d&apos;athlètes marocains grâce à des programmes dédiés.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-muted/30">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <Card className="card-smooth border-0 shadow-lg animate-fade-in">
+            <CardContent className="p-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+                Prêt à Commencer Votre Parcours ?
+              </h2>
+              <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+                Rejoignez-nous dès aujourd&apos;hui et découvrez l&apos;art du Ju-Jitsu 
+                dans un cadre professionnel et bienveillant.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link href="/contact">
+                  <Button className="btn-smooth text-lg px-8 py-3 bg-primary text-primary-foreground hover:bg-primary/90">
+                    Commencer Maintenant
+                  </Button>
+                </Link>
+                <Link href="/about">
+                  <Button variant="outline" className="btn-smooth text-lg px-8 py-3">
+                    En Savoir Plus
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-card border-t py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div>
+              <div className="flex items-center space-x-4 mb-6">
+                <LeagueLogo size="sm" />
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground">LRCSJJ</h3>
+                  <p className="text-sm text-muted-foreground">Ligue Régionale Casablanca-Settat</p>
+                </div>
+              </div>
+              <p className="text-muted-foreground leading-relaxed">
+                Excellence, discipline et tradition martiale au service du développement 
+                du Ju-Jitsu dans la région Casablanca-Settat.
+              </p>
+            </div>
+            
+            <div>
+              <h4 className="text-lg font-semibold text-foreground mb-6">Navigation</h4>
+              <ul className="space-y-3">
+                <li><Link href="/" className="text-muted-foreground hover:text-primary transition-colors">Accueil</Link></li>
+                <li><Link href="/about" className="text-muted-foreground hover:text-primary transition-colors">À Propos</Link></li>
+                <li><Link href="/contact" className="text-muted-foreground hover:text-primary transition-colors">Contact</Link></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="text-lg font-semibold text-foreground mb-6">Sous l&apos;égide de</h4>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <FederationLogo type="main" size="sm" showLabel={false} />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Fédération Royale Marocaine</p>
+                    <p className="text-sm text-muted-foreground">de Ju-Jitsu</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <FederationLogo type="jjif" size="sm" showLabel={false} />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Ju-Jitsu International</p>
+                    <p className="text-sm text-muted-foreground">Federation</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="border-t border-border mt-12 pt-8 text-center">
+            <p className="text-muted-foreground">
+              © 2025 LRCSJJ. Tous droits réservés.
+            </p>
+          </div>
+        </div>
       </footer>
     </div>
-  );
+  )
 }

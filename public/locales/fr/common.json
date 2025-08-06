@@ -1,0 +1,149 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "about": "À Propos",
+    "contact": "Contact",
+    "login": "Connexion"
+  },
+  "hero": {
+    "title": "Ligue Régionale de Casablanca-Settat de Ju-Jitsu",
+    "subtitle": "Excellence, Discipline et Tradition Martiale",
+    "description": "Rejoignez la communauté officielle de Ju-Jitsu de la région Casablanca-Settat sous l'égide de la Fédération Royale Marocaine de Ju-Jitsu.",
+    "cta": {
+      "championships": "Voir les Championnats",
+      "about": "À Propos"
+    }
+  },
+  "stats": {
+    "championships": "Championnats Gagnés",
+    "athletes": "Athlètes Actifs",
+    "clubs": "Clubs Affiliés",
+    "years": "Années d'Excellence"
+  },
+  "achievements": {
+    "title": "Nos Réalisations",
+    "subtitle": "Représentant le Maroc avec fierté sur la scène internationale",
+    "national": {
+      "title": "Champions Nationaux",
+      "description": "Multiples titres de champion national dans diverses catégories de poids et groupes d'âge."
+    },
+    "international": {
+      "title": "Reconnaissance Internationale",
+      "description": "Représentant le Maroc dans les compétitions africaines et internationales de Ju-Jitsu."
+    },
+    "youth": {
+      "title": "Développement Jeunesse",
+      "description": "Former la prochaine génération d'athlètes marocains de Ju-Jitsu grâce à des programmes d'entraînement dédiés."
+    }
+  },
+  "about": {
+    "title": "À Propos de la Ligue",
+    "subtitle": "La Ligue Régionale de Casablanca-Settat de Ju-Jitsu est un pilier d'excellence dans les arts martiaux marocains, favorisant la discipline, le respect et l'esprit de compétition dans toute la région.",
+    "mission": {
+      "title": "Notre Mission",
+      "description": "Promouvoir et développer le Ju-Jitsu dans la région Casablanca-Settat grâce à une formation structurée, des opportunités de compétition et en favorisant les valeurs de discipline, de respect et d'excellence. Nous nous efforçons de créer des voies permettant aux athlètes d'atteindre leur plein potentiel aux niveaux régional, national et international."
+    },
+    "vision": {
+      "title": "Notre Vision",
+      "description": "Être la ligue de Ju-Jitsu leader au Maroc, reconnue pour notre engagement envers l'excellence, le développement des jeunes et les réalisations sportives. Nous envisageons un avenir où nos athlètes représentent le Maroc avec fierté sur la scène mondiale tout en incarnant les valeurs et traditions de cet art martial noble."
+    },
+    "backToHome": "Retour à l'Accueil",
+    "achievements": {
+      "title": "Nos Réalisations",
+      "subtitle": "Des années de dévouement ont mené à un succès remarquable dans les compétitions nationales et internationales",
+      "throneCup": {
+        "title": "Champions de la Coupe du Trône",
+        "description": "Multiples victoires dans la compétition de Ju-Jitsu la plus prestigieuse du Maroc"
+      },
+      "nationalMedals": {
+        "title": "Médailles Nationales",
+        "description": "Plus de 50 médailles remportées aux championnats nationaux dans toutes les catégories d'âge"
+      },
+      "internationalTeam": {
+        "title": "Équipe Internationale",
+        "description": "Plus de 15 athlètes sélectionnés pour les compétitions de l'équipe nationale marocaine"
+      },
+      "regionalExcellence": {
+        "title": "Excellence Régionale",
+        "description": "Reconnue comme l'organisation de Ju-Jitsu de premier plan dans la région Casablanca-Settat"
+      }
+    },
+    "leadership": {
+      "title": "Direction et Champions",
+      "subtitle": "Rencontrez les dirigeants dévoués et les athlètes exceptionnels qui dirigent notre succès",
+      "president": {
+        "name": "Mohammed Alaoui",
+        "role": "Président de la Ligue",
+        "description": "Avec plus de 20 ans d'expérience dans l'administration des arts martiaux, Mohammed a mené notre ligue vers un succès et une reconnaissance sans précédent."
+      },
+      "technicalDirector": {
+        "name": "Fatima Zahra Benali",
+        "role": "Directrice Technique",
+        "description": "Ancienne championne nationale et arbitre internationale certifiée, Fatima supervise nos standards techniques et nos programmes de développement des athlètes."
+      },
+      "champion": {
+        "name": "Youssef Tazi",
+        "role": "Champion National",
+        "description": "Triple champion national et vainqueur de la Coupe du Trône, Youssef représente le summum de la réussite dans le Ju-Jitsu marocain."
+      }
+    },
+    "history": {
+      "title": "Notre Parcours",
+      "subtitle": "Une chronologie des étapes qui ont façonné notre ligue pour en faire ce qu'elle est aujourd'hui",
+      "2014": {
+        "title": "Fondation de la Ligue",
+        "description": "Établie comme ligue régionale officielle sous la Fédération Royale Marocaine de Ju-Jitsu"
+      },
+      "2017": {
+        "title": "Première Victoire de la Coupe du Trône",
+        "description": "Nos athlètes ont remporté leur premier titre de championnat national majeur"
+      },
+      "2020": {
+        "title": "Reconnaissance Internationale",
+        "description": "Premiers athlètes sélectionnés pour les compétitions internationales représentant le Maroc"
+      },
+      "2025": {
+        "title": "Transformation Numérique",
+        "description": "Lancement de notre plateforme numérique complète pour la gestion moderne de la ligue"
+      }
+    },
+    "callToAction": {
+      "title": "Rejoignez Notre Héritage",
+      "subtitle": "Faites partie de la communauté de Ju-Jitsu de premier plan du Maroc et atteignez votre plein potentiel",
+      "findClub": "Trouvez un Club Près de Chez Vous",
+      "contactUs": "Contactez-Nous"
+    }
+  },
+  "contact": {
+    "title": "Contactez-Nous",
+    "subtitle": "Nous sommes là pour répondre à vos questions et vous accompagner dans votre parcours en Ju-Jitsu",
+    "info": {
+      "title": "Informations de Contact",
+      "description": "N'hésitez pas à nous contacter pour toute question concernant nos activités, nos clubs affiliés ou pour rejoindre notre communauté."
+    },
+    "address": "Adresse",
+    "phone": "Téléphone",
+    "email": "Email",
+    "hours": {
+      "title": "Horaires",
+      "weekdays": "Lundi - Vendredi: 9h00 - 18h00",
+      "saturday": "Samedi: 9h00 - 14h00",
+      "sunday": "Dimanche: Fermé"
+    },
+    "form": {
+      "title": "Envoyez-nous un Message",
+      "description": "Remplissez le formulaire ci-dessous et nous vous répondrons dans les plus brefs délais",
+      "name": "Nom complet",
+      "email": "Email",
+      "subject": "Sujet",
+      "message": "Message",
+      "send": "Envoyer le Message",
+      "sending": "Envoi en cours...",
+      "success": "✓ Votre message a été envoyé avec succès! Nous vous répondrons bientôt."
+    }
+  },
+  "footer": {
+    "rights": "Tous droits réservés",
+    "federation": "Sous l'égide de la Fédération Royale Marocaine de Ju-Jitsu"
+  }
+}

@@ -1,0 +1,149 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact",
+    "login": "Login"
+  },
+  "hero": {
+    "title": "Casablanca-Settat Regional Ju-Jitsu League",
+    "subtitle": "Excellence, Discipline and Martial Tradition",
+    "description": "Join the official Ju-Jitsu community of the Casablanca-Settat region under the auspices of the Royal Moroccan Federation of Judo and Related Arts.",
+    "cta": {
+      "championships": "View Championships",
+      "about": "About Us"
+    }
+  },
+  "stats": {
+    "championships": "Championships Won",
+    "athletes": "Active Athletes",
+    "clubs": "Affiliated Clubs",
+    "years": "Years of Excellence"
+  },
+  "achievements": {
+    "title": "Our Achievements",
+    "subtitle": "Representing Morocco with pride on the international stage",
+    "national": {
+      "title": "National Champions",
+      "description": "Multiple national championship titles across various weight categories and age groups."
+    },
+    "international": {
+      "title": "International Recognition",
+      "description": "Representing Morocco in African and international Ju-Jitsu competitions."
+    },
+    "youth": {
+      "title": "Youth Development",
+      "description": "Building the next generation of Moroccan Ju-Jitsu athletes through dedicated training programs."
+    }
+  },
+  "about": {
+    "title": "About Our League",
+    "subtitle": "The Casablanca-Settat Ju-Jitsu League stands as a pillar of excellence in Moroccan martial arts, fostering discipline, respect, and competitive spirit across the region.",
+    "mission": {
+      "title": "Our Mission",
+      "description": "To promote and develop Ju-Jitsu in the Casablanca-Settat region through structured training, competitive opportunities, and fostering values of discipline, respect, and excellence. We strive to create pathways for athletes to reach their full potential at regional, national, and international levels."
+    },
+    "vision": {
+      "title": "Our Vision",
+      "description": "To be the leading Ju-Jitsu league in Morocco, recognized for our commitment to excellence, youth development, and sporting achievements. We envision a future where our athletes represent Morocco with pride on the global stage while embodying the values and traditions of this noble martial art."
+    },
+    "backToHome": "Back to Home",
+    "achievements": {
+      "title": "Our Achievements",
+      "subtitle": "Years of dedication have led to remarkable success in national and international competitions",
+      "throneCup": {
+        "title": "Throne Cup Champions",
+        "description": "Multiple victories in Morocco's most prestigious Ju-Jitsu competition"
+      },
+      "nationalMedals": {
+        "title": "National Medals",
+        "description": "Over 50 medals won at national championships across all age categories"
+      },
+      "internationalTeam": {
+        "title": "International Team",
+        "description": "15+ athletes selected for Moroccan national team competitions"
+      },
+      "regionalExcellence": {
+        "title": "Regional Excellence",
+        "description": "Recognized as the premier Ju-Jitsu organization in Casablanca-Settat region"
+      }
+    },
+    "leadership": {
+      "title": "Leadership & Champions",
+      "subtitle": "Meet the dedicated leaders and outstanding athletes who drive our success",
+      "president": {
+        "name": "Mohammed Alaoui",
+        "role": "League President",
+        "description": "With over 20 years of experience in martial arts administration, Mohammed has led our league to unprecedented success and recognition."
+      },
+      "technicalDirector": {
+        "name": "Fatima Zahra Benali",
+        "role": "Technical Director",
+        "description": "Former national champion and certified international referee, Fatima oversees our technical standards and athlete development programs."
+      },
+      "champion": {
+        "name": "Youssef Tazi",
+        "role": "National Champion",
+        "description": "Three-time national champion and Throne Cup winner, Youssef represents the pinnacle of achievement in Moroccan Ju-Jitsu."
+      }
+    },
+    "history": {
+      "title": "Our Journey",
+      "subtitle": "A timeline of milestones that shaped our league into what it is today",
+      "2014": {
+        "title": "League Foundation",
+        "description": "Established as the official regional league under the Royal Moroccan Ju-Jitsu Federation"
+      },
+      "2017": {
+        "title": "First Throne Cup Victory",
+        "description": "Our athletes claimed their first major national championship title"
+      },
+      "2020": {
+        "title": "International Recognition",
+        "description": "First athletes selected for international competitions representing Morocco"
+      },
+      "2025": {
+        "title": "Digital Transformation",
+        "description": "Launch of our comprehensive digital platform for modern league management"
+      }
+    },
+    "callToAction": {
+      "title": "Join Our Legacy",
+      "subtitle": "Become part of Morocco's premier Ju-Jitsu community and reach your full potential",
+      "findClub": "Find a Club Near You",
+      "contactUs": "Contact Us"
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "We are here to answer your questions and support you in your Ju-Jitsu journey",
+    "info": {
+      "title": "Contact Information",
+      "description": "Feel free to contact us for any questions about our activities, our affiliated clubs or to join our community."
+    },
+    "address": "Address",
+    "phone": "Phone",
+    "email": "Email",
+    "hours": {
+      "title": "Hours",
+      "weekdays": "Monday - Friday: 9:00 AM - 6:00 PM",
+      "saturday": "Saturday: 9:00 AM - 2:00 PM",
+      "sunday": "Sunday: Closed"
+    },
+    "form": {
+      "title": "Send us a Message",
+      "description": "Fill out the form below and we will get back to you as soon as possible",
+      "name": "Full name",
+      "email": "Email",
+      "subject": "Subject",
+      "message": "Message",
+      "send": "Send Message",
+      "sending": "Sending...",
+      "success": "✓ Your message has been sent successfully! We will reply soon."
+    }
+  },
+  "footer": {
+    "rights": "All rights reserved",
+    "federation": "Under the auspices of the Royal Moroccan Federation of Judo and Related Arts"
+  }
+}
