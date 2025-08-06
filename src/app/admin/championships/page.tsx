@@ -507,7 +507,7 @@ export default function ChampionshipsManagement() {
                   <Trophy className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-foreground"{stats.total}</div>
+                  <div className="text-2xl font-bold text-foreground">{stats.total}</div>
                 </CardContent>
               </Card>
               
@@ -537,7 +537,7 @@ export default function ChampionshipsManagement() {
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-foreground"{stats.totalClubs}</div>
+                  <div className="text-2xl font-bold text-foreground">{stats.totalClubs}</div>
                 </CardContent>
               </Card>
             </div>
@@ -681,7 +681,7 @@ export default function ChampionshipsManagement() {
                             </div>
                           </div>
                           <div className="flex-1">
-                            <h3 className="font-semibold text-foreground"{championship.name}</h3>
+                            <h3 className="font-semibold text-foreground">{championship.name}</h3>
                             <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                               <div className="flex items-center space-x-1">
                                 <Calendar className="w-4 h-4" />

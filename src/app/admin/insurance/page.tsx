@@ -486,7 +486,7 @@ export default function InsuranceManagement() {
                     <Shield className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold text-foreground"{stats.total}</div>
+                    <div className="text-2xl font-bold text-foreground">{stats.total}</div>
                   </CardContent>
                 </Card>
                 
@@ -516,7 +516,7 @@ export default function InsuranceManagement() {
                     <Euro className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold text-foreground"{stats.totalRevenue.toLocaleString()} MAD</div>
+                    <div className="text-2xl font-bold text-foreground">{stats.totalRevenue.toLocaleString()} MAD</div>
                   </CardContent>
                 </Card>
               </div>
@@ -569,7 +569,7 @@ export default function InsuranceManagement() {
                         </TableCell>
                         <TableCell>{insurance.athlete.club.name}</TableCell>
                         <TableCell>{insurance.season.name}</TableCell>
-                        <TableCell className="font-semibold text-foreground"{insurance.amount.toLocaleString()} MAD</TableCell>
+                        <TableCell className="font-semibold text-foreground">{insurance.amount.toLocaleString()} MAD</TableCell>
                         <TableCell>
                           <div className="flex items-center space-x-2">
                             {insurance.isPaid ? (
@@ -670,18 +670,18 @@ export default function InsuranceManagement() {
                           <CheckCircle className="w-4 h-4 text-accent" />
                           <span>Payées</span>
                         </div>
-                        <span className="font-semibold text-foreground"{stats.paid}</span>
+                        <span className="font-semibold text-foreground">{stats.paid}</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                           <AlertTriangle className="w-4 h-4 text-red-600" />
                           <span>Non payées</span>
                         </div>
-                        <span className="font-semibold text-foreground"{stats.unpaid}</span>
+                        <span className="font-semibold text-foreground">{stats.unpaid}</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span>Taux de paiement</span>
-                        <span className="font-semibold text-foreground"
+                        <span className="font-semibold text-foreground">
                           {stats.total > 0 ? Math.round((stats.paid / stats.total) * 100) : 0}%
                         </span>
                       </div>
@@ -709,7 +709,7 @@ export default function InsuranceManagement() {
                       </div>
                       <div className="flex items-center justify-between">
                         <span>Montant moyen</span>
-                        <span className="font-semibold text-foreground"
+                        <span className="font-semibold text-foreground">
                           {stats.total > 0 ? Math.round((stats.totalRevenue + stats.pendingRevenue) / stats.total).toLocaleString() : 0} MAD
                         </span>
                       </div>

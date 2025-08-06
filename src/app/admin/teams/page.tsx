@@ -344,7 +344,7 @@ export default function TeamsManagement() {
                       )}
                       <div className="bg-gray-50 rounded-lg p-3">
                         <p className="text-sm text-muted-foreground">Date de Création</p>
-                        <p className="font-semibold text-foreground"
+                        <p className="font-semibold text-foreground">
                           {new Date(selectedTeam.createdAt).toLocaleDateString('fr-FR', {
                             day: 'numeric',
                             month: 'long',
@@ -461,7 +461,7 @@ export default function TeamsManagement() {
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-foreground"{stats.total}</div>
+                  <div className="text-2xl font-bold text-foreground">{stats.total}</div>
                 </CardContent>
               </Card>
               
