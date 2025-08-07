@@ -501,7 +501,7 @@ export default function AthletesManagement() {
         </Dialog>
 
         <Card className="backdrop-blur-sm bg-card/90 border-0 shadow-2xl animate-scale-in">
-          <CardHeader className="bg-gradient-to-r from-[#d62027]/10 to-[#b91c1c]/10 dark:from-[#d62027]/20 dark:to-[#b91c1c]/20">
+          <CardHeader className="bg-background dark:bg-background border-b border-border">
             <CardTitle className="text-2xl text-foreground dark:text-white">Athlètes de la Ligue ({athletes.length})</CardTitle>
             <CardDescription className="text-muted-foreground dark:text-muted-foreground">
               Gérez tous les athlètes de la ligue Casablanca-Settat
