@@ -29,6 +29,16 @@ async function main() {
     }
   })
 
+    const admin3 = await prisma.admin.upsert({
+    where: { email: 'mouadom2003@gmail.com' },
+    update: {},
+    create: {
+      email: 'mouadom2003@gmail.com',
+      password: "mdol2003",
+      name: 'Administrator 3'
+    }
+  })
+
   console.log('✅ Created admin users:', { admin1: admin1.email, admin2: admin2.email })
 
   // Create a sample season
