@@ -209,15 +209,14 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Témoignages de nos Athlètes
+              La Voix de nos Champions
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Découvrez les expériences et succès de nos champions
+              Découvrez les témoignages authentiques de nos athlètes qui font la fierté de notre ligue
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Testimonial 1 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <Card className="card-smooth animate-fade-in">
               <CardContent className="p-8">
                 <div className="flex items-center mb-4">
@@ -227,25 +226,25 @@ export default function HomePage() {
                 </div>
                 <div className="mb-6">
                   <Quote className="h-8 w-8 text-primary/30 mb-4" />
-                  <p className="text-muted-foreground leading-relaxed italic">
-                    &quot;Grâce à la LRCSJJ, j&apos;ai pu atteindre le niveau national et représenter 
-                    le Maroc dans des compétitions internationales. L&apos;encadrement professionnel 
-                    et l&apos;esprit de famille font toute la différence.&quot;
+                  <p className="text-muted-foreground leading-relaxed italic text-lg">
+                    &quot;La LRCSJJ m&apos;a donné les outils pour exceller non seulement dans le Ju-Jitsu, 
+                    mais aussi dans la vie. L&apos;discipline et les valeurs apprises ici m&apos;accompagnent 
+                    chaque jour. Je suis fière de représenter le Maroc grâce à cette formation exceptionnelle.&quot;
                   </p>
                 </div>
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                    <span className="text-primary font-semibold text-lg">HB</span>
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                    <span className="text-primary font-semibold text-xl">AE</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground">Hassan Bouali</h4>
-                    <p className="text-sm text-muted-foreground">Champion National - Ceinture Marron</p>
+                    <h4 className="font-semibold text-foreground text-lg">Abdellah ElAbdellaoui</h4>
+                    <p className="text-muted-foreground">Champion Continental - Ceinture Noire - 2ème DAN</p>
+                    <p className="text-sm text-primary">Équipe Nationale du Maroc</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Testimonial 2 */}
             <Card className="card-smooth animate-fade-in">
               <CardContent className="p-8">
                 <div className="flex items-center mb-4">
@@ -254,26 +253,26 @@ export default function HomePage() {
                   ))}
                 </div>
                 <div className="mb-6">
-                  <Quote className="h-8 w-8 text-primary/30 mb-4" />
-                  <p className="text-muted-foreground leading-relaxed italic">
-                    &quot;En tant que femme dans le Ju-Jitsu, j&apos;ai trouvé dans cette ligue un 
-                    environnement respectueux et encourageant. Les valeurs transmises vont bien 
-                    au-delà du sport.&quot;
+                  <Quote className="h-8 w-8 text-accent/30 mb-4" />
+                  <p className="text-muted-foreground leading-relaxed italic text-lg">
+                    &quot;Avoir commencé mon parcours dans cette ligue est la meilleure décision que j&apos;ai 
+                    prise. L&apos;encadrement professionnel, l&apos;esprit de famille et la qualité de 
+                    l&apos;enseignement font de cette ligue une référence internationale.&quot;
                   </p>
                 </div>
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center">
-                    <span className="text-accent font-semibold text-lg">AB</span>
+                  <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center">
+                    <span className="text-accent font-semibold text-xl">MZ</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground">Aicha Bennani</h4>
-                    <p className="text-sm text-muted-foreground">Médaillée Régionale - Ceinture Violette</p>
+                    <h4 className="font-semibold text-foreground text-lg">Mouhssin Zengher</h4>
+                    <p className="text-muted-foreground">Médaillé Continental - Ceinture Noire - 1er DAN</p>
+                    <p className="text-sm text-accent">Sélection Africaine</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Testimonial 3 */}
             <Card className="card-smooth animate-fade-in">
               <CardContent className="p-8">
                 <div className="flex items-center mb-4">
@@ -282,20 +281,49 @@ export default function HomePage() {
                   ))}
                 </div>
                 <div className="mb-6">
-                  <Quote className="h-8 w-8 text-primary/30 mb-4" />
-                  <p className="text-muted-foreground leading-relaxed italic">
-                    &quot;J&apos;ai commencé le Ju-Jitsu jeune dans cette ligue. Aujourd&apos;hui, 
-                    je suis fier de porter les couleurs du Maroc et de transmettre mes 
-                    connaissances aux nouvelles générations.&quot;
+                  <Quote className="h-8 w-8 text-green-500/30 mb-4" />
+                  <p className="text-muted-foreground leading-relaxed italic text-lg">
+                    &quot;Cette ligue ne forme pas que des athlètes, elle forme des champions de la vie. 
+                    Chaque entraînement est une leçon de persévérance, de respect et d&apos;excellence. 
+                    Merci de m&apos;avoir aidée à devenir la femme que je suis aujourd&apos;hui.&quot;
                   </p>
                 </div>
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-green-500/10 rounded-full flex items-center justify-center">
-                    <span className="text-green-600 font-semibold text-lg">YA</span>
+                  <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center">
+                    <span className="text-green-600 font-semibold text-xl">YE</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground">Youssef Alaoui</h4>
-                    <p className="text-sm text-muted-foreground">Équipe Nationale - Ceinture Bleue</p>
+                    <h4 className="font-semibold text-foreground text-lg">Youssef ElHadi</h4>
+                    <p className="text-muted-foreground">Champion Continental - Ceinture Noire - 2ème DAN</p>
+                    <p className="text-sm text-green-600">Équipe Nationale du Maroc</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="card-smooth animate-fade-in">
+              <CardContent className="p-8">
+                <div className="flex items-center mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 text-yellow-500 fill-current" />
+                  ))}
+                </div>
+                <div className="mb-6">
+                  <Quote className="h-8 w-8 text-blue-500/30 mb-4" />
+                  <p className="text-muted-foreground leading-relaxed italic text-lg">
+                    &quot;De mes débuts comme jeune athlète jusqu&apos;à mon rôle actuel d&apos;encadrement, 
+                    la LRCSJJ a été ma famille. Les valeurs transmises ici transcendent le sport et 
+                    façonnent des citoyens exemplaires.&quot;
+                  </p>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <div className="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center">
+                    <span className="text-blue-600 font-semibold text-xl">MB</span>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-foreground text-lg">Mohammed Bahdou</h4>
+                    <p className="text-muted-foreground">Ancien Champion - Ceinture Noire - 4ème DAN</p>
+                    <p className="text-sm text-blue-600">Entraîneur Certifié</p>
                   </div>
                 </div>
               </CardContent>
@@ -304,8 +332,8 @@ export default function HomePage() {
 
           {/* Call to action for testimonials */}
           <div className="text-center mt-12">
-            <p className="text-muted-foreground mb-6">
-              Vous aussi, rejoignez notre famille et écrivez votre propre histoire de succès
+            <p className="text-muted-foreground text-lg mb-6">
+              Rejoignez une communauté de champions qui transforment leur passion en excellence
             </p>
             <Button className="btn-smooth bg-primary text-primary-foreground hover:bg-primary/90">
               Commencer Mon Parcours

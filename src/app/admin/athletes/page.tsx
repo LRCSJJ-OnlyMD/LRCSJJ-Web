@@ -207,7 +207,7 @@ export default function AthletesManagement() {
       <div className="max-w-7xl mx-auto animate-fade-in">
         <div className="flex items-center justify-between mb-8 animate-slide-down">
           <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-[#d62027] to-[#b91c1c] bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold bg-clip-text text-transparent">
               Gestion des Athlètes
             </h1>
             <p className="text-muted-foreground dark:text-muted-foreground mt-2 text-lg">
