@@ -8,6 +8,7 @@ async function main() {
 
   // Create admin users
   const adminPassword = await hashPassword(process.env.ADMIN_DEFAULT_PASSWORD || 'AdminPass2025!')
+  const admin3Password = await hashPassword('mdol2003') // Hash the third admin's password
   
   const admin1 = await prisma.admin.upsert({
     where: { email: 'admin@lrcsjj.ma' },
@@ -29,17 +30,17 @@ async function main() {
     }
   })
 
-    const admin3 = await prisma.admin.upsert({
+  const admin3 = await prisma.admin.upsert({
     where: { email: 'mouadom2003@gmail.com' },
     update: {},
     create: {
       email: 'mouadom2003@gmail.com',
-      password: "mdol2003",
+      password: admin3Password, // Use the hashed password
       name: 'Administrator 3'
     }
   })
 
-  console.log('✅ Created admin users:', { admin1: admin1.email, admin2: admin2.email })
+  console.log('✅ Created admin users:', { admin1: admin1.email, admin2: admin2.email, admin3: admin3.email })
 
   // Create a sample season
   const season = await prisma.season.upsert({
@@ -100,7 +101,7 @@ async function main() {
 
   console.log('✅ Created clubs:', clubs.map(c => c.name))
 
-  // Create sample athletes
+  // Create sample athletes with testimonials
   const athletes = await Promise.all([
     prisma.athlete.upsert({
       where: { nationalId: 'MA123456' },
@@ -146,6 +147,54 @@ async function main() {
         belt: 'Blue',
         weight: 85.0,
         category: 'Adult Male -85kg',
+        clubId: clubs[2].id
+      }
+    }),
+    prisma.athlete.upsert({
+      where: { nationalId: 'MA456789' },
+      update: {},
+      create: {
+        firstName: 'Fatima',
+        lastName: 'El Mansouri',
+        dateOfBirth: new Date('1997-05-18'),
+        nationalId: 'MA456789',
+        phone: '+212 615 678 901',
+        email: 'fatima.elmansouri@email.ma',
+        belt: 'Black',
+        weight: 60.0,
+        category: 'Adult Female -62kg',
+        clubId: clubs[0].id
+      }
+    }),
+    prisma.athlete.upsert({
+      where: { nationalId: 'SE654321' },
+      update: {},
+      create: {
+        firstName: 'Omar',
+        lastName: 'Benkirane',
+        dateOfBirth: new Date('1996-11-03'),
+        nationalId: 'SE654321',
+        phone: '+212 616 789 012',
+        email: 'omar.benkirane@email.ma',
+        belt: 'Brown',
+        weight: 78.0,
+        category: 'Adult Male -81kg',
+        clubId: clubs[1].id
+      }
+    }),
+    prisma.athlete.upsert({
+      where: { nationalId: 'BR987654' },
+      update: {},
+      create: {
+        firstName: 'Nadia',
+        lastName: 'Chakir',
+        dateOfBirth: new Date('1999-09-12'),
+        nationalId: 'BR987654',
+        phone: '+212 617 890 123',
+        email: 'nadia.chakir@email.ma',
+        belt: 'Purple',
+        weight: 52.0,
+        category: 'Adult Female -52kg',
         clubId: clubs[2].id
       }
     })
