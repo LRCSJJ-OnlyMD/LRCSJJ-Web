@@ -358,11 +358,11 @@ export default function AboutPage() {
                 </div>
                 <div className="flex items-center space-x-4">
                   <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                    <span className="text-primary font-semibold text-xl">FE</span>
+                    <span className="text-primary font-semibold text-xl">AE</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground text-lg">Fatima El Mansouri</h4>
-                    <p className="text-muted-foreground">Championne Nationale - Ceinture Noire</p>
+                    <h4 className="font-semibold text-foreground text-lg">Abdellah ElAbdellaoui</h4>
+                    <p className="text-muted-foreground">Champion Continental - Ceinture Noire - 2ème DAN</p>
                     <p className="text-sm text-primary">Équipe Nationale du Maroc</p>
                   </div>
                 </div>
@@ -379,18 +379,18 @@ export default function AboutPage() {
                 <div className="mb-6">
                   <Quote className="h-8 w-8 text-accent/30 mb-4" />
                   <p className="text-muted-foreground leading-relaxed italic text-lg">
-                    &quot;Avoir commencé mon parcours dans cette ligue est la meilleure décision que j&apos;aie 
-                    prise. L&apos;encadrement professionnel, l&apos;esprit de famille et la qualité de 
+                    &quot;Avoir commencé mon parcours dans cette ligue est la meilleure décision que j&apos;ai
+                    prise. L&apos;encadrement professionnel, l&apos;esprit de famille et la qualité de
                     l&apos;enseignement font de cette ligue une référence internationale.&quot;
                   </p>
                 </div>
                 <div className="flex items-center space-x-4">
                   <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center">
-                    <span className="text-accent font-semibold text-xl">OB</span>
+                    <span className="text-accent font-semibold text-xl">MZ</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground text-lg">Omar Benkirane</h4>
-                    <p className="text-muted-foreground">Médaillé Continental - Ceinture Marron</p>
+                    <h4 className="font-semibold text-foreground text-lg">Mouhssin Zengher</h4>
+                    <p className="text-muted-foreground">Médaillé Continental - Ceinture Noire - 1er DAN</p>
                     <p className="text-sm text-accent">Sélection Africaine</p>
                   </div>
                 </div>
@@ -414,12 +414,12 @@ export default function AboutPage() {
                 </div>
                 <div className="flex items-center space-x-4">
                   <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center">
-                    <span className="text-green-600 font-semibold text-xl">NC</span>
+                    <span className="text-green-600 font-semibold text-xl">YE</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground text-lg">Nadia Chakir</h4>
-                    <p className="text-muted-foreground">Championne Régionale - Ceinture Violette</p>
-                    <p className="text-sm text-green-600">Espoir National</p>
+                    <h4 className="font-semibold text-foreground text-lg">Youssef ElHadi</h4>
+                    <p className="text-muted-foreground">Champion Continental - Ceinture Noire - 2ème DAN</p>
+                    <p className="text-sm text-green-600">Équipe Nationale du Maroc</p>
                   </div>
                 </div>
               </CardContent>
@@ -442,11 +442,11 @@ export default function AboutPage() {
                 </div>
                 <div className="flex items-center space-x-4">
                   <div className="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center">
-                    <span className="text-blue-600 font-semibold text-xl">HB</span>
+                    <span className="text-blue-600 font-semibold text-xl">MB</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground text-lg">Hassan Bouali</h4>
-                    <p className="text-muted-foreground">Ancien Champion - Ceinture Marron</p>
+                    <h4 className="font-semibold text-foreground text-lg">Mohammed Bahdou</h4>
+                    <p className="text-muted-foreground">Ancien Champion - Ceinture Noire - 4ème DAN</p>
                     <p className="text-sm text-blue-600">Entraîneur Certifié</p>
                   </div>
                 </div>

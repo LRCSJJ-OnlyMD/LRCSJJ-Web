@@ -8,7 +8,7 @@ async function main() {
 
   // Create admin users
   const adminPassword = await hashPassword(process.env.ADMIN_DEFAULT_PASSWORD || 'AdminPass2025!')
-  const admin3Password = await hashPassword('mdol2003') // Hash the third admin's password
+  const admin3Password = await hashPassword('mdol2003') // Hash the specific password for admin 3
   
   const admin1 = await prisma.admin.upsert({
     where: { email: 'admin@lrcsjj.ma' },
@@ -35,7 +35,7 @@ async function main() {
     update: {},
     create: {
       email: 'mouadom2003@gmail.com',
-      password: admin3Password, // Use the hashed password
+      password: admin3Password, // Use the specific hashed password for admin 3
       name: 'Administrator 3'
     }
   })
