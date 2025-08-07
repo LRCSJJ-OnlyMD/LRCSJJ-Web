@@ -23,6 +23,31 @@ export interface ContactEmailData {
   reference: string
 }
 
+export interface EmailOptions {
+  to: string
+  subject: string
+  html: string
+  from?: string
+}
+
+export async function sendEmail(options: EmailOptions): Promise<boolean> {
+  try {
+    const mailOptions = {
+      from: options.from || process.env.SMTP_FROM,
+      to: options.to,
+      subject: options.subject,
+      html: options.html,
+    }
+
+    const result = await transporter.sendMail(mailOptions)
+    console.log('📧 Email sent successfully:', result.messageId)
+    return true
+  } catch (error) {
+    console.error('❌ Email sending failed:', error)
+    return false
+  }
+}
+
 export async function sendContactNotificationEmail(data: ContactEmailData) {
   try {
     // Email to admin

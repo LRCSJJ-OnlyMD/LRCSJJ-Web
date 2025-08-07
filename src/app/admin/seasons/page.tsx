@@ -49,7 +49,7 @@ export default function SeasonsManagement() {
   const deleteSeasonMutation = trpc.seasons.delete.useMutation()
 
   useEffect(() => {
-    const token = localStorage.getItem('admin-token')
+    const token = localStorage.getItem('auth-token')
     if (!token) {
       router.push('/login')
       return
@@ -129,9 +129,9 @@ export default function SeasonsManagement() {
     const start = new Date(season.startDate)
     const end = new Date(season.endDate)
     
-    if (now < start) return { label: 'À venir', color: 'text-primary', bg: 'bg-blue-50' }
-    if (now > end) return { label: 'Terminée', color: 'text-muted-foreground', bg: 'bg-gray-50' }
-    return { label: 'En cours', color: 'text-accent', bg: 'bg-green-50' }
+    if (now < start) return { label: 'À venir', color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800' }
+    if (now > end) return { label: 'Terminée', color: 'text-muted-foreground', bg: 'bg-muted/50 border border-border' }
+    return { label: 'En cours', color: 'text-green-600 dark:text-green-400', bg: 'bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800' }
   }
 
   const getSeasonDuration = (season: Season) => {
@@ -333,9 +333,9 @@ export default function SeasonsManagement() {
                           </p>
                         </div>
                       </div>
-                      <div className="bg-gray-50 rounded-lg p-3">
+                      <div className="bg-muted/50 rounded-lg p-3">
                         <p className="text-sm text-muted-foreground">Durée Totale</p>
-                        <p className="font-semibold text-lg">
+                        <p className="font-semibold text-lg text-foreground">
                           {Math.ceil((new Date(selectedSeason.endDate).getTime() - new Date(selectedSeason.startDate).getTime()) / (1000 * 60 * 60 * 24))} jours
                         </p>
                       </div>
@@ -345,23 +345,23 @@ export default function SeasonsManagement() {
                   <div>
                     <h4 className="font-semibold text-foreground mb-3">Statistiques</h4>
                     <div className="space-y-3">
-                      <div className="bg-blue-50 rounded-lg p-4">
+                      <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                         <div className="flex items-center space-x-3">
-                          <Users className="w-6 h-6 text-primary" />
+                          <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                           <div>
-                            <p className="text-sm text-primary">Assurances</p>
-                            <p className="font-semibold text-2xl text-primary-foreground">
+                            <p className="text-sm text-blue-700 dark:text-blue-300">Assurances</p>
+                            <p className="font-semibold text-2xl text-blue-900 dark:text-blue-100">
                               {selectedSeason._count?.insurances || 0}
                             </p>
                           </div>
                         </div>
                       </div>
-                      <div className="bg-yellow-50 rounded-lg p-4">
+                      <div className="bg-yellow-50 dark:bg-yellow-950/30 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
                         <div className="flex items-center space-x-3">
-                          <Trophy className="w-6 h-6 text-yellow-600" />
+                          <Trophy className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
                           <div>
-                            <p className="text-sm text-yellow-600">Championnats</p>
-                            <p className="font-semibold text-2xl text-yellow-800">
+                            <p className="text-sm text-yellow-700 dark:text-yellow-300">Championnats</p>
+                            <p className="font-semibold text-2xl text-yellow-900 dark:text-yellow-100">
                               {selectedSeason._count?.championships || 0}
                             </p>
                           </div>
@@ -375,9 +375,9 @@ export default function SeasonsManagement() {
                 <div>
                   <h4 className="font-semibold text-foreground mb-3">Informations Système</h4>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="bg-muted/50 rounded-lg p-3">
                       <p className="text-sm text-muted-foreground">Date de Création</p>
-                      <p className="font-medium">
+                      <p className="font-medium text-foreground">
                         {new Date(selectedSeason.createdAt).toLocaleDateString('fr-FR', {
                           day: 'numeric',
                           month: 'long',
@@ -385,9 +385,9 @@ export default function SeasonsManagement() {
                         })}
                       </p>
                     </div>
-                    <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="bg-muted/50 rounded-lg p-3">
                       <p className="text-sm text-muted-foreground">Dernière Modification</p>
-                      <p className="font-medium">
+                      <p className="font-medium text-foreground">
                         {new Date(selectedSeason.updatedAt).toLocaleDateString('fr-FR', {
                           day: 'numeric',
                           month: 'long',
@@ -399,7 +399,7 @@ export default function SeasonsManagement() {
                 </div>
 
                 {/* Season Status */}
-                <div className="bg-gray-50 rounded-lg p-4">
+                <div className="bg-muted/50 rounded-lg p-4">
                   <h4 className="font-semibold text-foreground mb-2">État de la Saison</h4>
                   <div className="text-sm text-foreground">
                     <p>

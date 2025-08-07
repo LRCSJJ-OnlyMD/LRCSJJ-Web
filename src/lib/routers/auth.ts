@@ -2,9 +2,11 @@ import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
 import { router, publicProcedure } from '../trpc'
 import { verifyPassword, generateToken } from '../auth'
+import { emailVerificationService } from '../email-verification'
 
 export const authRouter = router({
-  login: publicProcedure
+  // Step 1: Verify credentials and send email verification
+  initiateLogin: publicProcedure
     .input(z.object({
       email: z.string().email(),
       password: z.string().min(1)
@@ -30,6 +32,55 @@ export const authRouter = router({
         })
       }
 
+      // Send email verification
+      const result = await emailVerificationService.sendVerificationCode(
+        admin.email,
+        admin.id,
+        admin.name
+      )
+
+      if (!result.success) {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: result.error || 'Failed to send verification email'
+        })
+      }
+
+      return {
+        message: 'Code de vérification envoyé par email',
+        codeId: result.codeId,
+        maskedEmail: admin.email.replace(/(.{2})(.*)(@.*)/, '$1***$3'),
+        requiresVerification: true
+      }
+    }),
+
+  // Step 2: Verify email code and complete login
+  completeLogin: publicProcedure
+    .input(z.object({
+      codeId: z.string(),
+      verificationCode: z.string().length(6)
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const result = emailVerificationService.verifyCode(input.codeId, input.verificationCode)
+      
+      if (!result.success) {
+        throw new TRPCError({
+          code: 'UNAUTHORIZED',
+          message: result.error || 'Invalid verification code'
+        })
+      }
+
+      const admin = await ctx.prisma.admin.findUnique({
+        where: { id: result.adminId }
+      })
+
+      if (!admin) {
+        throw new TRPCError({
+          code: 'UNAUTHORIZED',
+          message: 'Invalid session'
+        })
+      }
+
       const token = generateToken({
         adminId: admin.id,
         email: admin.email
@@ -45,6 +96,7 @@ export const authRouter = router({
       }
     }),
 
+  // Get current admin info
   me: publicProcedure
     .query(async ({ ctx }) => {
       if (!ctx.admin) {

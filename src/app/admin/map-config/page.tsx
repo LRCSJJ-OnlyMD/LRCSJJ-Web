@@ -208,8 +208,8 @@ export default function MapConfigurationPage() {
         {isCreating && (
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Address Search Helper */}
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <Label className="text-sm font-medium mb-2 block">Quick Address Search</Label>
+            <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 p-4 rounded-lg">
+              <Label className="text-sm font-medium mb-2 block text-blue-900 dark:text-blue-100">Quick Address Search</Label>
               <div className="flex space-x-2">
                 <Input
                   placeholder="Enter city name (e.g., Casablanca, Rabat, Settat...)"
@@ -224,7 +224,7 @@ export default function MapConfigurationPage() {
                   {getCoordinatesFromAddress.isPending ? 'Searching...' : 'Search'}
                 </Button>
               </div>
-              <p className="text-xs text-primary mt-1">
+              <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
                 Search for cities in Morocco to automatically fill coordinates
               </p>
             </div>
@@ -294,10 +294,10 @@ export default function MapConfigurationPage() {
                 id="isActive"
                 checked={formData.isActive}
                 onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
-                className="h-4 w-4"
+                className="h-4 w-4 text-primary bg-background border-border rounded focus:ring-primary focus:ring-2"
                 title="Set as active location"
               />
-              <Label htmlFor="isActive">Set as active location immediately</Label>
+              <Label htmlFor="isActive" className="text-foreground">Set as active location immediately</Label>
             </div>
 
             <div className="flex space-x-2">
@@ -319,21 +319,23 @@ export default function MapConfigurationPage() {
           {configs?.map((config: MapConfiguration) => (
             <div
               key={config.id}
-              className={`p-4 rounded-lg border ${
-                config.isActive ? 'border-green-200 bg-green-50' : 'border-gray-200'
+              className={`p-4 rounded-lg border transition-colors duration-200 ${
+                config.isActive 
+                  ? 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/30' 
+                  : 'border-border bg-card hover:bg-muted/50'
               }`}
             >
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <div className="flex items-center space-x-2">
                     {config.isActive ? (
-                      <CheckCircle className="h-5 w-5 text-accent" />
+                      <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
                     ) : (
                       <Circle className="h-5 w-5 text-muted-foreground" />
                     )}
                     <h3 className="font-semibold text-foreground">{config.locationName}</h3>
                     {config.isActive && (
-                      <span className="bg-accent/10 text-accent-foreground text-xs px-2 py-1 rounded-full">
+                      <span className="bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200 text-xs px-2 py-1 rounded-full border border-green-200 dark:border-green-700">
                         Active
                       </span>
                     )}
@@ -375,9 +377,9 @@ export default function MapConfigurationPage() {
       </Card>
 
       {/* Instructions */}
-      <Card className="p-6 bg-blue-50">
-        <h3 className="font-semibold mb-2">How to get coordinates:</h3>
-        <ul className="text-sm space-y-1 text-foreground">
+      <Card className="p-6 bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800">
+        <h3 className="font-semibold mb-2 text-blue-900 dark:text-blue-100">How to get coordinates:</h3>
+        <ul className="text-sm space-y-1 text-blue-800 dark:text-blue-200">
           <li>1. Use the address search above for common Moroccan cities</li>
           <li>2. Go to Google Maps, right-click on your desired location</li>
           <li>3. Click on the coordinates that appear to copy them</li>
