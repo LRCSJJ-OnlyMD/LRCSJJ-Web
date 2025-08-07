@@ -40,7 +40,7 @@ export default function LoginPage() {
     onSuccess: (data) => {
       localStorage.setItem('auth-token', data.token)
       toast.success('Connexion réussie!')
-      router.push('/secret-dashboard-2025')
+      router.push('/admin')
     },
     onError: (error) => {
       toast.error(error.message || 'Code de vérification invalide')

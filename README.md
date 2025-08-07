@@ -13,7 +13,7 @@ A modern, secure, and multilingual full-stack web application for the regional J
 - **Modern UI** - 2025 futuristic design with league colors
 - **Dark/Light Theme** - Automatic theme switching with semantic OKLCH colors
 
-### Admin Dashboard (`/secret-dashboard-2025`)
+### Admin Dashboard (`/admin`)
 - **Enhanced Authentication** - JWT-based login with Email 2FA verification
 - **Password Security** - Visibility toggle and secure input handling
 - **Dashboard KPIs** - Real-time statistics and comprehensive overview
@@ -48,7 +48,7 @@ A modern, secure, and multilingual full-stack web application for the regional J
 - **Email Code Validation** - Time-limited verification codes with attempt limits
 - **Route Protection** - Server-side authentication checks
 - **Admin-Only Access** - Two-admin system stored in database
-- **Secure Route Naming** - Obfuscated admin routes (`/secret-dashboard-2025`)
+- **Secure Route Naming** - Admin routes (`/admin`)
 
 ### Email Verification Flow
 ```typescript
@@ -140,7 +140,7 @@ Visit `http://localhost:3000` to see the application.
 - **Email**: `admin@lrcsjj.ma`  
 - **Password**: `AdminPass2025!`
 
-Access the admin dashboard at: `http://localhost:3000/secret-dashboard-2025`
+Access the admin dashboard at: `http://localhost:3000/admin`
 
 ## 📁 Project Structure
 
@@ -151,7 +151,7 @@ src/
 │   ├── about/page.tsx               # About page
 │   ├── contact/page.tsx             # Contact page with maps
 │   ├── login/page.tsx               # Enhanced admin login with Email 2FA
-│   ├── secret-dashboard-2025/       # Admin dashboard
+│   ├── admin/                       # Admin dashboard
 │   │   ├── athletes/               # Athlete management
 │   │   ├── clubs/                  # Club management with maps
 │   │   ├── championships/          # Championship management

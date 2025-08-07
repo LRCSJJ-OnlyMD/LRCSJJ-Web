@@ -29,13 +29,13 @@ This is a modern, secure, and multilingual full-stack web application for the Ca
   - `/` - Landing page
   - `/about` - About page
   - `/login` - Admin login
-  - `/secret-dashboard-2025` - Admin dashboard
+  - `/admin` - Admin dashboard
 - **Database Models**: Club, Athlete, Insurance, Season, Admin, Championship, LeagueTeam
 
 ## Security
 - Admin routes protected with JWT authentication
 - Only two admin users stored in database with bcrypt-hashed passwords
-- Secure route naming (not /admin but /secret-dashboard-2025)
+- Secure route naming for admin access
 
 ## Features
 - Public site with landing and about pages
