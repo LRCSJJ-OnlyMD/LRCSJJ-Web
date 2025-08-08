@@ -1,76 +1,93 @@
-'use client'
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Building, Users, Calendar, Trophy, Shield, UserCheck, MapPin, TrendingUp, Activity, Users2 } from 'lucide-react'
-import Link from 'next/link'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Building,
+  Users,
+  Calendar,
+  Trophy,
+  Shield,
+  UserCheck,
+  MapPin,
+  TrendingUp,
+  Activity,
+  Users2,
+} from "lucide-react";
+import Link from "next/link";
 
 export default function DashboardPage() {
   const managementSections = [
     {
-      title: 'Clubs',
-      description: 'Gérer les clubs affiliés et leurs informations',
+      title: "Clubs",
+      description: "Gérer les clubs affiliés et leurs informations",
       icon: Building,
-      href: '/admin/clubs',
-      gradient: 'gradient-primary',
-      stats: '25+ clubs'
+      href: "/admin/clubs",
+      gradient: "gradient-primary",
+      stats: "25+ clubs",
     },
     {
-      title: 'Athlètes',
-      description: 'Gérer les athlètes inscrits et leurs données',
+      title: "Athlètes",
+      description: "Gérer les athlètes inscrits et leurs données",
       icon: Users,
-      href: '/admin/athletes',
-      gradient: 'gradient-accent',
-      stats: '200+ athlètes'
+      href: "/admin/athletes",
+      gradient: "gradient-accent",
+      stats: "200+ athlètes",
     },
     {
-      title: 'Saisons',
-      description: 'Organiser les saisons sportives et compétitions',
+      title: "Saisons",
+      description: "Organiser les saisons sportives et compétitions",
       icon: Calendar,
-      href: '/admin/seasons',
-      gradient: 'gradient-primary',
-      stats: '10+ saisons'
+      href: "/admin/seasons",
+      gradient: "gradient-primary",
+      stats: "10+ saisons",
     },
     {
-      title: 'Championnats',
-      description: 'Gérer les compétitions et tournois',
+      title: "Championnats",
+      description: "Gérer les compétitions et tournois",
       icon: Trophy,
-      href: '/admin/championships',
-      gradient: 'gradient-accent',
-      stats: '15+ championnats'
+      href: "/admin/championships",
+      gradient: "gradient-accent",
+      stats: "15+ championnats",
     },
     {
-      title: 'Assurances',
-      description: 'Gérer les assurances des athlètes',
+      title: "Assurances",
+      description: "Gérer les assurances des athlètes",
       icon: Shield,
-      href: '/admin/insurance',
-      gradient: 'gradient-primary',
-      stats: 'Suivi complet'
+      href: "/admin/insurance",
+      gradient: "gradient-primary",
+      stats: "Suivi complet",
     },
     {
-      title: 'Équipes',
-      description: 'Organiser les équipes de ligue',
+      title: "Équipes",
+      description: "Organiser les équipes de ligue",
       icon: Users2,
-      href: '/admin/teams',
-      gradient: 'gradient-accent',
-      stats: 'Organisation'
+      href: "/admin/teams",
+      gradient: "gradient-accent",
+      stats: "Organisation",
     },
     {
-      title: 'Configuration Carte',
-      description: 'Gérer les emplacements sur la carte',
+      title: "Configuration Carte",
+      description: "Gérer les emplacements sur la carte",
       icon: MapPin,
-      href: '/admin/map-config',
-      gradient: 'gradient-primary',
-      stats: 'Géolocalisation'
+      href: "/admin/map-config",
+      gradient: "gradient-primary",
+      stats: "Géolocalisation",
     },
     {
-      title: 'Gestionnaires de Clubs',
-      description: 'Gérer les accès et comptes des gestionnaires',
+      title: "Gestionnaires de Clubs",
+      description: "Gérer les accès et comptes des gestionnaires",
       icon: UserCheck,
-      href: '/admin/club-managers',
-      gradient: 'gradient-accent',
-      stats: 'Gestion des accès'
-    }
-  ]
+      href: "/admin/club-managers",
+      gradient: "gradient-accent",
+      stats: "Gestion des accès",
+    },
+  ];
 
   return (
     <div className="p-6 space-y-8">
@@ -103,16 +120,24 @@ export default function DashboardPage() {
 
       {/* Management Cards */}
       <div className="animate-fade-in-up animate-stagger-2">
-        <h2 className="text-2xl font-bold text-foreground mb-6">Gestion Administrative</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-6">
+          Gestion Administrative
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {managementSections.map((section, index) => {
-            const IconComponent = section.icon
+            const IconComponent = section.icon;
             return (
               <Link key={section.href} href={section.href}>
-                <Card className={`h-full hover-lift cursor-pointer group border-border bg-card/50 backdrop-blur-sm hover:bg-card transition-all duration-300 animate-scale-in animate-stagger-${(index % 5) + 1}`}>
+                <Card
+                  className={`h-full hover-lift cursor-pointer group border-border bg-card/50 backdrop-blur-sm hover:bg-card transition-all duration-300 animate-scale-in animate-stagger-${
+                    (index % 5) + 1
+                  }`}
+                >
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
-                      <div className={`p-3 rounded-xl ${section.gradient} text-white group-hover:scale-110 transition-transform duration-300`}>
+                      <div
+                        className={`p-3 rounded-xl ${section.gradient} text-white group-hover:scale-110 transition-transform duration-300`}
+                      >
                         <IconComponent className="h-6 w-6" />
                       </div>
                       <div className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
@@ -130,7 +155,7 @@ export default function DashboardPage() {
                   </CardContent>
                 </Card>
               </Link>
-            )
+            );
           })}
         </div>
       </div>
@@ -144,19 +169,40 @@ export default function DashboardPage() {
               <TrendingUp className="h-5 w-5 text-primary" />
               <span>Statistiques en Temps Réel</span>
             </CardTitle>
-            <CardDescription>Aperçu de l&apos;activité de la ligue</CardDescription>
+            <CardDescription>
+              Aperçu de l&apos;activité de la ligue
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {[
-                { label: 'Total des Clubs', value: '25+', color: 'text-primary' },
-                { label: 'Athlètes Actifs', value: '200+', color: 'text-accent' },
-                { label: 'Saisons Organisées', value: '10+', color: 'text-primary' },
-                { label: 'Championnats', value: '15+', color: 'text-accent' },
+                {
+                  label: "Total des Clubs",
+                  value: "25+",
+                  color: "text-primary",
+                },
+                {
+                  label: "Athlètes Actifs",
+                  value: "200+",
+                  color: "text-accent",
+                },
+                {
+                  label: "Saisons Organisées",
+                  value: "10+",
+                  color: "text-primary",
+                },
+                { label: "Championnats", value: "15+", color: "text-accent" },
               ].map((stat, index) => (
-                <div key={stat.label} className={`flex justify-between items-center animate-fade-in-right animate-stagger-${index + 1}`}>
+                <div
+                  key={stat.label}
+                  className={`flex justify-between items-center animate-fade-in-right animate-stagger-${
+                    index + 1
+                  }`}
+                >
                   <span className="text-muted-foreground">{stat.label}:</span>
-                  <span className={`font-bold text-lg ${stat.color}`}>{stat.value}</span>
+                  <span className={`font-bold text-lg ${stat.color}`}>
+                    {stat.value}
+                  </span>
                 </div>
               ))}
             </div>
@@ -170,42 +216,46 @@ export default function DashboardPage() {
               <Activity className="h-5 w-5 text-primary" />
               <span>Actions Rapides</span>
             </CardTitle>
-            <CardDescription>Raccourcis vers les fonctions principales</CardDescription>
+            <CardDescription>
+              Raccourcis vers les fonctions principales
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               {[
                 {
-                  title: 'Ajouter un nouveau club',
-                  description: 'Enregistrer un club affilié',
-                  href: '/admin/clubs',
-                  icon: Building
+                  title: "Ajouter un nouveau club",
+                  description: "Enregistrer un club affilié",
+                  href: "/admin/clubs",
+                  icon: Building,
                 },
                 {
-                  title: 'Inscrire un athlète',
-                  description: 'Ajouter un athlète à la ligue',
-                  href: '/admin/athletes',
-                  icon: Users
+                  title: "Inscrire un athlète",
+                  description: "Ajouter un athlète à la ligue",
+                  href: "/admin/athletes",
+                  icon: Users,
                 },
                 {
-                  title: 'Créer une saison',
-                  description: 'Planifier une saison sportive',
-                  href: '/admin/seasons',
-                  icon: Calendar
+                  title: "Créer une saison",
+                  description: "Planifier une saison sportive",
+                  href: "/admin/seasons",
+                  icon: Calendar,
                 },
                 {
-                  title: 'Configurer la carte',
-                  description: 'Gérer les emplacements',
-                  href: '/admin/map-config',
-                  icon: MapPin
-                }
+                  title: "Configurer la carte",
+                  description: "Gérer les emplacements",
+                  href: "/admin/map-config",
+                  icon: MapPin,
+                },
               ].map((action, index) => {
-                const ActionIcon = action.icon
+                const ActionIcon = action.icon;
                 return (
-                  <Link 
-                    key={action.href} 
-                    href={action.href} 
-                    className={`block p-4 border border-border rounded-lg hover:bg-accent/10 hover:border-primary/30 transition-all duration-300 group animate-fade-in-left animate-stagger-${index + 1}`}
+                  <Link
+                    key={action.href}
+                    href={action.href}
+                    className={`block p-4 border border-border rounded-lg hover:bg-accent/10 hover:border-primary/30 transition-all duration-300 group animate-fade-in-left animate-stagger-${
+                      index + 1
+                    }`}
                   >
                     <div className="flex items-center space-x-3">
                       <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300">
@@ -221,7 +271,7 @@ export default function DashboardPage() {
                       </div>
                     </div>
                   </Link>
-                )
+                );
               })}
             </div>
           </CardContent>
@@ -235,5 +285,5 @@ export default function DashboardPage() {
         </p>
       </div>
     </div>
-  )
+  );
 }

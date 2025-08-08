@@ -1,45 +1,50 @@
-import { z } from 'zod'
-import { TRPCError } from '@trpc/server'
-import { router, publicProcedure, adminProcedure } from '../trpc'
-import { verifyPassword, generateToken, hashPassword } from '../auth'
-import { emailVerificationService } from '../email-verification'
-import { sendClubManagerWelcomeEmail } from '../email'
+import { z } from "zod";
+import { TRPCError } from "@trpc/server";
+import { router, publicProcedure, adminProcedure } from "../trpc";
+import { verifyPassword, generateToken, hashPassword } from "../auth";
+import { emailVerificationService } from "../email-verification";
+import { sendClubManagerWelcomeEmail } from "../email";
 
 export const clubManagerRouter = router({
   // Admin creates club manager
   create: adminProcedure
-    .input(z.object({
-      email: z.string().email(),
-      name: z.string().min(1),
-      clubId: z.string().min(1)
-    }))
+    .input(
+      z.object({
+        email: z.string().email(),
+        name: z.string().min(1),
+        clubId: z.string().min(1),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
       // Check if club exists
       const club = await ctx.prisma.club.findUnique({
-        where: { id: input.clubId }
-      })
+        where: { id: input.clubId },
+      });
 
       if (!club) {
         throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: 'Club not found'
-        })
+          code: "NOT_FOUND",
+          message: "Club not found",
+        });
       }
 
       // Check if club already has a manager
       const existingManager = await ctx.prisma.clubManager.findUnique({
-        where: { clubId: input.clubId }
-      })
+        where: { clubId: input.clubId },
+      });
 
       if (existingManager) {
         throw new TRPCError({
-          code: 'CONFLICT',
-          message: 'Club already has a manager'
-        })
+          code: "CONFLICT",
+          message: "Club already has a manager",
+        });
       }
 
       // Generate temporary password
-      const temporaryPassword = Math.random().toString(36).slice(-8).toUpperCase()
+      const temporaryPassword = Math.random()
+        .toString(36)
+        .slice(-8)
+        .toUpperCase();
 
       // Create club manager
       const clubManager = await ctx.prisma.clubManager.create({
@@ -48,12 +53,12 @@ export const clubManagerRouter = router({
           name: input.name,
           clubId: input.clubId,
           temporaryPassword,
-          passwordResetAt: new Date()
+          passwordResetAt: new Date(),
         },
         include: {
-          club: true
-        }
-      })
+          club: true,
+        },
+      });
 
       // Send welcome email with credentials
       await sendClubManagerWelcomeEmail(
@@ -61,33 +66,35 @@ export const clubManagerRouter = router({
         input.name,
         club.name,
         temporaryPassword
-      )
+      );
 
       return {
         id: clubManager.id,
         email: clubManager.email,
         name: clubManager.name,
-        clubName: club.name
-      }
+        clubName: club.name,
+      };
     }),
 
   // Club manager login
   initiateLogin: publicProcedure
-    .input(z.object({
-      email: z.string().email(),
-      password: z.string().min(1)
-    }))
+    .input(
+      z.object({
+        email: z.string().email(),
+        password: z.string().min(1),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
       const manager = await ctx.prisma.clubManager.findUnique({
         where: { email: input.email },
-        include: { club: true }
-      })
+        include: { club: true },
+      });
 
       if (!manager || !manager.isActive) {
         throw new TRPCError({
-          code: 'UNAUTHORIZED',
-          message: 'Invalid credentials'
-        })
+          code: "UNAUTHORIZED",
+          message: "Invalid credentials",
+        });
       }
 
       // Check if using temporary password
@@ -96,25 +103,28 @@ export const clubManagerRouter = router({
         return {
           requiresPasswordReset: true,
           managerId: manager.id,
-          message: 'Please set your new password'
-        }
+          message: "Please set your new password",
+        };
       }
 
       // Regular password check
       if (!manager.password) {
         throw new TRPCError({
-          code: 'UNAUTHORIZED',
-          message: 'Account not activated. Please contact administrator.'
-        })
+          code: "UNAUTHORIZED",
+          message: "Account not activated. Please contact administrator.",
+        });
       }
 
-      const isValidPassword = await verifyPassword(input.password, manager.password)
-      
+      const isValidPassword = await verifyPassword(
+        input.password,
+        manager.password
+      );
+
       if (!isValidPassword) {
         throw new TRPCError({
-          code: 'UNAUTHORIZED',
-          message: 'Invalid credentials'
-        })
+          code: "UNAUTHORIZED",
+          message: "Invalid credentials",
+        });
       }
 
       // Send email verification
@@ -122,44 +132,46 @@ export const clubManagerRouter = router({
         manager.email,
         manager.id,
         manager.name
-      )
+      );
 
       if (!result.success) {
         throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: result.error || 'Failed to send verification email'
-        })
+          code: "INTERNAL_SERVER_ERROR",
+          message: result.error || "Failed to send verification email",
+        });
       }
 
       return {
-        message: 'Code de vérification envoyé par email',
+        message: "Code de vérification envoyé par email",
         codeId: result.codeId,
-        maskedEmail: manager.email.replace(/(.{2})(.*)(@.*)/, '$1***$3'),
-        requiresVerification: true
-      }
+        maskedEmail: manager.email.replace(/(.{2})(.*)(@.*)/, "$1***$3"),
+        requiresVerification: true,
+      };
     }),
 
   // Set new password for first-time login
   setPassword: publicProcedure
-    .input(z.object({
-      managerId: z.string(),
-      temporaryPassword: z.string(),
-      newPassword: z.string().min(8)
-    }))
+    .input(
+      z.object({
+        managerId: z.string(),
+        temporaryPassword: z.string(),
+        newPassword: z.string().min(8),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
       const manager = await ctx.prisma.clubManager.findUnique({
-        where: { id: input.managerId }
-      })
+        where: { id: input.managerId },
+      });
 
       if (!manager || manager.temporaryPassword !== input.temporaryPassword) {
         throw new TRPCError({
-          code: 'UNAUTHORIZED',
-          message: 'Invalid temporary password'
-        })
+          code: "UNAUTHORIZED",
+          message: "Invalid temporary password",
+        });
       }
 
       // Hash new password
-      const hashedPassword = await hashPassword(input.newPassword)
+      const hashedPassword = await hashPassword(input.newPassword);
 
       // Update manager with new password
       await ctx.prisma.clubManager.update({
@@ -167,53 +179,58 @@ export const clubManagerRouter = router({
         data: {
           password: hashedPassword,
           temporaryPassword: null,
-          passwordResetAt: null
-        }
-      })
+          passwordResetAt: null,
+        },
+      });
 
-      return { success: true, message: 'Password set successfully' }
+      return { success: true, message: "Password set successfully" };
     }),
 
   // Complete login with verification code
   completeLogin: publicProcedure
-    .input(z.object({
-      codeId: z.string(),
-      verificationCode: z.string().length(6)
-    }))
+    .input(
+      z.object({
+        codeId: z.string(),
+        verificationCode: z.string().length(6),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
-      const result = emailVerificationService.verifyCode(input.codeId, input.verificationCode)
-      
+      const result = emailVerificationService.verifyCode(
+        input.codeId,
+        input.verificationCode
+      );
+
       if (!result.success) {
         throw new TRPCError({
-          code: 'UNAUTHORIZED',
-          message: result.error || 'Invalid verification code'
-        })
+          code: "UNAUTHORIZED",
+          message: result.error || "Invalid verification code",
+        });
       }
 
       const manager = await ctx.prisma.clubManager.findUnique({
         where: { id: result.adminId },
-        include: { club: true }
-      })
+        include: { club: true },
+      });
 
       if (!manager) {
         throw new TRPCError({
-          code: 'UNAUTHORIZED',
-          message: 'Invalid session'
-        })
+          code: "UNAUTHORIZED",
+          message: "Invalid session",
+        });
       }
 
       // Update last login
       await ctx.prisma.clubManager.update({
         where: { id: manager.id },
-        data: { lastLoginAt: new Date() }
-      })
+        data: { lastLoginAt: new Date() },
+      });
 
       const token = generateToken({
         adminId: manager.id,
         email: manager.email,
-        role: 'CLUB_MANAGER',
-        clubId: manager.clubId
-      })
+        role: "CLUB_MANAGER",
+        clubId: manager.clubId,
+      });
 
       return {
         token,
@@ -223,43 +240,44 @@ export const clubManagerRouter = router({
           name: manager.name,
           clubId: manager.clubId,
           clubName: manager.club.name,
-          role: 'CLUB_MANAGER'
-        }
-      }
+          role: "CLUB_MANAGER",
+        },
+      };
     }),
 
   // Get all club managers (admin only)
-  getAll: adminProcedure
-    .query(async ({ ctx }) => {
-      const managers = await ctx.prisma.clubManager.findMany({
-        include: {
-          club: true
-        },
-        orderBy: { createdAt: 'desc' }
-      })
+  getAll: adminProcedure.query(async ({ ctx }) => {
+    const managers = await ctx.prisma.clubManager.findMany({
+      include: {
+        club: true,
+      },
+      orderBy: { createdAt: "desc" },
+    });
 
-      return managers.map(manager => ({
-        id: manager.id,
-        email: manager.email,
-        name: manager.name,
-        clubName: manager.club.name,
-        isActive: manager.isActive,
-        lastLoginAt: manager.lastLoginAt,
-        createdAt: manager.createdAt
-      }))
-    }),
+    return managers.map((manager) => ({
+      id: manager.id,
+      email: manager.email,
+      name: manager.name,
+      clubName: manager.club.name,
+      isActive: manager.isActive,
+      lastLoginAt: manager.lastLoginAt,
+      createdAt: manager.createdAt,
+    }));
+  }),
 
   // Deactivate club manager
   deactivate: adminProcedure
-    .input(z.object({
-      managerId: z.string()
-    }))
+    .input(
+      z.object({
+        managerId: z.string(),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
       await ctx.prisma.clubManager.update({
         where: { id: input.managerId },
-        data: { isActive: false }
-      })
+        data: { isActive: false },
+      });
 
-      return { success: true }
-    })
-})
+      return { success: true };
+    }),
+});

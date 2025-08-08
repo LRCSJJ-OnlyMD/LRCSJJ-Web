@@ -1,184 +1,286 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table'
-import { toast } from 'sonner'
-import { 
-  ArrowLeft, 
-  Users, 
-  UserPlus, 
-  Edit, 
-  Trash2, 
-  Shield, 
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { AthleteFormDialog } from "@/components/ui/athlete-form-dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { toast } from "sonner";
+import {
+  ArrowLeft,
+  Users,
+  UserPlus,
+  Edit,
+  Trash2,
+  Shield,
   Search,
   Download,
-  Eye
-} from 'lucide-react'
-import { LeagueLogo } from '@/components/logos'
+  Eye,
+} from "lucide-react";
+import { LeagueLogo } from "@/components/logos";
 
 interface Athlete {
-  id: string
-  firstName: string
-  lastName: string
-  email: string
-  phone: string
-  dateOfBirth: string
-  gender: 'MALE' | 'FEMALE'
-  belt: string
-  weight: number
-  hasInsurance: boolean
-  insuranceExpiry: string | null
-  createdAt: string
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  dateOfBirth: string;
+  gender: "MALE" | "FEMALE";
+  belt: string;
+  weight: number;
+  hasInsurance: boolean;
+  insuranceExpiry: string | null;
+  createdAt: string;
 }
 
 export default function ClubManagerAthletesPage() {
-  const [isLoading, setIsLoading] = useState(true)
-  const [athletes, setAthletes] = useState<Athlete[]>([])
-  const [searchTerm, setSearchTerm] = useState('')
-  const [filterBelt, setFilterBelt] = useState('')
-  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(true);
+  const [athletes, setAthletes] = useState<Athlete[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterBelt, setFilterBelt] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState<"add" | "edit" | "view">("add");
+  const [selectedAthlete, setSelectedAthlete] = useState<Athlete | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     // Check if user is authenticated
-    const tokenData = localStorage.getItem('club-manager-token')
+    const tokenData = localStorage.getItem("club-manager-token");
     if (!tokenData) {
-      toast.error('Vous devez être connecté pour accéder à cette page')
-      router.push('/club-manager/login')
-      return
+      toast.error("Vous devez être connecté pour accéder à cette page");
+      router.push("/club-manager/login");
+      return;
     }
 
     try {
-      const parsedData = JSON.parse(tokenData)
-      console.log('Club Manager:', parsedData.name, 'managing club:', parsedData.clubName)
-      
+      const parsedData = JSON.parse(tokenData);
+      console.log(
+        "Club Manager:",
+        parsedData.name,
+        "managing club:",
+        parsedData.clubName
+      );
+
       // TODO: Fetch athletes for this specific club using parsedData.clubId
-      
+
       // Mock athletes data for the club
       setTimeout(() => {
         setAthletes([
           {
-            id: '1',
-            firstName: 'Ahmed',
-            lastName: 'Benali',
-            email: 'ahmed.benali@email.com',
-            phone: '+212 6 12 34 56 78',
-            dateOfBirth: '1995-05-15',
-            gender: 'MALE',
-            belt: 'Marron',
+            id: "1",
+            firstName: "Ahmed",
+            lastName: "Benali",
+            email: "ahmed.benali@email.com",
+            phone: "+212 6 12 34 56 78",
+            dateOfBirth: "1995-05-15",
+            gender: "MALE",
+            belt: "Marron",
             weight: 75,
             hasInsurance: true,
-            insuranceExpiry: '2025-12-31',
-            createdAt: '2024-01-15T10:00:00Z'
+            insuranceExpiry: "2025-12-31",
+            createdAt: "2024-01-15T10:00:00Z",
           },
           {
-            id: '2',
-            firstName: 'Fatima',
-            lastName: 'El Alaoui',
-            email: 'fatima.alaoui@email.com',
-            phone: '+212 6 23 45 67 89',
-            dateOfBirth: '1998-03-22',
-            gender: 'FEMALE',
-            belt: 'Bleue',
+            id: "2",
+            firstName: "Fatima",
+            lastName: "El Alaoui",
+            email: "fatima.alaoui@email.com",
+            phone: "+212 6 23 45 67 89",
+            dateOfBirth: "1998-03-22",
+            gender: "FEMALE",
+            belt: "Bleue",
             weight: 60,
             hasInsurance: true,
-            insuranceExpiry: '2025-11-30',
-            createdAt: '2024-02-20T14:30:00Z'
+            insuranceExpiry: "2025-11-30",
+            createdAt: "2024-02-20T14:30:00Z",
           },
           {
-            id: '3',
-            firstName: 'Youssef',
-            lastName: 'Kassimi',
-            email: 'youssef.kassimi@email.com',
-            phone: '+212 6 34 56 78 90',
-            dateOfBirth: '2000-08-10',
-            gender: 'MALE',
-            belt: 'Verte',
+            id: "3",
+            firstName: "Youssef",
+            lastName: "Kassimi",
+            email: "youssef.kassimi@email.com",
+            phone: "+212 6 34 56 78 90",
+            dateOfBirth: "2000-08-10",
+            gender: "MALE",
+            belt: "Verte",
             weight: 82,
             hasInsurance: false,
             insuranceExpiry: null,
-            createdAt: '2024-03-10T09:15:00Z'
+            createdAt: "2024-03-10T09:15:00Z",
           },
           {
-            id: '4',
-            firstName: 'Sophia',
-            lastName: 'Benomar',
-            email: 'sophia.benomar@email.com',
-            phone: '+212 6 45 67 89 01',
-            dateOfBirth: '1997-11-05',
-            gender: 'FEMALE',
-            belt: 'Noire',
+            id: "4",
+            firstName: "Sophia",
+            lastName: "Benomar",
+            email: "sophia.benomar@email.com",
+            phone: "+212 6 45 67 89 01",
+            dateOfBirth: "1997-11-05",
+            gender: "FEMALE",
+            belt: "Noire",
             weight: 55,
             hasInsurance: true,
-            insuranceExpiry: '2025-10-15',
-            createdAt: '2024-01-05T16:45:00Z'
-          }
-        ])
-        setIsLoading(false)
-      }, 1000)
+            insuranceExpiry: "2025-10-15",
+            createdAt: "2024-01-05T16:45:00Z",
+          },
+        ]);
+        setIsLoading(false);
+      }, 1000);
     } catch {
-      toast.error('Session invalide')
-      router.push('/club-manager/login')
+      toast.error("Session invalide");
+      router.push("/club-manager/login");
     }
-  }, [router])
+  }, [router]);
 
-  const filteredAthletes = athletes.filter(athlete => {
-    const matchesSearch = 
+  const filteredAthletes = athletes.filter((athlete) => {
+    const matchesSearch =
       athlete.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       athlete.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      athlete.email.toLowerCase().includes(searchTerm.toLowerCase())
-    
-    const matchesBelt = !filterBelt || athlete.belt === filterBelt
-    
-    return matchesSearch && matchesBelt
-  })
+      athlete.email.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesBelt = !filterBelt || athlete.belt === filterBelt;
+
+    return matchesSearch && matchesBelt;
+  });
 
   const getBeltColor = (belt: string) => {
     const colors: Record<string, string> = {
-      'Blanche': 'bg-gray-100 text-gray-800',
-      'Jaune': 'bg-yellow-100 text-yellow-800',
-      'Orange': 'bg-orange-100 text-orange-800',
-      'Verte': 'bg-green-100 text-green-800',
-      'Bleue': 'bg-blue-100 text-blue-800',
-      'Marron': 'bg-amber-100 text-amber-800',
-      'Noire': 'bg-gray-800 text-white'
-    }
-    return colors[belt] || 'bg-gray-100 text-gray-800'
-  }
+      Blanche: "bg-gray-100 text-gray-800",
+      Jaune: "bg-yellow-100 text-yellow-800",
+      Orange: "bg-orange-100 text-orange-800",
+      Verte: "bg-green-100 text-green-800",
+      Bleue: "bg-blue-100 text-blue-800",
+      Marron: "bg-amber-100 text-amber-800",
+      Noire: "bg-gray-800 text-white",
+    };
+    return colors[belt] || "bg-gray-100 text-gray-800";
+  };
 
   const calculateAge = (dateOfBirth: string) => {
-    const birth = new Date(dateOfBirth)
-    const now = new Date()
-    return now.getFullYear() - birth.getFullYear()
-  }
+    const birth = new Date(dateOfBirth);
+    const now = new Date();
+    return now.getFullYear() - birth.getFullYear();
+  };
 
   const handleAddAthlete = () => {
-    toast.info('Fonctionnalité d\'ajout d\'athlète en cours de développement')
-  }
+    setSelectedAthlete(null);
+    setDialogMode("add");
+    setIsDialogOpen(true);
+  };
 
   const handleEditAthlete = (athleteId: string) => {
-    toast.info(`Modification de l'athlète ${athleteId} - En cours de développement`)
-  }
+    const athlete = athletes.find((a) => a.id === athleteId);
+    if (athlete) {
+      setSelectedAthlete(athlete);
+      setDialogMode("edit");
+      setIsDialogOpen(true);
+    }
+  };
 
   const handleDeleteAthlete = (athleteId: string) => {
-    toast.info(`Suppression de l'athlète ${athleteId} - En cours de développement`)
-  }
+    if (
+      window.confirm(
+        "Êtes-vous sûr de vouloir supprimer cet athlète ? Cette action est irréversible."
+      )
+    ) {
+      setAthletes((prev) => prev.filter((athlete) => athlete.id !== athleteId));
+      toast.success("Athlète supprimé avec succès");
+    }
+  };
+
+  const handleSaveAthlete = (
+    athleteData: Omit<Athlete, "id" | "createdAt">
+  ) => {
+    if (dialogMode === "add") {
+      const newAthlete: Athlete = {
+        ...athleteData,
+        id: Date.now().toString(),
+        createdAt: new Date().toISOString(),
+      };
+      setAthletes((prev) => [...prev, newAthlete]);
+      toast.success("Athlète ajouté avec succès");
+    } else if (dialogMode === "edit" && selectedAthlete) {
+      const updatedAthlete: Athlete = {
+        ...athleteData,
+        id: selectedAthlete.id,
+        createdAt: selectedAthlete.createdAt,
+      };
+      setAthletes((prev) =>
+        prev.map((athlete) =>
+          athlete.id === selectedAthlete.id ? updatedAthlete : athlete
+        )
+      );
+      toast.success("Athlète modifié avec succès");
+    }
+    setIsDialogOpen(false);
+  };
 
   const handleExportData = () => {
-    toast.info('Export des données - En cours de développement')
-  }
+    // Create CSV content
+    const headers = [
+      "Nom",
+      "Prénom",
+      "Email",
+      "Téléphone",
+      "Date de naissance",
+      "Sexe",
+      "Ceinture",
+      "Poids",
+      "Assurance",
+      "Expiration assurance",
+    ];
+    const csvContent = [
+      headers.join(","),
+      ...filteredAthletes.map((athlete) =>
+        [
+          athlete.lastName,
+          athlete.firstName,
+          athlete.email,
+          athlete.phone,
+          athlete.dateOfBirth,
+          athlete.gender === "MALE" ? "Homme" : "Femme",
+          athlete.belt,
+          athlete.weight,
+          athlete.hasInsurance ? "Oui" : "Non",
+          athlete.insuranceExpiry || "",
+        ].join(",")
+      ),
+    ].join("\n");
+
+    // Create and download file
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute(
+        "download",
+        `athletes_${new Date().toISOString().split("T")[0]}.csv`
+      );
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+    toast.success("Export réalisé avec succès");
+  };
 
   if (isLoading) {
     return (
@@ -188,7 +290,7 @@ export default function ClubManagerAthletesPage() {
           <p className="text-muted-foreground">Chargement des athlètes...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -200,11 +302,15 @@ export default function ClubManagerAthletesPage() {
             <div className="flex items-center gap-4">
               <LeagueLogo size="sm" />
               <div>
-                <h1 className="text-xl font-bold text-foreground">Gestion des Athlètes</h1>
-                <p className="text-sm text-muted-foreground">Club Ju-Jitsu Casablanca</p>
+                <h1 className="text-xl font-bold text-foreground">
+                  Gestion des Athlètes
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  Club Ju-Jitsu Casablanca
+                </p>
               </div>
             </div>
-            
+
             <Link href="/club-manager/dashboard">
               <Button variant="outline" size="sm">
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -226,13 +332,16 @@ export default function ClubManagerAthletesPage() {
               Gérez les athlètes de votre club et leurs informations
             </p>
           </div>
-          
+
           <div className="flex gap-3">
             <Button onClick={handleExportData} variant="outline">
               <Download className="w-4 h-4 mr-2" />
               Exporter
             </Button>
-            <Button onClick={handleAddAthlete} className="bg-[#017444] hover:bg-[#017444]/90">
+            <Button
+              onClick={handleAddAthlete}
+              className="bg-[#017444] hover:bg-[#017444]/90"
+            >
               <UserPlus className="w-4 h-4 mr-2" />
               Ajouter un Athlète
             </Button>
@@ -245,8 +354,12 @@ export default function ClubManagerAthletesPage() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Total Athlètes</p>
-                  <p className="text-3xl font-bold text-foreground">{athletes.length}</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Total Athlètes
+                  </p>
+                  <p className="text-3xl font-bold text-foreground">
+                    {athletes.length}
+                  </p>
                 </div>
                 <Users className="w-8 h-8 text-[#017444]" />
               </div>
@@ -257,9 +370,11 @@ export default function ClubManagerAthletesPage() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Avec Assurance</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Avec Assurance
+                  </p>
                   <p className="text-3xl font-bold text-foreground">
-                    {athletes.filter(a => a.hasInsurance).length}
+                    {athletes.filter((a) => a.hasInsurance).length}
                   </p>
                 </div>
                 <Shield className="w-8 h-8 text-green-600" />
@@ -271,9 +386,11 @@ export default function ClubManagerAthletesPage() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Hommes</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Hommes
+                  </p>
                   <p className="text-3xl font-bold text-foreground">
-                    {athletes.filter(a => a.gender === 'MALE').length}
+                    {athletes.filter((a) => a.gender === "MALE").length}
                   </p>
                 </div>
                 <Users className="w-8 h-8 text-blue-600" />
@@ -285,9 +402,11 @@ export default function ClubManagerAthletesPage() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Femmes</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Femmes
+                  </p>
                   <p className="text-3xl font-bold text-foreground">
-                    {athletes.filter(a => a.gender === 'FEMALE').length}
+                    {athletes.filter((a) => a.gender === "FEMALE").length}
                   </p>
                 </div>
                 <Users className="w-8 h-8 text-pink-600" />
@@ -313,7 +432,7 @@ export default function ClubManagerAthletesPage() {
                   />
                 </div>
               </div>
-              
+
               <div className="w-full md:w-48">
                 <Label htmlFor="filter-belt">Filtrer par ceinture</Label>
                 <select
@@ -340,7 +459,9 @@ export default function ClubManagerAthletesPage() {
         {/* Athletes Table */}
         <Card>
           <CardHeader>
-            <CardTitle>Liste des Athlètes ({filteredAthletes.length})</CardTitle>
+            <CardTitle>
+              Liste des Athlètes ({filteredAthletes.length})
+            </CardTitle>
             <CardDescription>
               Tous les athlètes inscrits dans votre club
             </CardDescription>
@@ -364,21 +485,31 @@ export default function ClubManagerAthletesPage() {
                     <TableRow key={athlete.id}>
                       <TableCell>
                         <div>
-                          <p className="font-medium">{athlete.firstName} {athlete.lastName}</p>
+                          <p className="font-medium">
+                            {athlete.firstName} {athlete.lastName}
+                          </p>
                           <p className="text-sm text-muted-foreground">
-                            {athlete.gender === 'MALE' ? 'Homme' : 'Femme'}
+                            {athlete.gender === "MALE" ? "Homme" : "Femme"}
                           </p>
                         </div>
                       </TableCell>
                       <TableCell>
                         <div>
                           <p className="text-sm">{athlete.email}</p>
-                          <p className="text-sm text-muted-foreground">{athlete.phone}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {athlete.phone}
+                          </p>
                         </div>
                       </TableCell>
-                      <TableCell>{calculateAge(athlete.dateOfBirth)} ans</TableCell>
                       <TableCell>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getBeltColor(athlete.belt)}`}>
+                        {calculateAge(athlete.dateOfBirth)} ans
+                      </TableCell>
+                      <TableCell>
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${getBeltColor(
+                            athlete.belt
+                          )}`}
+                        >
                           {athlete.belt}
                         </span>
                       </TableCell>
@@ -387,7 +518,9 @@ export default function ClubManagerAthletesPage() {
                         {athlete.hasInsurance ? (
                           <div className="flex items-center gap-2">
                             <Shield className="w-4 h-4 text-green-600" />
-                            <span className="text-sm text-green-600">Valide</span>
+                            <span className="text-sm text-green-600">
+                              Valide
+                            </span>
                           </div>
                         ) : (
                           <div className="flex items-center gap-2">
@@ -427,21 +560,29 @@ export default function ClubManagerAthletesPage() {
                 </TableBody>
               </Table>
             </div>
-            
+
             {filteredAthletes.length === 0 && (
               <div className="text-center py-8">
                 <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground">
-                  {searchTerm || filterBelt 
-                    ? 'Aucun athlète ne correspond aux critères de recherche'
-                    : 'Aucun athlète inscrit dans ce club'
-                  }
+                  {searchTerm || filterBelt
+                    ? "Aucun athlète ne correspond aux critères de recherche"
+                    : "Aucun athlète inscrit dans ce club"}
                 </p>
               </div>
             )}
           </CardContent>
         </Card>
       </div>
+
+      {/* Athlete Form Dialog */}
+      <AthleteFormDialog
+        isOpen={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        mode={dialogMode}
+        athlete={selectedAthlete || undefined}
+        onSave={handleSaveAthlete}
+      />
     </div>
-  )
+  );
 }

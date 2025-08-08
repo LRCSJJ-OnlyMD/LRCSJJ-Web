@@ -1,83 +1,91 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { toast } from 'sonner'
-import { 
-  ArrowLeft, 
-  Users, 
-  Trophy, 
-  Shield, 
-  CreditCard, 
-  FileText, 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { toast } from "sonner";
+import {
+  ArrowLeft,
+  Users,
+  Trophy,
+  Shield,
+  CreditCard,
+  FileText,
   Calendar,
   UserPlus,
-  LogOut
-} from 'lucide-react'
-import { LeagueLogo } from '@/components/logos'
+  LogOut,
+} from "lucide-react";
+import { LeagueLogo } from "@/components/logos";
 
 export default function ClubManagerDashboard() {
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true);
   const [clubManager, setClubManager] = useState<{
-    id: string
-    name: string
-    email: string
+    id: string;
+    name: string;
+    email: string;
     club: {
-      name: string
-      city: string
-      establishedYear: number
-    }
-    lastLogin: string
-  } | null>(null)
-  const router = useRouter()
+      name: string;
+      city: string;
+      establishedYear: number;
+    };
+    lastLogin: string;
+  } | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     // Check if user is authenticated
-    const tokenData = localStorage.getItem('club-manager-token')
+    const tokenData = localStorage.getItem("club-manager-token");
     if (!tokenData) {
-      toast.error('Vous devez être connecté pour accéder à cette page')
-      router.push('/club-manager/login')
-      return
+      toast.error("Vous devez être connecté pour accéder à cette page");
+      router.push("/club-manager/login");
+      return;
     }
 
     try {
-      const parsedData = JSON.parse(tokenData)
+      const parsedData = JSON.parse(tokenData);
       setClubManager({
-        id: parsedData.clubId || '1',
-        name: parsedData.name || 'Gestionnaire',
-        email: parsedData.email || 'manager@club.com',
+        id: parsedData.clubId || "1",
+        name: parsedData.name || "Gestionnaire",
+        email: parsedData.email || "manager@club.com",
         club: {
-          name: parsedData.clubName || 'Club Ju-Jitsu',
-          city: 'Casablanca',
-          establishedYear: 2010
+          name: parsedData.clubName || "Club Ju-Jitsu",
+          city: "Casablanca",
+          establishedYear: 2010,
         },
-        lastLogin: new Date().toISOString()
-      })
-      setIsLoading(false)
+        lastLogin: new Date().toISOString(),
+      });
+      setIsLoading(false);
     } catch {
-      toast.error('Session invalide')
-      router.push('/club-manager/login')
+      toast.error("Session invalide");
+      router.push("/club-manager/login");
     }
-  }, [router])
+  }, [router]);
 
   const handleLogout = () => {
-    localStorage.removeItem('club-manager-token')
-    toast.success('Déconnexion réussie')
-    router.push('/club-manager/login')
-  }
+    localStorage.removeItem("club-manager-token");
+    toast.success("Déconnexion réussie");
+    router.push("/club-manager/login");
+  };
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <LeagueLogo size="lg" className="mb-4" />
-          <p className="text-muted-foreground">Chargement du tableau de bord...</p>
+          <p className="text-muted-foreground">
+            Chargement du tableau de bord...
+          </p>
         </div>
       </div>
-    )
+    );
   }
 
   if (!clubManager) {
@@ -86,13 +94,15 @@ export default function ClubManagerDashboard() {
         <div className="text-center">
           <Shield className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-2">Accès non autorisé</h1>
-          <p className="text-muted-foreground mb-4">Vous devez être connecté en tant que gestionnaire de club</p>
-          <Button onClick={() => router.push('/club-manager/login')}>
+          <p className="text-muted-foreground mb-4">
+            Vous devez être connecté en tant que gestionnaire de club
+          </p>
+          <Button onClick={() => router.push("/club-manager/login")}>
             Se Connecter
           </Button>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -104,15 +114,23 @@ export default function ClubManagerDashboard() {
             <div className="flex items-center gap-4">
               <LeagueLogo size="sm" />
               <div>
-                <h1 className="text-xl font-bold text-foreground">Espace Gestionnaire</h1>
-                <p className="text-sm text-muted-foreground">{clubManager.club.name}</p>
+                <h1 className="text-xl font-bold text-foreground">
+                  Espace Gestionnaire
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  {clubManager.club.name}
+                </p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-3">
               <div className="text-right">
-                <p className="text-sm font-medium text-foreground">{clubManager.name}</p>
-                <p className="text-xs text-muted-foreground">{clubManager.email}</p>
+                <p className="text-sm font-medium text-foreground">
+                  {clubManager.name}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {clubManager.email}
+                </p>
               </div>
               <Button variant="outline" size="sm" onClick={handleLogout}>
                 <LogOut className="w-4 h-4 mr-2" />
@@ -125,8 +143,8 @@ export default function ClubManagerDashboard() {
 
       <div className="container mx-auto px-4 py-8">
         {/* Back to home link */}
-        <Link 
-          href="/" 
+        <Link
+          href="/"
           className="inline-flex items-center text-muted-foreground hover:text-primary mb-6 transition-colors"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -139,7 +157,8 @@ export default function ClubManagerDashboard() {
             Bienvenue, {clubManager.name}
           </h2>
           <p className="text-muted-foreground">
-            Gérez votre club et vos athlètes depuis votre tableau de bord personnalisé
+            Gérez votre club et vos athlètes depuis votre tableau de bord
+            personnalisé
           </p>
         </div>
 
@@ -149,7 +168,9 @@ export default function ClubManagerDashboard() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Athlètes</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Athlètes
+                  </p>
                   <p className="text-3xl font-bold text-foreground">24</p>
                 </div>
                 <Users className="w-8 h-8 text-[#017444]" />
@@ -161,7 +182,9 @@ export default function ClubManagerDashboard() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Championnats</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Championnats
+                  </p>
                   <p className="text-3xl font-bold text-foreground">3</p>
                 </div>
                 <Trophy className="w-8 h-8 text-[#d62027]" />
@@ -173,7 +196,9 @@ export default function ClubManagerDashboard() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Assurances</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Assurances
+                  </p>
                   <p className="text-3xl font-bold text-foreground">22</p>
                 </div>
                 <Shield className="w-8 h-8 text-blue-600" />
@@ -185,7 +210,9 @@ export default function ClubManagerDashboard() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Paiements</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Paiements
+                  </p>
                   <p className="text-3xl font-bold text-foreground">1,250€</p>
                 </div>
                 <CreditCard className="w-8 h-8 text-green-600" />
@@ -323,23 +350,30 @@ export default function ClubManagerDashboard() {
                 <UserPlus className="w-5 h-5 text-green-600" />
                 <div>
                   <p className="font-medium">Nouvel athlète ajouté</p>
-                  <p className="text-sm text-muted-foreground">Youssef Benali inscrit avec succès - Il y a 2 heures</p>
+                  <p className="text-sm text-muted-foreground">
+                    Youssef Benali inscrit avec succès - Il y a 2 heures
+                  </p>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg">
                 <CreditCard className="w-5 h-5 text-blue-600" />
                 <div>
                   <p className="font-medium">Paiement traité</p>
-                  <p className="text-sm text-muted-foreground">Assurance annuelle - 150€ - Il y a 1 jour</p>
+                  <p className="text-sm text-muted-foreground">
+                    Assurance annuelle - 150€ - Il y a 1 jour
+                  </p>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg">
                 <Trophy className="w-5 h-5 text-[#d62027]" />
                 <div>
                   <p className="font-medium">Inscription championnat</p>
-                  <p className="text-sm text-muted-foreground">Équipe senior inscrite au championnat régional - Il y a 3 jours</p>
+                  <p className="text-sm text-muted-foreground">
+                    Équipe senior inscrite au championnat régional - Il y a 3
+                    jours
+                  </p>
                 </div>
               </div>
             </div>
@@ -347,5 +381,5 @@ export default function ClubManagerDashboard() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

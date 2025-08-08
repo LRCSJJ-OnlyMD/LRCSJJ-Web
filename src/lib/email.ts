@@ -1,33 +1,33 @@
-import nodemailer from 'nodemailer'
+import nodemailer from "nodemailer";
 
 // Email configuration
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
-  port: parseInt(process.env.SMTP_PORT || '587'),
+  port: parseInt(process.env.SMTP_PORT || "587"),
   secure: false, // true for 465, false for other ports
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
   tls: {
-    rejectUnauthorized: false
-  }
-})
+    rejectUnauthorized: false,
+  },
+});
 
 export interface ContactEmailData {
-  name: string
-  email: string
-  subject: string
-  message: string
-  timestamp: string
-  reference: string
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  timestamp: string;
+  reference: string;
 }
 
 export interface EmailOptions {
-  to: string
-  subject: string
-  html: string
-  from?: string
+  to: string;
+  subject: string;
+  html: string;
+  from?: string;
 }
 
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
@@ -37,14 +37,14 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
       to: options.to,
       subject: options.subject,
       html: options.html,
-    }
+    };
 
-    const result = await transporter.sendMail(mailOptions)
-    console.log('📧 Email sent successfully:', result.messageId)
-    return true
+    const result = await transporter.sendMail(mailOptions);
+    console.log("📧 Email sent successfully:", result.messageId);
+    return true;
   } catch (error) {
-    console.error('❌ Email sending failed:', error)
-    return false
+    console.error("❌ Email sending failed:", error);
+    return false;
   }
 }
 
@@ -67,20 +67,28 @@ export async function sendContactNotificationEmail(data: ContactEmailData) {
             
             <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #d62027;">
               <p><strong>Nom:</strong> ${data.name}</p>
-              <p><strong>Email:</strong> <a href="mailto:${data.email}" style="color: #d62027;">${data.email}</a></p>
+              <p><strong>Email:</strong> <a href="mailto:${
+                data.email
+              }" style="color: #d62027;">${data.email}</a></p>
               <p><strong>Sujet:</strong> ${data.subject}</p>
-              <p><strong>Date:</strong> ${new Date(data.timestamp).toLocaleString('fr-FR')}</p>
+              <p><strong>Date:</strong> ${new Date(
+                data.timestamp
+              ).toLocaleString("fr-FR")}</p>
               <p><strong>Référence:</strong> ${data.reference}</p>
             </div>
             
             <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #017444;">
               <h3 style="color: #017444; margin-top: 0;">Message:</h3>
-              <p style="white-space: pre-wrap; line-height: 1.6;">${data.message}</p>
+              <p style="white-space: pre-wrap; line-height: 1.6;">${
+                data.message
+              }</p>
             </div>
             
             <div style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 8px;">
               <p style="margin: 0; font-size: 14px; color: #1565c0;">
-                <strong>Action requise:</strong> Répondez à ce message en contactant directement ${data.name} à l'adresse ${data.email}
+                <strong>Action requise:</strong> Répondez à ce message en contactant directement ${
+                  data.name
+                } à l'adresse ${data.email}
               </p>
             </div>
           </div>
@@ -93,13 +101,13 @@ export async function sendContactNotificationEmail(data: ContactEmailData) {
           </div>
         </div>
       `,
-    }
+    };
 
     // Confirmation email to user
     const userMailOptions = {
       from: process.env.SMTP_FROM,
       to: data.email,
-      subject: 'Confirmation de réception - LRCSJJ',
+      subject: "Confirmation de réception - LRCSJJ",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background: linear-gradient(135deg, #d62027, #017444); color: white; padding: 20px; border-radius: 8px 8px 0 0;">
@@ -110,17 +118,25 @@ export async function sendContactNotificationEmail(data: ContactEmailData) {
           <div style="background: #f8f9fa; padding: 20px; border: 1px solid #e9ecef;">
             <p>Bonjour <strong>${data.name}</strong>,</p>
             
-            <p>Nous avons bien reçu votre message concernant "<strong>${data.subject}</strong>" et nous vous remercions pour votre intérêt.</p>
+            <p>Nous avons bien reçu votre message concernant "<strong>${
+              data.subject
+            }</strong>" et nous vous remercions pour votre intérêt.</p>
             
             <div style="background: white; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #017444;">
               <h3 style="color: #017444; margin-top: 0;">Votre message:</h3>
-              <p style="white-space: pre-wrap; line-height: 1.6; color: #666;">${data.message}</p>
+              <p style="white-space: pre-wrap; line-height: 1.6; color: #666;">${
+                data.message
+              }</p>
             </div>
             
             <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 15px; border-radius: 8px; margin: 20px 0;">
               <p style="margin: 0; color: #155724;">
-                <strong>✓ Référence de votre demande:</strong> ${data.reference}<br>
-                <strong>✓ Date de réception:</strong> ${new Date(data.timestamp).toLocaleString('fr-FR')}
+                <strong>✓ Référence de votre demande:</strong> ${
+                  data.reference
+                }<br>
+                <strong>✓ Date de réception:</strong> ${new Date(
+                  data.timestamp
+                ).toLocaleString("fr-FR")}
               </p>
             </div>
             
@@ -146,23 +162,23 @@ export async function sendContactNotificationEmail(data: ContactEmailData) {
           </div>
         </div>
       `,
-    }
+    };
 
     // Send both emails
-    const adminResult = await transporter.sendMail(adminMailOptions)
-    const userResult = await transporter.sendMail(userMailOptions)
+    const adminResult = await transporter.sendMail(adminMailOptions);
+    const userResult = await transporter.sendMail(userMailOptions);
 
-    console.log('📧 Admin email sent:', adminResult.messageId)
-    console.log('📧 User confirmation email sent:', userResult.messageId)
+    console.log("📧 Admin email sent:", adminResult.messageId);
+    console.log("📧 User confirmation email sent:", userResult.messageId);
 
     return {
       success: true,
       adminMessageId: adminResult.messageId,
       userMessageId: userResult.messageId,
-    }
+    };
   } catch (error) {
-    console.error('❌ Email sending failed:', error)
-    throw error
+    console.error("❌ Email sending failed:", error);
+    throw error;
   }
 }
 
@@ -176,7 +192,7 @@ export async function sendClubManagerWelcomeEmail(
     const mailOptions = {
       from: process.env.SMTP_FROM,
       to: email,
-      subject: 'Bienvenue - Accès Gestionnaire de Club LRCSJJ',
+      subject: "Bienvenue - Accès Gestionnaire de Club LRCSJJ",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background: linear-gradient(135deg, #d62027, #017444); color: white; padding: 20px; border-radius: 8px 8px 0 0;">
@@ -243,24 +259,24 @@ export async function sendClubManagerWelcomeEmail(
           </div>
         </div>
       `,
-    }
+    };
 
-    const result = await transporter.sendMail(mailOptions)
-    console.log('📧 Club manager welcome email sent:', result.messageId)
-    return true
+    const result = await transporter.sendMail(mailOptions);
+    console.log("📧 Club manager welcome email sent:", result.messageId);
+    return true;
   } catch (error) {
-    console.error('❌ Club manager welcome email failed:', error)
-    return false
+    console.error("❌ Club manager welcome email failed:", error);
+    return false;
   }
 }
 
 export async function testEmailConnection() {
   try {
-    await transporter.verify()
-    console.log('✅ Email configuration is valid')
-    return true
+    await transporter.verify();
+    console.log("✅ Email configuration is valid");
+    return true;
   } catch (error) {
-    console.error('❌ Email configuration error:', error)
-    return false
+    console.error("❌ Email configuration error:", error);
+    return false;
   }
 }

@@ -13,7 +13,7 @@ The LRCSJJ web application now uses **Stripe** as the primary payment gateway fo
 ✅ **PDF Generation**: Export invoices and payment receipts  
 ✅ **Webhook Support**: Real-time payment status updates  
 ✅ **Moroccan Dirham (MAD)**: Native currency support  
-✅ **Session Management**: 30-minute payment session expiry  
+✅ **Session Management**: 30-minute payment session expiry
 
 ## Stripe Setup Instructions
 
@@ -65,6 +65,7 @@ JWT_SECRET=your-very-long-random-secret-key-here
 ### 5. Test the Integration
 
 1. Start your development server:
+
    ```bash
    npm run dev
    ```
@@ -81,13 +82,13 @@ JWT_SECRET=your-very-long-random-secret-key-here
 
 ## API Routes Created
 
-| Route | Method | Description |
-|-------|--------|-------------|
-| `/api/payments/create-session` | POST | Create Stripe checkout session |
-| `/api/payments/verify-session` | GET | Verify payment completion |
-| `/api/payments/history` | GET | Get athlete payment history |
-| `/api/payments/insurance-status` | GET | Check insurance status |
-| `/api/payments/webhook` | POST | Handle Stripe webhooks |
+| Route                            | Method | Description                    |
+| -------------------------------- | ------ | ------------------------------ |
+| `/api/payments/create-session`   | POST   | Create Stripe checkout session |
+| `/api/payments/verify-session`   | GET    | Verify payment completion      |
+| `/api/payments/history`          | GET    | Get athlete payment history    |
+| `/api/payments/insurance-status` | GET    | Check insurance status         |
+| `/api/payments/webhook`          | POST   | Handle Stripe webhooks         |
 
 ## Payment Flow
 
@@ -101,12 +102,12 @@ JWT_SECRET=your-very-long-random-secret-key-here
 
 ## Testing Cards (Test Mode Only)
 
-| Card Number | Description |
-|-------------|-------------|
+| Card Number           | Description        |
+| --------------------- | ------------------ |
 | `4242 4242 4242 4242` | Successful payment |
-| `4000 0000 0000 0002` | Card declined |
+| `4000 0000 0000 0002` | Card declined      |
 | `4000 0000 0000 9995` | Insufficient funds |
-| `4000 0000 0000 0069` | Expired card |
+| `4000 0000 0000 0069` | Expired card       |
 
 **Note**: Use any future expiry date (e.g., 12/34) and any 3-digit CVC
 
@@ -127,6 +128,7 @@ JWT_SECRET=your-very-long-random-secret-key-here
 ### 3. Currency Configuration
 
 The system is configured for **Moroccan Dirham (MAD)**. Stripe supports MAD for:
+
 - Card payments
 - Bank transfers (in Morocco)
 - Mobile wallets
@@ -153,7 +155,7 @@ The system is configured for **Moroccan Dirham (MAD)**. Stripe supports MAD for:
 ✅ **SSL Encryption**: All communications encrypted  
 ✅ **Webhook Verification**: Signatures verified for all webhooks  
 ✅ **Session Expiry**: Payment sessions expire after 30 minutes  
-✅ **Fraud Detection**: Stripe's built-in fraud prevention  
+✅ **Fraud Detection**: Stripe's built-in fraud prevention
 
 ## Support and Troubleshooting
 
@@ -167,6 +169,7 @@ The system is configured for **Moroccan Dirham (MAD)**. Stripe supports MAD for:
 ### Logs
 
 Check the following for debugging:
+
 - Browser console for client-side errors
 - Server logs for API errors
 - Stripe Dashboard → Events for webhook status
