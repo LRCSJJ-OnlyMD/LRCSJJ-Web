@@ -24,21 +24,35 @@ import {
   LogOut,
 } from "lucide-react";
 import { LeagueLogo } from "@/components/logos";
+import { trpc } from "@/lib/trpc-client";
+
+interface ClubManagerData {
+  id: string;
+  name: string;
+  email: string;
+  clubId: string;
+  clubName: string;
+  role: string;
+}
 
 export default function ClubManagerDashboard() {
   const [isLoading, setIsLoading] = useState(true);
-  const [clubManager, setClubManager] = useState<{
-    id: string;
-    name: string;
-    email: string;
-    club: {
-      name: string;
-      city: string;
-      establishedYear: number;
-    };
-    lastLogin: string;
-  } | null>(null);
+  const [clubManager, setClubManager] = useState<ClubManagerData | null>(null);
   const router = useRouter();
+
+  // tRPC queries
+  const { data: athleteStats } = trpc.athletes.getMyClubStats.useQuery(
+    undefined,
+    {
+      enabled: !!clubManager,
+    }
+  );
+  const { data: insuranceStats } = trpc.insurance.getMyClubStats.useQuery(
+    undefined,
+    {
+      enabled: !!clubManager,
+    }
+  );
 
   useEffect(() => {
     // Check if user is authenticated
@@ -52,15 +66,12 @@ export default function ClubManagerDashboard() {
     try {
       const parsedData = JSON.parse(tokenData);
       setClubManager({
-        id: parsedData.clubId || "1",
-        name: parsedData.name || "Gestionnaire",
-        email: parsedData.email || "manager@club.com",
-        club: {
-          name: parsedData.clubName || "Club Ju-Jitsu",
-          city: "Casablanca",
-          establishedYear: 2010,
-        },
-        lastLogin: new Date().toISOString(),
+        id: parsedData.managerId || parsedData.id,
+        name: parsedData.name,
+        email: parsedData.email,
+        clubId: parsedData.clubId,
+        clubName: parsedData.clubName,
+        role: parsedData.role,
       });
       setIsLoading(false);
     } catch {
@@ -118,7 +129,7 @@ export default function ClubManagerDashboard() {
                   Espace Gestionnaire
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  {clubManager.club.name}
+                  {clubManager.clubName}
                 </p>
               </div>
             </div>
@@ -171,7 +182,9 @@ export default function ClubManagerDashboard() {
                   <p className="text-sm font-medium text-muted-foreground">
                     Athlètes
                   </p>
-                  <p className="text-3xl font-bold text-foreground">24</p>
+                  <p className="text-3xl font-bold text-foreground">
+                    {athleteStats?.totalAthletes || 0}
+                  </p>
                 </div>
                 <Users className="w-8 h-8 text-[#017444]" />
               </div>
@@ -183,23 +196,11 @@ export default function ClubManagerDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">
-                    Championnats
+                    Assurances payées
                   </p>
-                  <p className="text-3xl font-bold text-foreground">3</p>
-                </div>
-                <Trophy className="w-8 h-8 text-[#d62027]" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Assurances
+                  <p className="text-3xl font-bold text-foreground">
+                    {insuranceStats?.paid || 0}
                   </p>
-                  <p className="text-3xl font-bold text-foreground">22</p>
                 </div>
                 <Shield className="w-8 h-8 text-blue-600" />
               </div>
@@ -211,9 +212,27 @@ export default function ClubManagerDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">
-                    Paiements
+                    Assurances impayées
                   </p>
-                  <p className="text-3xl font-bold text-foreground">1,250€</p>
+                  <p className="text-3xl font-bold text-foreground">
+                    {insuranceStats?.unpaid || 0}
+                  </p>
+                </div>
+                <Shield className="w-8 h-8 text-red-600" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Revenus
+                  </p>
+                  <p className="text-3xl font-bold text-foreground">
+                    {insuranceStats?.totalRevenue || 0} MAD
+                  </p>
                 </div>
                 <CreditCard className="w-8 h-8 text-green-600" />
               </div>

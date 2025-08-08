@@ -30,20 +30,32 @@ import {
   type ClientPaymentRequest,
 } from "@/lib/stripe-client";
 import { toast } from "sonner";
+import { trpc } from "@/lib/trpc-client";
 
-// Mock data structure - in production, this would come from your database
+// Types based on Prisma schema
 interface Athlete {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   email?: string;
   phone?: string;
   clubId: string;
-  clubName: string;
-  insuranceStatus: "ACTIVE" | "EXPIRED" | "NEVER_PAID";
-  lastPaymentDate?: string;
-  expiryDate?: string;
-  category: string;
-  birthDate: string;
+  club: {
+    id: string;
+    name: string;
+  };
+  insurances: Array<{
+    id: string;
+    isPaid: boolean;
+    paidAt?: Date;
+    season: {
+      id: string;
+      year: string;
+      name: string;
+    };
+  }>;
+  category?: string;
+  dateOfBirth: Date;
 }
 
 interface Season {
@@ -64,97 +76,275 @@ export function AthletePaymentManager() {
   const [isLoading, setIsLoading] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>("");
 
-  // Load mock data - replace with actual API calls
+  // tRPC queries
+  const { data: seasonsData, isLoading: loadingSeasons } =
+    trpc.seasons.getAll.useQuery();
+  const {
+    data: athletesData,
+    isLoading: loadingAthletes,
+    refetch: refetchAthletes,
+  } = trpc.athletes.getMyClubAthletes.useQuery({
+    search: searchTerm,
+    seasonId: selectedSeason?.id,
+  });
+
+  // Load data from tRPC
   useEffect(() => {
-    loadMockData();
-  }, []);
+    if (seasonsData) {
+      setSeasons(seasonsData);
+      const activeSeason = seasonsData.find((s) => s.isActive);
+      if (activeSeason && !selectedSeason) {
+        setSelectedSeason(activeSeason);
+      }
+    }
+  }, [seasonsData, selectedSeason]);
 
-  const loadMockData = () => {
-    // Mock seasons
-    const mockSeasons: Season[] = [
-      {
-        id: "season-2025",
-        year: "2025",
-        name: "Saison 2025",
-        isActive: true,
-      },
-      {
-        id: "season-2024",
-        year: "2024",
-        name: "Saison 2024",
-        isActive: false,
-      },
-    ];
+  useEffect(() => {
+    if (athletesData) {
+      setAthletes(athletesData);
+    }
+  }, [athletesData]);
 
-    // Mock athletes
-    const mockAthletes: Athlete[] = [
-      {
-        id: "athlete-1",
-        name: "Ahmed Benali",
-        email: "ahmed.benali@example.com",
-        phone: "+212612345678",
-        clubId: "club-1",
-        clubName: "Club Ju-Jitsu Casablanca",
-        insuranceStatus: "EXPIRED",
-        lastPaymentDate: "2024-01-15",
-        expiryDate: "2025-01-15",
-        category: "Senior",
-        birthDate: "1995-05-20",
-      },
-      {
-        id: "athlete-2",
-        name: "Fatima El Alaoui",
-        email: "fatima.elalaoui@example.com",
-        phone: "+212623456789",
-        clubId: "club-1",
-        clubName: "Club Ju-Jitsu Casablanca",
-        insuranceStatus: "ACTIVE",
-        lastPaymentDate: "2025-02-10",
-        expiryDate: "2026-02-10",
-        category: "Junior",
-        birthDate: "2000-08-15",
-      },
-      {
-        id: "athlete-3",
-        name: "Youssef Kassimi",
-        email: "youssef.kassimi@example.com",
-        phone: "+212634567890",
-        clubId: "club-1",
-        clubName: "Club Ju-Jitsu Casablanca",
-        insuranceStatus: "NEVER_PAID",
-        category: "Cadet",
-        birthDate: "2005-12-03",
-      },
-      {
-        id: "athlete-4",
-        name: "Sophia Benomar",
-        email: "sophia.benomar@example.com",
-        phone: "+212645678901",
-        clubId: "club-1",
-        clubName: "Club Ju-Jitsu Casablanca",
-        insuranceStatus: "EXPIRED",
-        lastPaymentDate: "2024-06-20",
-        expiryDate: "2025-06-20",
-        category: "Senior",
-        birthDate: "1998-03-12",
-      },
-      {
-        id: "athlete-5",
-        name: "Hassan Moukrim",
-        email: "hassan.moukrim@example.com",
-        phone: "+212656789012",
-        clubId: "club-1",
-        clubName: "Club Ju-Jitsu Casablanca",
-        insuranceStatus: "NEVER_PAID",
-        category: "Senior",
-        birthDate: "1992-11-08",
-      },
-    ];
+  // Refetch athletes when season changes
+  useEffect(() => {
+    if (selectedSeason) {
+      refetchAthletes();
+    }
+  }, [selectedSeason, refetchAthletes]);
 
-    setSeasons(mockSeasons);
-    setAthletes(mockAthletes);
-    setSelectedSeason(mockSeasons.find((s) => s.isActive) || mockSeasons[0]);
+  const getAthleteInsuranceStatus = (athlete: Athlete) => {
+    if (!selectedSeason) return "UNKNOWN";
+
+    const seasonInsurance = athlete.insurances.find(
+      (ins) => ins.season.id === selectedSeason.id
+    );
+
+    if (!seasonInsurance) return "NEVER_PAID";
+    if (seasonInsurance.isPaid) return "ACTIVE";
+    return "EXPIRED";
   };
+
+  const filteredAthletes = athletes.filter((athlete) => {
+    const fullName = `${athlete.firstName} ${athlete.lastName}`;
+    const matchesSearch =
+      fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      athlete.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      athlete.category?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const insuranceStatus = getAthleteInsuranceStatus(athlete);
+    const matchesStatus = !filterStatus || insuranceStatus === filterStatus;
+
+    return matchesSearch && matchesStatus;
+  });
+
+  const handleAthleteSelection = (athleteId: string, checked: boolean) => {
+    console.log("Checkbox clicked:", athleteId, checked);
+    const newSelection = new Set(selectedAthletes);
+    if (checked) {
+      newSelection.add(athleteId);
+    } else {
+      newSelection.delete(athleteId);
+    }
+    setSelectedAthletes(newSelection);
+    console.log("New selection:", Array.from(newSelection));
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    console.log("Select all clicked:", checked);
+    if (checked) {
+      const allIds = filteredAthletes.map((a) => a.id);
+      setSelectedAthletes(new Set(allIds));
+      console.log("Selected all:", allIds);
+    } else {
+      setSelectedAthletes(new Set());
+      console.log("Deselected all");
+    }
+  };
+
+  const handleSinglePayment = async (athlete: Athlete) => {
+    if (!selectedSeason) {
+      toast.error("Veuillez sélectionner une saison");
+      return;
+    }
+
+    console.log(
+      "Starting single payment for:",
+      `${athlete.firstName} ${athlete.lastName}`
+    );
+    setIsLoading(true);
+
+    try {
+      const paymentRequest: ClientPaymentRequest = {
+        athleteId: athlete.id,
+        athleteName: `${athlete.firstName} ${athlete.lastName}`,
+        clubId: athlete.clubId,
+        clubName: athlete.club.name,
+        seasonId: selectedSeason.id,
+        seasonYear: selectedSeason.year,
+        customerEmail: athlete.email,
+        customerPhone: athlete.phone,
+      };
+
+      console.log("Payment request:", paymentRequest);
+      toast.loading("Création de la session de paiement...", {
+        id: "payment-loading",
+      });
+
+      const result = await StripeClientService.redirectToCheckout(
+        paymentRequest
+      );
+
+      toast.dismiss("payment-loading");
+
+      if (result.success) {
+        toast.success(
+          `Redirection vers le paiement pour ${athlete.firstName} ${athlete.lastName}`
+        );
+      } else {
+        console.error("Payment error:", result.error);
+        toast.error(result.error || "Erreur lors de la création du paiement");
+      }
+    } catch (error) {
+      console.error("Payment error:", error);
+      toast.dismiss("payment-loading");
+      toast.error("Erreur lors de la création du paiement");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleBulkPayment = async () => {
+    if (selectedAthletes.size === 0) {
+      toast.error("Veuillez sélectionner au moins un athlète");
+      return;
+    }
+
+    if (!selectedSeason) {
+      toast.error("Veuillez sélectionner une saison");
+      return;
+    }
+
+    console.log("Starting bulk payment for:", Array.from(selectedAthletes));
+
+    const selectedAthletesList = athletes.filter((a) =>
+      selectedAthletes.has(a.id)
+    );
+    console.log(
+      "Selected athletes list:",
+      selectedAthletesList.map((a) => `${a.firstName} ${a.lastName}`)
+    );
+
+    setIsLoading(true);
+    try {
+      const athleteNames = selectedAthletesList
+        .map((a) => `${a.firstName} ${a.lastName}`)
+        .join(", ");
+
+      const paymentRequest: ClientPaymentRequest = {
+        athleteId: "bulk-payment",
+        athleteName: `Paiement groupé (${selectedAthletes.size} athlètes): ${athleteNames}`,
+        clubId: selectedAthletesList[0].clubId,
+        clubName: selectedAthletesList[0].club.name,
+        seasonId: selectedSeason.id,
+        seasonYear: selectedSeason.year,
+        customerEmail: selectedAthletesList[0].email,
+        customerPhone: selectedAthletesList[0].phone,
+      };
+
+      console.log("Bulk payment request:", paymentRequest);
+      toast.loading("Création de la session de paiement groupé...", {
+        id: "bulk-payment-loading",
+      });
+
+      const result = await StripeClientService.redirectToCheckout(
+        paymentRequest
+      );
+
+      toast.dismiss("bulk-payment-loading");
+
+      if (result.success) {
+        toast.success(
+          `Redirection vers le paiement groupé pour ${selectedAthletes.size} athlètes`
+        );
+        setSelectedAthletes(new Set());
+      } else {
+        console.error("Bulk payment error:", result.error);
+        toast.error(
+          result.error || "Erreur lors de la création du paiement groupé"
+        );
+      }
+    } catch (error) {
+      console.error("Bulk payment error:", error);
+      toast.dismiss("bulk-payment-loading");
+      toast.error("Erreur lors de la création du paiement groupé");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "ACTIVE":
+        return (
+          <Badge
+            variant="default"
+            className="bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800"
+          >
+            <CheckCircle className="w-3 h-3 mr-1" />
+            Active
+          </Badge>
+        );
+      case "EXPIRED":
+        return (
+          <Badge
+            variant="destructive"
+            className="bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800"
+          >
+            <XCircle className="w-3 h-3 mr-1" />
+            Expiré
+          </Badge>
+        );
+      case "NEVER_PAID":
+        return (
+          <Badge
+            variant="secondary"
+            className="bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800"
+          >
+            <AlertTriangle className="w-3 h-3 mr-1" />
+            Jamais payé
+          </Badge>
+        );
+      default:
+        return <Badge variant="outline">{status}</Badge>;
+    }
+  };
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString("fr-FR");
+  };
+
+  const getPaymentAmount = () => {
+    return 150 * selectedAthletes.size; // 150 MAD per athlete
+  };
+
+  const formatAmount = (amount: number) => {
+    return `${amount} MAD`;
+  };
+
+  if (loadingSeasons || loadingAthletes) {
+    return (
+      <div className="w-full max-w-6xl mx-auto space-y-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
+              <span className="ml-2">Chargement...</span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   const filteredAthletes = athletes.filter((athlete) => {
     const matchesSearch =
@@ -547,36 +737,52 @@ export function AthletePaymentManager() {
                   />
                   <div className="space-y-1">
                     <div className="flex items-center gap-3">
-                      <p className="font-medium">{athlete.name}</p>
+                      <p className="font-medium">
+                        {athlete.firstName} {athlete.lastName}
+                      </p>
                       <span className="text-sm text-gray-500">•</span>
                       <span className="text-sm text-gray-600">
-                        {athlete.category}
+                        {athlete.category || "Non spécifié"}
                       </span>
-                      {getStatusBadge(athlete.insuranceStatus)}
+                      {getStatusBadge(getAthleteInsuranceStatus(athlete))}
                     </div>
                     <div className="text-sm text-gray-600">
                       {athlete.email && <span>{athlete.email}</span>}
                       {athlete.email && athlete.phone && <span> • </span>}
                       {athlete.phone && <span>{athlete.phone}</span>}
                     </div>
-                    {athlete.insuranceStatus === "ACTIVE" &&
-                      athlete.expiryDate && (
-                        <div className="text-xs text-green-600">
-                          Expire le: {formatDate(athlete.expiryDate)}
-                        </div>
-                      )}
-                    {athlete.insuranceStatus === "EXPIRED" &&
-                      athlete.expiryDate && (
-                        <div className="text-xs text-red-600">
-                          Expiré le: {formatDate(athlete.expiryDate)}
-                        </div>
-                      )}
+                    {(() => {
+                      const status = getAthleteInsuranceStatus(athlete);
+                      const seasonInsurance = athlete.insurances.find(
+                        (ins) => ins.season.id === selectedSeason?.id
+                      );
+
+                      if (status === "ACTIVE" && seasonInsurance?.paidAt) {
+                        return (
+                          <div className="text-xs text-green-600">
+                            Payé le:{" "}
+                            {formatDate(new Date(seasonInsurance.paidAt))}
+                          </div>
+                        );
+                      }
+
+                      if (status === "EXPIRED" && seasonInsurance?.paidAt) {
+                        return (
+                          <div className="text-xs text-red-600">
+                            Expiré (payé le:{" "}
+                            {formatDate(new Date(seasonInsurance.paidAt))})
+                          </div>
+                        );
+                      }
+
+                      return null;
+                    })()}
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-bold text-red-600">
-                    $15 USD (≈ 150 MAD)
+                    150 MAD
                   </span>
                   <Button
                     size="sm"

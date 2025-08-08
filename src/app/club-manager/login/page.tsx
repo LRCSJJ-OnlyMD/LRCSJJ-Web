@@ -26,9 +26,9 @@ export default function ClubManagerLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [loginStep, setLoginStep] = useState<"credentials" | "change-password" | "verification">(
-    "credentials"
-  );
+  const [loginStep, setLoginStep] = useState<
+    "credentials" | "change-password" | "verification"
+  >("credentials");
   const [managerId, setManagerId] = useState<string>("");
   const [temporaryPassword, setTemporaryPassword] = useState<string>("");
   const [codeId, setCodeId] = useState<string>("");
@@ -58,7 +58,9 @@ export default function ClubManagerLoginPage() {
 
   const setPasswordMutation = trpc.clubManager.setPassword.useMutation({
     onSuccess: () => {
-      toast.success("Mot de passe défini avec succès! Veuillez vous reconnecter.");
+      toast.success(
+        "Mot de passe défini avec succès! Veuillez vous reconnecter."
+      );
       // Reset form and go back to login
       setLoginStep("credentials");
       setEmail("");
@@ -401,7 +403,11 @@ export default function ClubManagerLoginPage() {
                     type="text"
                     placeholder="123456"
                     value={verificationCode}
-                    onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    onChange={(e) =>
+                      setVerificationCode(
+                        e.target.value.replace(/\D/g, "").slice(0, 6)
+                      )
+                    }
                     disabled={completeLoginMutation.isPending}
                     required
                     maxLength={6}
@@ -412,7 +418,10 @@ export default function ClubManagerLoginPage() {
                 <Button
                   type="submit"
                   className="w-full bg-[#017444] hover:bg-[#017444]/90 text-white transition-all duration-300 hover-lift"
-                  disabled={completeLoginMutation.isPending || verificationCode.length !== 6}
+                  disabled={
+                    completeLoginMutation.isPending ||
+                    verificationCode.length !== 6
+                  }
                 >
                   {completeLoginMutation.isPending
                     ? "Vérification en cours..."

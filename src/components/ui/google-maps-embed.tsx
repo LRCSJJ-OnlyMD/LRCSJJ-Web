@@ -75,8 +75,8 @@ export function GoogleMapsEmbed({
 
             {/* Map Icon Overlay */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center text-white">
-                <div className="w-16 h-16 bg-[#d62027] rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-pulse">
+              <div className="text-center text-white dark:text-gray-200">
+                <div className="w-16 h-16 bg-destructive rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-pulse">
                   <MapPin className="h-8 w-8 text-white" />
                 </div>
                 <h4 className="text-lg font-semibold mb-2">{locationName}</h4>
@@ -100,7 +100,7 @@ export function GoogleMapsEmbed({
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center space-x-2 mb-2">
-                <MapPin className="h-5 w-5 text-[#017444] flex-shrink-0" />
+                <MapPin className="h-5 w-5 text-primary flex-shrink-0" />
                 <h3 className="font-semibold text-foreground">
                   {locationName}
                 </h3>
@@ -125,7 +125,7 @@ export function GoogleMapsEmbed({
               <Button
                 variant="default"
                 size="sm"
-                className="flex-1 bg-[#017444] hover:bg-emerald-700 text-white"
+                className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
                 onClick={() => window.open(mapsUrl, "_blank")}
               >
                 <ExternalLink className="h-4 w-4 mr-2" />
@@ -135,7 +135,7 @@ export function GoogleMapsEmbed({
               <Button
                 variant="outline"
                 size="sm"
-                className="flex-1 hover:bg-[#d62027] hover:text-white hover:border-[#d62027]"
+                className="flex-1 hover:bg-destructive hover:text-destructive-foreground hover:border-destructive"
                 onClick={() => window.open(directionsUrl, "_blank")}
               >
                 <Navigation className="h-4 w-4 mr-2" />
