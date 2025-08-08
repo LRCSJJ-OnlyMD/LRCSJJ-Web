@@ -5,7 +5,7 @@ import Stripe from 'stripe'
 
 // Initialize Stripe server-side
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-12-18.acacia',
+  apiVersion: '2025-07-30.basil',
 })
 
 export interface InsurancePaymentRequest {
@@ -33,13 +33,13 @@ export interface StripePaymentResponse {
 }
 
 export class StripePaymentService {
-  // Annual insurance amount in MAD (150 Dirhams)
-  private static readonly ANNUAL_INSURANCE_AMOUNT = 150
-  private static readonly CURRENCY = 'mad' // Moroccan Dirham
+  // Annual insurance amount - using USD for Stripe compatibility (150 MAD ≈ 15 USD)
+  private static readonly ANNUAL_INSURANCE_AMOUNT = 15 // Representing 150 MAD in USD equivalent
+  private static readonly CURRENCY = 'usd' // US Dollar (widely supported by Stripe)
   
   // Stripe configuration
-  private static readonly SUCCESS_URL = `${process.env.NEXT_PUBLIC_APP_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}`
-  private static readonly CANCEL_URL = `${process.env.NEXT_PUBLIC_APP_URL}/payment/cancel`
+  private static readonly SUCCESS_URL = `${process.env.NEXT_PUBLIC_APP_URL}/club-manager/payments?payment=success&session_id={CHECKOUT_SESSION_ID}`
+  private static readonly CANCEL_URL = `${process.env.NEXT_PUBLIC_APP_URL}/club-manager/payments?payment=cancelled`
 
   /**
    * Create Stripe Checkout Session for yearly insurance payment

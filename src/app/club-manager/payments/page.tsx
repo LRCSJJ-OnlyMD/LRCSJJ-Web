@@ -197,7 +197,14 @@ export default function ClubManagerPaymentsPage() {
   }
 
   const handleCreatePayment = () => {
-    toast.info('Création d\'une nouvelle demande de paiement - En cours de développement')
+    // Switch to the athletes tab to create new payments
+    const athleteTab = document.querySelector('[data-value="athletes"]') as HTMLElement
+    if (athleteTab) {
+      athleteTab.click()
+      toast.success('Créez des paiements depuis l\'onglet "Gestion des Athlètes"')
+    } else {
+      toast.info('Utilisez l\'onglet "Gestion des Athlètes" pour créer de nouveaux paiements')
+    }
   }
 
   const handleViewPayment = (paymentId: string) => {

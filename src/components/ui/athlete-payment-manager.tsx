@@ -157,6 +157,7 @@ export function AthletePaymentManager() {
   })
 
   const handleAthleteSelection = (athleteId: string, checked: boolean) => {
+    console.log('Checkbox clicked:', athleteId, checked) // Debug log
     const newSelection = new Set(selectedAthletes)
     if (checked) {
       newSelection.add(athleteId)
@@ -164,13 +165,18 @@ export function AthletePaymentManager() {
       newSelection.delete(athleteId)
     }
     setSelectedAthletes(newSelection)
+    console.log('New selection:', Array.from(newSelection)) // Debug log
   }
 
   const handleSelectAll = (checked: boolean) => {
+    console.log('Select all clicked:', checked) // Debug log
     if (checked) {
-      setSelectedAthletes(new Set(filteredAthletes.map(a => a.id)))
+      const allIds = filteredAthletes.map(a => a.id)
+      setSelectedAthletes(new Set(allIds))
+      console.log('Selected all:', allIds) // Debug log
     } else {
       setSelectedAthletes(new Set())
+      console.log('Deselected all') // Debug log
     }
   }
 
@@ -180,7 +186,9 @@ export function AthletePaymentManager() {
       return
     }
 
+    console.log('Starting single payment for:', athlete.name) // Debug log
     setIsLoading(true)
+    
     try {
       const paymentRequest: ClientPaymentRequest = {
         athleteId: athlete.id,
@@ -193,16 +201,24 @@ export function AthletePaymentManager() {
         customerPhone: athlete.phone
       }
 
+      console.log('Payment request:', paymentRequest) // Debug log
+      toast.loading('Création de la session de paiement...', { id: 'payment-loading' })
+
       const result = await StripeClientService.redirectToCheckout(paymentRequest)
+      
+      toast.dismiss('payment-loading')
       
       if (result.success) {
         toast.success(`Redirection vers le paiement pour ${athlete.name}`)
+        // The user will be redirected to Stripe, so we don't need to do anything else
       } else {
+        console.error('Payment error:', result.error) // Debug log
         toast.error(result.error || 'Erreur lors de la création du paiement')
       }
     } catch (error) {
+      console.error('Payment error:', error) // Debug log
+      toast.dismiss('payment-loading')
       toast.error('Erreur lors de la création du paiement')
-      console.error('Payment error:', error)
     } finally {
       setIsLoading(false)
     }
@@ -219,20 +235,22 @@ export function AthletePaymentManager() {
       return
     }
 
-    // For bulk payments, we'll create individual Stripe sessions
-    // In a more advanced implementation, you could create a single session with multiple line items
+    console.log('Starting bulk payment for:', Array.from(selectedAthletes)) // Debug log
     
     const selectedAthletesList = athletes.filter(a => selectedAthletes.has(a.id))
+    console.log('Selected athletes list:', selectedAthletesList.map(a => a.name)) // Debug log
     
     setIsLoading(true)
     try {
-      // Create payment for the first athlete (for demo)
-      // In production, you might want to create a bulk payment session
+      // For bulk payments, we'll create a single session for the first athlete with a description
+      // that includes all selected athletes. In production, you might want to create a more
+      // sophisticated bulk payment system.
       const firstAthlete = selectedAthletesList[0]
+      const athleteNames = selectedAthletesList.map(a => a.name).join(', ')
       
       const paymentRequest: ClientPaymentRequest = {
         athleteId: firstAthlete.id,
-        athleteName: `Paiement groupé pour ${selectedAthletes.size} athlètes`,
+        athleteName: `Paiement groupé (${selectedAthletes.size} athlètes): ${athleteNames}`,
         clubId: firstAthlete.clubId,
         clubName: firstAthlete.clubName,
         seasonId: selectedSeason.id,
@@ -241,16 +259,25 @@ export function AthletePaymentManager() {
         customerPhone: firstAthlete.phone
       }
 
+      console.log('Bulk payment request:', paymentRequest) // Debug log
+      toast.loading('Création de la session de paiement groupé...', { id: 'bulk-payment-loading' })
+
       const result = await StripeClientService.redirectToCheckout(paymentRequest)
+      
+      toast.dismiss('bulk-payment-loading')
       
       if (result.success) {
         toast.success(`Redirection vers le paiement groupé pour ${selectedAthletes.size} athlètes`)
+        // Clear selection after successful payment initiation
+        setSelectedAthletes(new Set())
       } else {
+        console.error('Bulk payment error:', result.error) // Debug log
         toast.error(result.error || 'Erreur lors de la création du paiement groupé')
       }
     } catch (error) {
+      console.error('Bulk payment error:', error) // Debug log
+      toast.dismiss('bulk-payment-loading')
       toast.error('Erreur lors de la création du paiement groupé')
-      console.error('Bulk payment error:', error)
     } finally {
       setIsLoading(false)
     }
@@ -289,15 +316,12 @@ export function AthletePaymentManager() {
   }
 
   const getPaymentAmount = () => {
-    return 150 * selectedAthletes.size // 150 MAD per athlete
+    return 15 * selectedAthletes.size // $15 USD per athlete (equivalent to 150 MAD)
   }
 
   const formatAmount = (amount: number) => {
-    return new Intl.NumberFormat('fr-MA', {
-      style: 'currency',
-      currency: 'MAD',
-      minimumFractionDigits: 2
-    }).format(amount)
+    const madEquivalent = amount * 10 // $15 USD ≈ 150 MAD
+    return `$${amount} USD (≈ ${madEquivalent} MAD)`
   }
 
   return (
@@ -310,7 +334,7 @@ export function AthletePaymentManager() {
             Gestion des Paiements d&apos;Assurance
           </CardTitle>
           <CardDescription>
-            Créer des paiements d&apos;assurance pour les athlètes (150 MAD par an)
+            Créer des paiements d&apos;assurance pour les athlètes ($15 USD ≈ 150 MAD par an)
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -489,7 +513,7 @@ export function AthletePaymentManager() {
                 </div>
                 
                 <div className="flex items-center gap-2">
-                  <span className="text-lg font-bold text-red-600">150 MAD</span>
+                  <span className="text-lg font-bold text-red-600">$15 USD (≈ 150 MAD)</span>
                   <Button
                     size="sm"
                     onClick={() => handleSinglePayment(athlete)}

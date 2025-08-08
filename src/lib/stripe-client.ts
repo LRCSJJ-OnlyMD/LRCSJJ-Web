@@ -26,6 +26,20 @@ export class StripeClientService {
     error?: string
   }> {
     try {
+      console.log('Starting checkout process for:', paymentRequest) // Debug log
+      
+      // Validate request first
+      const validation = this.validatePaymentRequest(paymentRequest)
+      if (!validation.isValid) {
+        console.error('Validation failed:', validation.errors) // Debug log
+        return {
+          success: false,
+          error: validation.errors.join(', ')
+        }
+      }
+
+      console.log('Calling create-session API...') // Debug log
+
       // Create payment session on server
       const response = await fetch('/api/payments/create-session', {
         method: 'POST',
@@ -35,36 +49,60 @@ export class StripeClientService {
         body: JSON.stringify(paymentRequest),
       })
 
-      const data = await response.json()
+      console.log('API Response status:', response.status) // Debug log
 
-      if (!data.success) {
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('API Error response:', errorText) // Debug log
+        throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`)
+      }
+
+      const data = await response.json()
+      console.log('API Response data:', data) // Debug log
+
+      if (!data.success || !data.sessionId) {
+        console.error('API returned error:', data.error) // Debug log
         return {
           success: false,
           error: data.error || 'Erreur lors de la création de la session de paiement'
         }
       }
 
+      console.log('Loading Stripe...') // Debug log
+
       // Get Stripe instance
       const stripe = await stripePromise
       if (!stripe) {
+        console.error('Failed to load Stripe') // Debug log
         return {
           success: false,
           error: 'Erreur de chargement de Stripe'
         }
       }
 
-      // Redirect to checkout
+      console.log('Redirecting to Stripe checkout with session ID:', data.sessionId) // Debug log
+
+      // Option 1: Use direct URL redirect (more reliable for VS Code browser)
+      if (data.paymentUrl) {
+        console.log('Using direct URL redirect to:', data.paymentUrl) // Debug log
+        window.location.href = data.paymentUrl
+        return { success: true }
+      }
+
+      // Option 2: Fallback to Stripe SDK redirect
       const { error } = await stripe.redirectToCheckout({
         sessionId: data.sessionId
       })
 
       if (error) {
+        console.error('Stripe checkout error:', error) // Debug log
         return {
           success: false,
           error: error.message || 'Erreur de redirection vers le paiement'
         }
       }
 
+      console.log('Successfully initiated Stripe checkout') // Debug log
       return { success: true }
 
     } catch (error) {
