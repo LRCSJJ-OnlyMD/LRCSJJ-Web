@@ -49,6 +49,9 @@ export default function HomePage() {
                 <Link href="/contact" className="text-muted-foreground hover:text-primary transition-colors duration-200">
                   Contact
                 </Link>
+                <Link href="/club-manager/login" className="text-muted-foreground hover:text-[#017444] transition-colors duration-200">
+                  Clubs
+                </Link>
               </nav>
               
               <div className="flex items-center space-x-3">

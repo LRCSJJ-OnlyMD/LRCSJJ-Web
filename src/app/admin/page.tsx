@@ -1,7 +1,7 @@
 'use client'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Building, Users, Calendar, Trophy, Shield, UserCheck, MapPin, TrendingUp, Activity } from 'lucide-react'
+import { Building, Users, Calendar, Trophy, Shield, UserCheck, MapPin, TrendingUp, Activity, Users2 } from 'lucide-react'
 import Link from 'next/link'
 
 export default function DashboardPage() {
@@ -49,7 +49,7 @@ export default function DashboardPage() {
     {
       title: 'Équipes',
       description: 'Organiser les équipes de ligue',
-      icon: UserCheck,
+      icon: Users2,
       href: '/admin/teams',
       gradient: 'gradient-accent',
       stats: 'Organisation'
@@ -61,6 +61,14 @@ export default function DashboardPage() {
       href: '/admin/map-config',
       gradient: 'gradient-primary',
       stats: 'Géolocalisation'
+    },
+    {
+      title: 'Gestionnaires de Clubs',
+      description: 'Gérer les accès et comptes des gestionnaires',
+      icon: UserCheck,
+      href: '/admin/club-managers',
+      gradient: 'gradient-accent',
+      stats: 'Gestion des accès'
     }
   ]
 

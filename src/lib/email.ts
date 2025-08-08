@@ -166,6 +166,94 @@ export async function sendContactNotificationEmail(data: ContactEmailData) {
   }
 }
 
+export async function sendClubManagerWelcomeEmail(
+  email: string,
+  name: string,
+  clubName: string,
+  temporaryPassword: string
+): Promise<boolean> {
+  try {
+    const mailOptions = {
+      from: process.env.SMTP_FROM,
+      to: email,
+      subject: 'Bienvenue - Accès Gestionnaire de Club LRCSJJ',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background: linear-gradient(135deg, #d62027, #017444); color: white; padding: 20px; border-radius: 8px 8px 0 0;">
+            <h1 style="margin: 0; font-size: 24px;">Bienvenue dans l'Espace Gestionnaire</h1>
+            <p style="margin: 5px 0 0 0; opacity: 0.9;">Ligue Régionale Casablanca-Settat Ju-Jitsu</p>
+          </div>
+          
+          <div style="background: #f8f9fa; padding: 20px; border: 1px solid #e9ecef;">
+            <p>Bonjour <strong>${name}</strong>,</p>
+            
+            <p>Félicitations ! Vous avez été désigné(e) comme gestionnaire du club <strong>${clubName}</strong> dans notre système de gestion LRCSJJ.</p>
+            
+            <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h3 style="color: #155724; margin-top: 0;">🔑 Vos Identifiants de Connexion</h3>
+              <p style="margin: 0; color: #155724;">
+                <strong>Email:</strong> ${email}<br>
+                <strong>Mot de passe temporaire:</strong> <code style="background: #f8f9fa; padding: 2px 6px; border-radius: 4px; font-family: monospace; color: #d62027;">${temporaryPassword}</code>
+              </p>
+            </div>
+            
+            <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 8px; margin: 20px 0;">
+              <p style="margin: 0; color: #856404;">
+                <strong>⚠️ Important:</strong> Vous devez changer ce mot de passe lors de votre première connexion pour des raisons de sécurité.
+              </p>
+            </div>
+            
+            <div style="text-align: center; margin: 25px 0;">
+              <a href="${process.env.NEXT_PUBLIC_APP_URL}/club-manager/login" 
+                 style="background: #d62027; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+                Se Connecter à l'Espace Gestionnaire
+              </a>
+            </div>
+            
+            <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #017444;">
+              <h3 style="color: #017444; margin-top: 0;">🏆 Vos Responsabilités</h3>
+              <ul style="color: #666; line-height: 1.6;">
+                <li>Gestion des athlètes de votre club</li>
+                <li>Suivi des assurances et licences</li>
+                <li>Gestion des équipes et inscriptions aux championnats</li>
+                <li>Suivi des paiements et facturation</li>
+                <li>Communication avec la ligue</li>
+              </ul>
+            </div>
+            
+            <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 20px 0;">
+              <p style="margin: 0; color: #1565c0;">
+                <strong>💡 Besoin d'aide?</strong><br>
+                Notre équipe support est disponible pour vous accompagner dans la prise en main de votre espace gestionnaire.
+              </p>
+            </div>
+            
+            <p>Nous vous souhaitons une excellente gestion et restons à votre disposition pour toute question.</p>
+            
+            <p>Cordialement,<br>
+            <strong>L'équipe LRCSJJ</strong></p>
+          </div>
+          
+          <div style="background: #343a40; color: white; padding: 15px; border-radius: 0 0 8px 8px; text-align: center;">
+            <p style="margin: 0; font-size: 12px;">
+              © 2025 LRCSJJ - Ligue Régionale Casablanca-Settat Ju-Jitsu<br>
+              Complexe Sportif Mohammed V, Avenue Hassan II, Casablanca<br>
+              Email: <a href="mailto:contact@lrcsjj.ma" style="color: #fff;">contact@lrcsjj.ma</a> | Tél: +212 522 123 456
+            </p>
+          </div>
+        </div>
+      `,
+    }
+
+    const result = await transporter.sendMail(mailOptions)
+    console.log('📧 Club manager welcome email sent:', result.messageId)
+    return true
+  } catch (error) {
+    console.error('❌ Club manager welcome email failed:', error)
+    return false
+  }
+}
+
 export async function testEmailConnection() {
   try {
     await transporter.verify()

@@ -18,10 +18,29 @@ model Admin {
   email     String   @unique
   password  String
   name      String
+  role      String   @default("ADMIN") // ADMIN, SUPER_ADMIN
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("admins")
+}
+
+model ClubManager {
+  id                String   @id @default(cuid())
+  email             String   @unique
+  password          String?  // Null until first login
+  name              String
+  clubId            String   @unique
+  isActive          Boolean  @default(true)
+  temporaryPassword String?  // For initial setup
+  passwordResetAt   DateTime?
+  lastLoginAt       DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  club Club @relation(fields: [clubId], references: [id], onDelete: Cascade)
+
+  @@map("club_managers")
 }
 
 model Club {
@@ -35,9 +54,11 @@ model Club {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  athletes     Athlete[]
-  teamMembers  LeagueTeamMember[]
-  championships ClubChampionship[]
+  athletes        Athlete[]
+  teamMembers     LeagueTeamMember[]
+  championships   ClubChampionship[]
+  manager         ClubManager?
+  paymentRequests PaymentRequest[]
 
   @@map("clubs")
 }
@@ -83,20 +104,44 @@ model Athlete {
 }
 
 model Insurance {
-  id        String   @id @default(cuid())
-  athleteId String
-  seasonId  String
-  amount    Float
-  paidAt    DateTime?
-  isPaid    Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id               String   @id @default(cuid())
+  athleteId        String
+  seasonId         String
+  amount           Float
+  paidAt           DateTime?
+  isPaid           Boolean  @default(false)
+  paymentRequestId String?  // Link to payment request
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
-  athlete Athlete @relation(fields: [athleteId], references: [id], onDelete: Cascade)
-  season  Season  @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  athlete        Athlete         @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+  season         Season          @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  paymentRequest PaymentRequest? @relation(fields: [paymentRequestId], references: [id])
 
   @@unique([athleteId, seasonId])
   @@map("insurances")
+}
+
+model PaymentRequest {
+  id                String   @id @default(cuid())
+  clubId            String
+  amount            Float    // Total amount
+  currency          String   @default("MAD")
+  status            String   @default("PENDING") // PENDING, PAID, EXPIRED, FAILED
+  paymentMethod     String?  // STRIPE, BANK_TRANSFER, CASH
+  stripeSessionId   String?  // Stripe checkout session ID
+  paymentIntentId   String?  // Stripe payment intent ID
+  transactionId     String?  // General transaction ID
+  expiresAt         DateTime // 30 minutes from creation for Stripe sessions
+  paidAt            DateTime?
+  invoiceUrl        String?  // Generated invoice PDF
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  club       Club        @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  insurances Insurance[]
+
+  @@map("payment_requests")
 }
 
 model Championship {
