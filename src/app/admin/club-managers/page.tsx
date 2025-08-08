@@ -50,16 +50,20 @@ export default function AdminClubManagersPage() {
   // Use real tRPC queries
   const managersQuery = trpc.clubManager.getAll.useQuery();
   const clubsQuery = trpc.clubs.getAll.useQuery();
-  
+
   const createManagerMutation = trpc.clubManager.create.useMutation({
     onSuccess: () => {
-      toast.success("Gestionnaire créé avec succès! Email de bienvenue envoyé.");
+      toast.success(
+        "Gestionnaire créé avec succès! Email de bienvenue envoyé."
+      );
       setFormData({ name: "", email: "", clubId: "" });
       setShowCreateForm(false);
       managersQuery.refetch();
     },
     onError: (error) => {
-      toast.error(error.message || "Erreur lors de la création du gestionnaire");
+      toast.error(
+        error.message || "Erreur lors de la création du gestionnaire"
+      );
     },
   });
 
@@ -83,15 +87,20 @@ export default function AdminClubManagersPage() {
     },
   });
 
-  const regeneratePasswordMutation = trpc.clubManager.regeneratePassword.useMutation({
-    onSuccess: (data) => {
-      toast.success(`Nouveau mot de passe temporaire: ${data.temporaryPassword}`);
-      managersQuery.refetch();
-    },
-    onError: (error) => {
-      toast.error(error.message || "Erreur lors de la régénération du mot de passe");
-    },
-  });
+  const regeneratePasswordMutation =
+    trpc.clubManager.regeneratePassword.useMutation({
+      onSuccess: (data) => {
+        toast.success(
+          `Nouveau mot de passe temporaire: ${data.temporaryPassword}`
+        );
+        managersQuery.refetch();
+      },
+      onError: (error) => {
+        toast.error(
+          error.message || "Erreur lors de la régénération du mot de passe"
+        );
+      },
+    });
 
   useEffect(() => {
     // Check if user is authenticated as admin
@@ -148,7 +157,11 @@ export default function AdminClubManagersPage() {
   };
 
   const handleRegeneratePassword = (managerId: string) => {
-    if (confirm("Êtes-vous sûr de vouloir régénérer le mot de passe ? L'ancien mot de passe ne fonctionnera plus.")) {
+    if (
+      confirm(
+        "Êtes-vous sûr de vouloir régénérer le mot de passe ? L'ancien mot de passe ne fonctionnera plus."
+      )
+    ) {
       regeneratePasswordMutation.mutate({ managerId });
     }
   };
@@ -415,11 +428,6 @@ export default function AdminClubManagersPage() {
                           <p className="text-sm text-muted-foreground">
                             {manager.email}
                           </p>
-                          {manager.temporaryPassword && (
-                            <p className="text-xs text-blue-600 dark:text-blue-400 font-mono">
-                              Temp: {manager.temporaryPassword}
-                            </p>
-                          )}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -452,7 +460,9 @@ export default function AdminClubManagersPage() {
                           <span className="text-muted-foreground">Jamais</span>
                         )}
                       </TableCell>
-                      <TableCell>{formatDate(manager.createdAt.toISOString())}</TableCell>
+                      <TableCell>
+                        {formatDate(manager.createdAt.toISOString())}
+                      </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
                           <Button
@@ -468,9 +478,14 @@ export default function AdminClubManagersPage() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => handleToggleStatus(manager.id, manager.isActive)}
+                            onClick={() =>
+                              handleToggleStatus(manager.id, manager.isActive)
+                            }
                             title={manager.isActive ? "Désactiver" : "Activer"}
-                            disabled={activateMutation.isPending || deactivateMutation.isPending}
+                            disabled={
+                              activateMutation.isPending ||
+                              deactivateMutation.isPending
+                            }
                           >
                             <Shield className="w-4 h-4" />
                           </Button>
@@ -487,7 +502,9 @@ export default function AdminClubManagersPage() {
                             size="sm"
                             variant="outline"
                             onClick={() =>
-                              toast.success(`Email de bienvenue envoyé à ${manager.email}`)
+                              toast.success(
+                                `Email de bienvenue envoyé à ${manager.email}`
+                              )
                             }
                             title="Renvoyer l'email de bienvenue"
                           >

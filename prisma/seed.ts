@@ -154,15 +154,27 @@ async function main() {
 
     const tempPassword = staticPasswords[club.name] || "manager2025";
 
+    console.log(`Creating manager for ${club.name}:`);
+    console.log(`  Email: ${managerEmail}`);
+    console.log(`  Temporary Password: ${tempPassword}`);
+
     await prisma.clubManager.upsert({
       where: { email: managerEmail },
-      update: {},
+      update: {
+        // Update existing manager to ensure consistency
+        temporaryPassword: tempPassword,
+        isActive: true,
+        password: null, // Ensure password is null so they use temp password
+        passwordResetAt: new Date(),
+      },
       create: {
         email: managerEmail,
-        name: `Manager ${club.name.split(" ")[0]}`,
+        name: `Manager ${club.name.split(" ")[1] || club.name.split(" ")[0]}`, // Use Atlas, Champions, etc.
         clubId: club.id,
         temporaryPassword: tempPassword,
         isActive: true,
+        password: null, // Explicitly set to null
+        passwordResetAt: new Date(),
       },
     });
   }

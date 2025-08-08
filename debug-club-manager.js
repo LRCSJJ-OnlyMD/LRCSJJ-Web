@@ -1,35 +1,38 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 async function checkClubManager() {
   try {
-    console.log('🔍 Checking club manager status...');
-    
+    console.log("🔍 Checking club manager status...");
+
     const manager = await prisma.clubManager.findUnique({
-      where: { 
-        email: 'manager.clubatlasjujitsucasablanca@lrcsjj.ma' 
+      where: {
+        email: "manager.clubatlasjujitsucasablanca@lrcsjj.ma",
       },
       include: {
-        club: true
-      }
+        club: true,
+      },
     });
-    
+
     if (!manager) {
-      console.log('❌ Club manager not found');
-      
+      console.log("❌ Club manager not found");
+
       // Let's see what managers exist
       const allManagers = await prisma.clubManager.findMany({
-        include: { club: true }
+        include: { club: true },
       });
-      
-      console.log('\n📋 Existing club managers:');
-      allManagers.forEach(m => {
-        console.log(`- ${m.email} (${m.name}) - Club: ${m.club.name} - Active: ${m.isActive} - Has Password: ${!!m.password}`);
+
+      console.log("\n📋 Existing club managers:");
+      allManagers.forEach((m) => {
+        console.log(
+          `- ${m.email} (${m.name}) - Club: ${m.club.name} - Active: ${
+            m.isActive
+          } - Has Password: ${!!m.password}`
+        );
       });
-      
     } else {
-      console.log('✅ Club manager found:');
+      console.log("✅ Club manager found:");
       console.log(`- Email: ${manager.email}`);
       console.log(`- Name: ${manager.name}`);
       console.log(`- Club: ${manager.club.name}`);
@@ -40,9 +43,8 @@ async function checkClubManager() {
       console.log(`- Password Reset At: ${manager.passwordResetAt}`);
       console.log(`- Last Login: ${manager.lastLoginAt}`);
     }
-    
   } catch (error) {
-    console.error('Error:', error);
+    console.error("Error:", error);
   } finally {
     await prisma.$disconnect();
   }

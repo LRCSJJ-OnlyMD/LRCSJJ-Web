@@ -1,54 +1,51 @@
-import { z } from 'zod'
-import { adminProcedure, clubManagerProcedure, router } from '../trpc'
-import { prisma } from '../prisma'
+import { z } from "zod";
+import { adminProcedure, clubManagerProcedure, router } from "../trpc";
+import { prisma } from "../prisma";
 
 export const seasonsRouter = router({
   // Admin procedures - full access
-  getAll: adminProcedure
-    .query(async () => {
-      return await prisma.season.findMany({
-        include: {
-          _count: {
-            select: {
-              insurances: true,
-              championships: true,
-            },
+  getAll: adminProcedure.query(async () => {
+    return await prisma.season.findMany({
+      include: {
+        _count: {
+          select: {
+            insurances: true,
+            championships: true,
           },
         },
-        orderBy: {
-          startDate: 'desc',
-        },
-      })
-    }),
+      },
+      orderBy: {
+        startDate: "desc",
+      },
+    });
+  }),
 
   // Club manager procedures - read-only access to seasons
-  getAllForClubManager: clubManagerProcedure
-    .query(async () => {
-      return await prisma.season.findMany({
-        orderBy: {
-          startDate: 'desc',
-        },
-      })
-    }),
+  getAllForClubManager: clubManagerProcedure.query(async () => {
+    return await prisma.season.findMany({
+      orderBy: {
+        startDate: "desc",
+      },
+    });
+  }),
 
-  getCurrent: adminProcedure
-    .query(async () => {
-      const currentDate = new Date()
-      return await prisma.season.findFirst({
-        where: {
-          startDate: { lte: currentDate },
-          endDate: { gte: currentDate },
-        },
-        include: {
-          _count: {
-            select: {
-              insurances: true,
-              championships: true,
-            },
+  getCurrent: adminProcedure.query(async () => {
+    const currentDate = new Date();
+    return await prisma.season.findFirst({
+      where: {
+        startDate: { lte: currentDate },
+        endDate: { gte: currentDate },
+      },
+      include: {
+        _count: {
+          select: {
+            insurances: true,
+            championships: true,
           },
         },
-      })
-    }),
+      },
+    });
+  }),
 
   getById: adminProcedure
     .input(z.object({ id: z.string() }))
@@ -63,16 +60,18 @@ export const seasonsRouter = router({
             },
           },
         },
-      })
+      });
     }),
 
   create: adminProcedure
-    .input(z.object({
-      name: z.string().min(1),
-      startDate: z.string(),
-      endDate: z.string(),
-      isActive: z.boolean().default(false),
-    }))
+    .input(
+      z.object({
+        name: z.string().min(1),
+        startDate: z.string(),
+        endDate: z.string(),
+        isActive: z.boolean().default(false),
+      })
+    )
     .mutation(async ({ input }) => {
       return await prisma.season.create({
         data: {
@@ -80,19 +79,21 @@ export const seasonsRouter = router({
           startDate: new Date(input.startDate),
           endDate: new Date(input.endDate),
         },
-      })
+      });
     }),
 
   update: adminProcedure
-    .input(z.object({
-      id: z.string(),
-      name: z.string().min(1).optional(),
-      startDate: z.string().optional(),
-      endDate: z.string().optional(),
-      isActive: z.boolean().optional(),
-    }))
+    .input(
+      z.object({
+        id: z.string(),
+        name: z.string().min(1).optional(),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+        isActive: z.boolean().optional(),
+      })
+    )
     .mutation(async ({ input }) => {
-      const { id, ...data } = input
+      const { id, ...data } = input;
       return await prisma.season.update({
         where: { id },
         data: {
@@ -100,7 +101,7 @@ export const seasonsRouter = router({
           startDate: data.startDate ? new Date(data.startDate) : undefined,
           endDate: data.endDate ? new Date(data.endDate) : undefined,
         },
-      })
+      });
     }),
 
   delete: adminProcedure
@@ -108,7 +109,7 @@ export const seasonsRouter = router({
     .mutation(async ({ input }) => {
       return await prisma.season.delete({
         where: { id: input.id },
-      })
+      });
     }),
 
   setActive: adminProcedure
@@ -117,12 +118,12 @@ export const seasonsRouter = router({
       // First, set all seasons to inactive
       await prisma.season.updateMany({
         data: { isActive: false },
-      })
+      });
 
       // Then, set the specified season to active
       return await prisma.season.update({
         where: { id: input.id },
         data: { isActive: true },
-      })
+      });
     }),
-})
+});
