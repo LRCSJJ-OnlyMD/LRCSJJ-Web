@@ -37,8 +37,8 @@ interface Athlete {
   id: string;
   firstName: string;
   lastName: string;
-  email?: string;
-  phone?: string;
+  email?: string | null;
+  phone?: string | null;
   clubId: string;
   club: {
     id: string;
@@ -47,22 +47,28 @@ interface Athlete {
   insurances: Array<{
     id: string;
     isPaid: boolean;
-    paidAt?: Date;
+    paidAt?: Date | null;
     season: {
       id: string;
-      year: string;
       name: string;
     };
   }>;
-  category?: string;
+  category?: string | null;
   dateOfBirth: Date;
 }
 
 interface Season {
   id: string;
-  year: string;
   name: string;
+  startDate: Date;
+  endDate: Date;
   isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  _count?: {
+    insurances: number;
+    championships: number;
+  };
 }
 
 export function AthletePaymentManager() {
@@ -78,7 +84,7 @@ export function AthletePaymentManager() {
 
   // tRPC queries
   const { data: seasonsData, isLoading: loadingSeasons } =
-    trpc.seasons.getAll.useQuery();
+    trpc.seasons.getAllForClubManager.useQuery();
   const {
     data: athletesData,
     isLoading: loadingAthletes,
@@ -180,9 +186,9 @@ export function AthletePaymentManager() {
         clubId: athlete.clubId,
         clubName: athlete.club.name,
         seasonId: selectedSeason.id,
-        seasonYear: selectedSeason.year,
-        customerEmail: athlete.email,
-        customerPhone: athlete.phone,
+        seasonYear: selectedSeason.name, // Use season name instead of year
+        customerEmail: athlete.email || undefined,
+        customerPhone: athlete.phone || undefined,
       };
 
       console.log("Payment request:", paymentRequest);
@@ -246,9 +252,9 @@ export function AthletePaymentManager() {
         clubId: selectedAthletesList[0].clubId,
         clubName: selectedAthletesList[0].club.name,
         seasonId: selectedSeason.id,
-        seasonYear: selectedSeason.year,
-        customerEmail: selectedAthletesList[0].email,
-        customerPhone: selectedAthletesList[0].phone,
+        seasonYear: selectedSeason.name, // Use season name instead of year
+        customerEmail: selectedAthletesList[0].email || undefined,
+        customerPhone: selectedAthletesList[0].phone || undefined,
       };
 
       console.log("Bulk payment request:", paymentRequest);

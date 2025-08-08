@@ -1,8 +1,9 @@
 import { z } from 'zod'
-import { adminProcedure, router } from '../trpc'
+import { adminProcedure, clubManagerProcedure, router } from '../trpc'
 import { prisma } from '../prisma'
 
 export const seasonsRouter = router({
+  // Admin procedures - full access
   getAll: adminProcedure
     .query(async () => {
       return await prisma.season.findMany({
@@ -14,6 +15,16 @@ export const seasonsRouter = router({
             },
           },
         },
+        orderBy: {
+          startDate: 'desc',
+        },
+      })
+    }),
+
+  // Club manager procedures - read-only access to seasons
+  getAllForClubManager: clubManagerProcedure
+    .query(async () => {
+      return await prisma.season.findMany({
         orderBy: {
           startDate: 'desc',
         },
