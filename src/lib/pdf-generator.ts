@@ -2,60 +2,60 @@
 // Simplified version for document generation without external dependencies
 
 export interface Invoice {
-  invoiceNumber: string
-  clubName: string
-  clubAddress: string
-  date: string
-  dueDate: string
+  invoiceNumber: string;
+  clubName: string;
+  clubAddress: string;
+  date: string;
+  dueDate: string;
   items: {
-    description: string
-    quantity: number
-    unitPrice: number
-    total: number
-  }[]
-  subtotal: number
-  tax: number
-  total: number
-  paymentMethod?: string
-  paymentCode?: string
+    description: string;
+    quantity: number;
+    unitPrice: number;
+    total: number;
+  }[];
+  subtotal: number;
+  tax: number;
+  total: number;
+  paymentMethod?: string;
+  paymentCode?: string;
 }
 
 export interface PaymentHistory {
-  clubName: string
-  period: string
+  clubName: string;
+  period: string;
   payments: {
-    date: string
-    athlete: string
-    amount: number
-    type: string
-    status: string
-    paymentMethod?: string
-    transactionId?: string
-  }[]
+    date: string;
+    athlete: string;
+    amount: number;
+    type: string;
+    status: string;
+    paymentMethod?: string;
+    transactionId?: string;
+  }[];
   summary: {
-    totalPaid: number
-    totalPending: number
-    totalOverdue: number
-  }
+    totalPaid: number;
+    totalPending: number;
+    totalOverdue: number;
+  };
 }
 
 export interface AthleteReport {
-  clubName: string
+  clubName: string;
   athletes: {
-    name: string
-    belt: string
-    age: number
-    weight: number
-    hasInsurance: boolean
-    insuranceExpiry?: string
-    registrationDate: string
-  }[]
+    name: string;
+    belt: string;
+    age: number;
+    weight: number;
+    hasInsurance: boolean;
+    insuranceExpiry?: string;
+    registrationDate: string;
+  }[];
   statistics: {
-    totalAthletes: number
-    averageAge: number
-    beltDistribution: Record<string, number>
-    insuredPercentage: number
-  }
+    totalAthletes: number;
+    averageAge: number;
+    beltDistribution: Record<string, number>;
+    insuredPercentage: number;
+  };
 }
 
 export class PDFGenerator {
@@ -116,14 +116,18 @@ export class PDFGenerator {
             </tr>
         </thead>
         <tbody>
-            ${invoice.items.map(item => `
+            ${invoice.items
+              .map(
+                (item) => `
                 <tr>
                     <td>${item.description}</td>
                     <td>${item.quantity}</td>
                     <td>${item.unitPrice.toFixed(2)}</td>
                     <td>${item.total.toFixed(2)}</td>
                 </tr>
-            `).join('')}
+            `
+              )
+              .join("")}
             <tr class="total-row">
                 <td colspan="3"><strong>Sous-total</strong></td>
                 <td><strong>${invoice.subtotal.toFixed(2)} MAD</strong></td>
@@ -139,13 +143,21 @@ export class PDFGenerator {
         </tbody>
     </table>
 
-    ${invoice.paymentMethod ? `
+    ${
+      invoice.paymentMethod
+        ? `
         <div class="payment-info">
             <h3>Informations de paiement:</h3>
             <p><strong>Méthode:</strong> ${invoice.paymentMethod}</p>
-            ${invoice.paymentCode ? `<p><strong>Code de paiement:</strong> ${invoice.paymentCode}</p>` : ''}
+            ${
+              invoice.paymentCode
+                ? `<p><strong>Code de paiement:</strong> ${invoice.paymentCode}</p>`
+                : ""
+            }
         </div>
-    ` : ''}
+    `
+        : ""
+    }
 
     <div class="footer">
         <p>Merci pour votre confiance!</p>
@@ -154,7 +166,7 @@ export class PDFGenerator {
     </div>
 </body>
 </html>
-    `.trim()
+    `.trim();
   }
 
   // Generate payment history as HTML
@@ -196,15 +208,21 @@ export class PDFGenerator {
         <h3>Résumé financier:</h3>
         <div class="summary-item">
             <span>Total payé:</span>
-            <span><strong>${history.summary.totalPaid.toFixed(2)} MAD</strong></span>
+            <span><strong>${history.summary.totalPaid.toFixed(
+              2
+            )} MAD</strong></span>
         </div>
         <div class="summary-item">
             <span>Total en attente:</span>
-            <span><strong>${history.summary.totalPending.toFixed(2)} MAD</strong></span>
+            <span><strong>${history.summary.totalPending.toFixed(
+              2
+            )} MAD</strong></span>
         </div>
         <div class="summary-item">
             <span>Total en retard:</span>
-            <span><strong>${history.summary.totalOverdue.toFixed(2)} MAD</strong></span>
+            <span><strong>${history.summary.totalOverdue.toFixed(
+              2
+            )} MAD</strong></span>
         </div>
     </div>
 
@@ -221,27 +239,33 @@ export class PDFGenerator {
             </tr>
         </thead>
         <tbody>
-            ${history.payments.map(payment => `
+            ${history.payments
+              .map(
+                (payment) => `
                 <tr>
                     <td>${payment.date}</td>
                     <td>${payment.athlete}</td>
                     <td>${payment.type}</td>
                     <td>${payment.amount.toFixed(2)}</td>
-                    <td class="status-${payment.status.toLowerCase()}">${payment.status}</td>
-                    <td>${payment.paymentMethod || '-'}</td>
-                    <td>${payment.transactionId || '-'}</td>
+                    <td class="status-${payment.status.toLowerCase()}">${
+                  payment.status
+                }</td>
+                    <td>${payment.paymentMethod || "-"}</td>
+                    <td>${payment.transactionId || "-"}</td>
                 </tr>
-            `).join('')}
+            `
+              )
+              .join("")}
         </tbody>
     </table>
 
     <div class="footer">
-        <p>Document généré le ${new Date().toLocaleDateString('fr-FR')}</p>
+        <p>Document généré le ${new Date().toLocaleDateString("fr-FR")}</p>
         <p>LRCSJJ - Excellence, Discipline et Tradition Martiale</p>
     </div>
 </body>
 </html>
-    `.trim()
+    `.trim();
   }
 
   // Generate athlete report as HTML
@@ -284,11 +308,15 @@ export class PDFGenerator {
             <div>Total Athlètes</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number">${report.statistics.averageAge.toFixed(1)}</div>
+            <div class="stat-number">${report.statistics.averageAge.toFixed(
+              1
+            )}</div>
             <div>Âge Moyen</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number">${report.statistics.insuredPercentage.toFixed(1)}%</div>
+            <div class="stat-number">${report.statistics.insuredPercentage.toFixed(
+              1
+            )}%</div>
             <div>Taux d'Assurance</div>
         </div>
     </div>
@@ -306,114 +334,141 @@ export class PDFGenerator {
             </tr>
         </thead>
         <tbody>
-            ${report.athletes.map(athlete => `
+            ${report.athletes
+              .map(
+                (athlete) => `
                 <tr>
                     <td>${athlete.name}</td>
                     <td>${athlete.belt}</td>
                     <td>${athlete.age}</td>
                     <td>${athlete.weight}</td>
-                    <td class="${athlete.hasInsurance ? 'insured-yes' : 'insured-no'}">
-                        ${athlete.hasInsurance ? 'Oui' : 'Non'}
+                    <td class="${
+                      athlete.hasInsurance ? "insured-yes" : "insured-no"
+                    }">
+                        ${athlete.hasInsurance ? "Oui" : "Non"}
                     </td>
-                    <td>${athlete.insuranceExpiry || '-'}</td>
+                    <td>${athlete.insuranceExpiry || "-"}</td>
                     <td>${athlete.registrationDate}</td>
                 </tr>
-            `).join('')}
+            `
+              )
+              .join("")}
         </tbody>
     </table>
 
     <div class="footer">
-        <p>Document généré le ${new Date().toLocaleDateString('fr-FR')}</p>
+        <p>Document généré le ${new Date().toLocaleDateString("fr-FR")}</p>
         <p>LRCSJJ - Excellence, Discipline et Tradition Martiale</p>
     </div>
 </body>
 </html>
-    `.trim()
+    `.trim();
   }
 
   // Download HTML content as PDF-ready file
   static downloadAsHTML(content: string, filename: string): void {
-    const blob = new Blob([content], { type: 'text/html;charset=utf-8' })
-    const link = document.createElement('a')
+    const blob = new Blob([content], { type: "text/html;charset=utf-8" });
+    const link = document.createElement("a");
     if (link.download !== undefined) {
-      const url = URL.createObjectURL(blob)
-      link.setAttribute('href', url)
-      link.setAttribute('download', filename.replace('.pdf', '.html'))
-      link.style.visibility = 'hidden'
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(url)
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", filename.replace(".pdf", ".html"));
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     }
   }
 
   // Print HTML content (user can save as PDF)
   static printHTML(content: string): void {
-    const printWindow = window.open('', '_blank')
+    const printWindow = window.open("", "_blank");
     if (printWindow) {
-      printWindow.document.write(content)
-      printWindow.document.close()
-      printWindow.focus()
+      printWindow.document.write(content);
+      printWindow.document.close();
+      printWindow.focus();
       setTimeout(() => {
-        printWindow.print()
-      }, 250)
+        printWindow.print();
+      }, 250);
     }
   }
 
   // Generate and download invoice
   static downloadInvoice(invoice: Invoice): void {
-    const content = this.generateInvoiceHTML(invoice)
-    const filename = `facture_${invoice.invoiceNumber}_${new Date().toISOString().split('T')[0]}.html`
-    this.downloadAsHTML(content, filename)
+    const content = this.generateInvoiceHTML(invoice);
+    const filename = `facture_${invoice.invoiceNumber}_${
+      new Date().toISOString().split("T")[0]
+    }.html`;
+    this.downloadAsHTML(content, filename);
   }
 
   // Generate and print invoice
   static printInvoice(invoice: Invoice): void {
-    const content = this.generateInvoiceHTML(invoice)
-    this.printHTML(content)
+    const content = this.generateInvoiceHTML(invoice);
+    this.printHTML(content);
   }
 
   // Generate and download payment history
   static downloadPaymentHistory(history: PaymentHistory): void {
-    const content = this.generatePaymentHistoryHTML(history)
-    const filename = `historique_paiements_${history.period.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.html`
-    this.downloadAsHTML(content, filename)
+    const content = this.generatePaymentHistoryHTML(history);
+    const filename = `historique_paiements_${history.period.replace(
+      /\s+/g,
+      "_"
+    )}_${new Date().toISOString().split("T")[0]}.html`;
+    this.downloadAsHTML(content, filename);
   }
 
   // Generate and download athlete report
   static downloadAthleteReport(report: AthleteReport): void {
-    const content = this.generateAthleteReportHTML(report)
-    const filename = `rapport_athletes_${report.clubName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.html`
-    this.downloadAsHTML(content, filename)
+    const content = this.generateAthleteReportHTML(report);
+    const filename = `rapport_athletes_${report.clubName.replace(
+      /\s+/g,
+      "_"
+    )}_${new Date().toISOString().split("T")[0]}.html`;
+    this.downloadAsHTML(content, filename);
   }
 
   // Export as CSV for data analysis
   static exportPaymentHistoryCSV(history: PaymentHistory): void {
-    const headers = ['Date', 'Athlète', 'Type', 'Montant', 'Statut', 'Méthode', 'Transaction ID']
+    const headers = [
+      "Date",
+      "Athlète",
+      "Type",
+      "Montant",
+      "Statut",
+      "Méthode",
+      "Transaction ID",
+    ];
     const csvContent = [
-      headers.join(','),
-      ...history.payments.map(payment => [
-        payment.date,
-        `"${payment.athlete}"`,
-        payment.type,
-        payment.amount,
-        payment.status,
-        payment.paymentMethod || '',
-        payment.transactionId || ''
-      ].join(','))
-    ].join('\n')
+      headers.join(","),
+      ...history.payments.map((payment) =>
+        [
+          payment.date,
+          `"${payment.athlete}"`,
+          payment.type,
+          payment.amount,
+          payment.status,
+          payment.paymentMethod || "",
+          payment.transactionId || "",
+        ].join(",")
+      ),
+    ].join("\n");
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' })
-    const link = document.createElement('a')
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8" });
+    const link = document.createElement("a");
     if (link.download !== undefined) {
-      const url = URL.createObjectURL(blob)
-      link.setAttribute('href', url)
-      link.setAttribute('download', `paiements_${history.period.replace(/\s+/g, '_')}.csv`)
-      link.style.visibility = 'hidden'
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(url)
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute(
+        "download",
+        `paiements_${history.period.replace(/\s+/g, "_")}.csv`
+      );
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     }
   }
 }

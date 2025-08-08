@@ -175,7 +175,7 @@ export function StripePaymentProcessing({
         return (
           <Badge
             variant="default"
-            className="bg-green-100 text-green-800 border-green-200"
+            className="bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800"
           >
             <CheckCircle className="w-3 h-3 mr-1" />
             Payé
@@ -186,7 +186,7 @@ export function StripePaymentProcessing({
         return (
           <Badge
             variant="secondary"
-            className="bg-yellow-100 text-yellow-800 border-yellow-200"
+            className="bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800"
           >
             <Clock className="w-3 h-3 mr-1" />
             En attente
@@ -197,7 +197,7 @@ export function StripePaymentProcessing({
         return (
           <Badge
             variant="destructive"
-            className="bg-red-100 text-red-800 border-red-200"
+            className="bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800"
           >
             <XCircle className="w-3 h-3 mr-1" />
             Échoué
@@ -266,7 +266,7 @@ export function StripePaymentProcessing({
                     {insuranceStatus.hasValidInsurance ? (
                       <Badge
                         variant="default"
-                        className="bg-green-100 text-green-800 border-green-200"
+                        className="bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800"
                       >
                         <CheckCircle className="w-3 h-3 mr-1" />
                         Assurance active
@@ -274,7 +274,7 @@ export function StripePaymentProcessing({
                     ) : (
                       <Badge
                         variant="destructive"
-                        className="bg-red-100 text-red-800 border-red-200"
+                        className="bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800"
                       >
                         <XCircle className="w-3 h-3 mr-1" />
                         Assurance expirée
@@ -388,7 +388,7 @@ export function StripePaymentProcessing({
               <div className="space-y-4">
                 {insuranceStatus?.hasValidInsurance ? (
                   <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                    <div className="flex items-center gap-2 text-green-800">
+                    <div className="flex items-center gap-2 text-green-800 dark:text-green-400">
                       <CheckCircle className="w-5 h-5" />
                       <span className="font-medium">
                         Assurance déjà active pour cette saison

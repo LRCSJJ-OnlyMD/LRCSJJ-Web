@@ -42,6 +42,15 @@ export class StripePaymentService {
   private static readonly CANCEL_URL = `${process.env.NEXT_PUBLIC_APP_URL}/club-manager/payments?payment=cancelled`;
 
   /**
+   * Extract quantity from athlete name (for bulk payments)
+   * Looks for pattern like "Paiement groupé (3 athlètes): ..."
+   */
+  private static getQuantityFromAthleteName(athleteName: string): number {
+    const match = athleteName.match(/Paiement groupé \((\d+) athlètes?\):/);
+    return match ? parseInt(match[1], 10) : 1;
+  }
+
+  /**
    * Create Stripe Checkout Session for yearly insurance payment
    */
   static async createInsurancePaymentSession(
@@ -76,9 +85,9 @@ export class StripePaymentService {
                   season_id: request.seasonId,
                 },
               },
-              unit_amount: this.ANNUAL_INSURANCE_AMOUNT * 100, // Stripe expects amount in smallest currency unit (centimes for MAD)
+              unit_amount: this.ANNUAL_INSURANCE_AMOUNT * 100, // Stripe expects amount in smallest currency unit
             },
-            quantity: 1,
+            quantity: this.getQuantityFromAthleteName(request.athleteName), // Extract quantity for bulk payments
           },
         ],
 

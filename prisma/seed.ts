@@ -8,13 +8,15 @@ dotenv.config();
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("🌱 Starting database seed...");
+  console.log(
+    "🌱 Starting LRCSJJ database seed with realistic startup data..."
+  );
 
   // Create admin users
   const adminPassword = await hashPassword(
     process.env.ADMIN_DEFAULT_PASSWORD || "AdminPass2025!"
   );
-  const admin3Password = await hashPassword("mdol2003"); // Hash the specific password for admin 3
+  const admin3Password = await hashPassword("mdol2003");
 
   const admin1 = await prisma.admin.upsert({
     where: { email: "admin@lrcsjj.ma" },
@@ -22,17 +24,19 @@ async function main() {
     create: {
       email: "admin@lrcsjj.ma",
       password: adminPassword,
-      name: "Administrator 1",
+      name: "Administrateur Principal LRCSJJ",
+      role: "SUPER_ADMIN",
     },
   });
 
   const admin2 = await prisma.admin.upsert({
-    where: { email: "admin2@lrcsjj.ma" },
+    where: { email: "secretaire@lrcsjj.ma" },
     update: {},
     create: {
-      email: "admin2@lrcsjj.ma",
+      email: "secretaire@lrcsjj.ma",
       password: adminPassword,
-      name: "Administrator 2",
+      name: "Secrétaire Général",
+      role: "ADMIN",
     },
   });
 
@@ -41,8 +45,9 @@ async function main() {
     update: {},
     create: {
       email: "mouadom2003@gmail.com",
-      password: admin3Password, // Use the specific hashed password for admin 3
-      name: "Administrator 3",
+      password: admin3Password,
+      name: "Développeur Système",
+      role: "SUPER_ADMIN",
     },
   });
 
@@ -52,8 +57,8 @@ async function main() {
     admin3: admin3.email,
   });
 
-  // Create a sample season
-  const season = await prisma.season.upsert({
+  // Create current season (2024-2025)
+  const currentSeason = await prisma.season.upsert({
     where: { name: "2024-2025" },
     update: {},
     create: {
@@ -64,785 +69,504 @@ async function main() {
     },
   });
 
-  console.log("✅ Created season:", season.name);
-
-  // Create sample clubs
-  const clubs = await Promise.all([
-    prisma.club.upsert({
-      where: { id: "club-casa-1" },
-      update: {},
-      create: {
-        id: "club-casa-1",
-        name: "Club Ju-Jitsu Casablanca Elite",
-        address: "Boulevard Mohammed V, Casablanca 20000, Morocco",
-        phone: "+212 522 123 456",
-        email: "contact@jjcasa.ma",
-        president: "Ahmed Benali",
-        coach: "Mohamed El Fassi",
-      },
-    }),
-    prisma.club.upsert({
-      where: { id: "club-settat-1" },
-      update: {},
-      create: {
-        id: "club-settat-1",
-        name: "Club Ju-Jitsu Settat Champions",
-        address: "Avenue Hassan II, Settat 26000, Morocco",
-        phone: "+212 523 456 789",
-        email: "contact@jjsettat.ma",
-        president: "Fatima Zahra",
-        coach: "Youssef Alami",
-      },
-    }),
-    prisma.club.upsert({
-      where: { id: "club-berrechid-1" },
-      update: {},
-      create: {
-        id: "club-berrechid-1",
-        name: "Club Ju-Jitsu Berrechid Warriors",
-        address: "Rue Al Qods, Berrechid 26100, Morocco",
-        phone: "+212 522 789 012",
-        email: "contact@jjberrechid.ma",
-        president: "Omar Tazi",
-        coach: "Karim Senhaji",
-      },
-    }),
-    prisma.club.upsert({
-      where: { id: "club-mohammedia-1" },
-      update: {},
-      create: {
-        id: "club-mohammedia-1",
-        name: "Club Ju-Jitsu Mohammedia Fighters",
-        address: "Boulevard Ibn Sina, Mohammedia 28810, Morocco",
-        phone: "+212 523 321 654",
-        email: "contact@jjmohammedia.ma",
-        president: "Rachid Benjelloun",
-        coach: "Noureddine Lahlou",
-      },
-    }),
-  ]);
-
-  console.log(
-    "✅ Created clubs:",
-    clubs.map((c) => c.name)
-  );
-
-  // Create comprehensive athlete data for each club (10+ athletes per club)
-  console.log("🏃 Creating athletes for each club...");
-
-  // Casablanca Elite Club Athletes
-  const casablancaAthletes = [
-    {
-      firstName: "Hassan",
-      lastName: "Bouali",
-      nationalId: "MA123456",
-      belt: "Black",
-      weight: 70.5,
-      category: "Adult Male -73kg",
-      phone: "+212 612 345 678",
-      email: "hassan.bouali@email.ma",
-      dob: "1995-03-15",
-    },
-    {
-      firstName: "Fatima",
-      lastName: "El Mansouri",
-      nationalId: "MA456789",
-      belt: "Brown",
-      weight: 60.0,
-      category: "Adult Female -62kg",
-      phone: "+212 615 678 901",
-      email: "fatima.elmansouri@email.ma",
-      dob: "1997-05-18",
-    },
-    {
-      firstName: "Youssef",
-      lastName: "Chakraoui",
-      nationalId: "MA789456",
-      belt: "Purple",
-      weight: 85.0,
-      category: "Adult Male -85kg",
-      phone: "+212 618 234 567",
-      email: "youssef.chakraoui@email.ma",
-      dob: "1996-08-22",
-    },
-    {
-      firstName: "Amina",
-      lastName: "Benkirane",
-      nationalId: "MA321654",
-      belt: "Blue",
-      weight: 55.0,
-      category: "Adult Female -57kg",
-      phone: "+212 619 345 678",
-      email: "amina.benkirane@email.ma",
-      dob: "1998-12-10",
-    },
-    {
-      firstName: "Omar",
-      lastName: "Senhaji",
-      nationalId: "MA654321",
-      belt: "Black",
-      weight: 78.0,
-      category: "Adult Male -81kg",
-      phone: "+212 620 456 789",
-      email: "omar.senhaji@email.ma",
-      dob: "1994-11-03",
-    },
-    {
-      firstName: "Khadija",
-      lastName: "Alami",
-      nationalId: "MA987654",
-      belt: "Brown",
-      weight: 52.0,
-      category: "Adult Female -52kg",
-      phone: "+212 621 567 890",
-      email: "khadija.alami@email.ma",
-      dob: "1999-04-17",
-    },
-    {
-      firstName: "Mehdi",
-      lastName: "Tazi",
-      nationalId: "MA147258",
-      belt: "Purple",
-      weight: 90.0,
-      category: "Adult Male -90kg",
-      phone: "+212 622 678 901",
-      email: "mehdi.tazi@email.ma",
-      dob: "1997-09-12",
-    },
-    {
-      firstName: "Nadia",
-      lastName: "Benjelloun",
-      nationalId: "MA258369",
-      belt: "Blue",
-      weight: 48.0,
-      category: "Adult Female -48kg",
-      phone: "+212 623 789 012",
-      email: "nadia.benjelloun@email.ma",
-      dob: "2000-01-28",
-    },
-    {
-      firstName: "Rachid",
-      lastName: "Lahlou",
-      nationalId: "MA369147",
-      belt: "Black",
-      weight: 66.0,
-      category: "Adult Male -66kg",
-      phone: "+212 624 890 123",
-      email: "rachid.lahlou@email.ma",
-      dob: "1993-07-05",
-    },
-    {
-      firstName: "Salma",
-      lastName: "Fassi",
-      nationalId: "MA159753",
-      belt: "Brown",
-      weight: 70.0,
-      category: "Adult Female -70kg",
-      phone: "+212 625 901 234",
-      email: "salma.fassi@email.ma",
-      dob: "1996-03-14",
-    },
-    {
-      firstName: "Karim",
-      lastName: "Berrada",
-      nationalId: "MA753159",
-      belt: "Purple",
-      weight: 73.0,
-      category: "Adult Male -73kg",
-      phone: "+212 626 012 345",
-      email: "karim.berrada@email.ma",
-      dob: "1998-10-20",
-    },
-    {
-      firstName: "Zineb",
-      lastName: "Mouline",
-      nationalId: "MA951357",
-      belt: "Blue",
-      weight: 57.0,
-      category: "Adult Female -57kg",
-      phone: "+212 627 123 456",
-      email: "zineb.mouline@email.ma",
-      dob: "2001-06-08",
-    },
-  ];
-
-  // Settat Champions Club Athletes
-  const settatAthletes = [
-    {
-      firstName: "Aicha",
-      lastName: "Bennani",
-      nationalId: "SE123456",
-      belt: "Black",
-      weight: 57.0,
-      category: "Adult Female -57kg",
-      phone: "+212 613 456 789",
-      email: "aicha.bennani@email.ma",
-      dob: "1998-07-22",
-    },
-    {
-      firstName: "Omar",
-      lastName: "Benkirane",
-      nationalId: "SE654321",
-      belt: "Brown",
-      weight: 78.0,
-      category: "Adult Male -81kg",
-      phone: "+212 616 789 012",
-      email: "omar.benkirane@email.ma",
-      dob: "1996-11-03",
-    },
-    {
-      firstName: "Maryam",
-      lastName: "El Idrissi",
-      nationalId: "SE789123",
-      belt: "Purple",
-      weight: 62.0,
-      category: "Adult Female -62kg",
-      phone: "+212 628 234 567",
-      email: "maryam.elidrissi@email.ma",
-      dob: "1997-04-15",
-    },
-    {
-      firstName: "Abdellah",
-      lastName: "Chraibi",
-      nationalId: "SE321789",
-      belt: "Blue",
-      weight: 85.0,
-      category: "Adult Male -85kg",
-      phone: "+212 629 345 678",
-      email: "abdellah.chraibi@email.ma",
-      dob: "1995-12-08",
-    },
-    {
-      firstName: "Latifa",
-      lastName: "Benali",
-      nationalId: "SE456123",
-      belt: "Black",
-      weight: 52.0,
-      category: "Adult Female -52kg",
-      phone: "+212 630 456 789",
-      email: "latifa.benali@email.ma",
-      dob: "1999-09-25",
-    },
-    {
-      firstName: "Noureddine",
-      lastName: "Tahiri",
-      nationalId: "SE987456",
-      belt: "Brown",
-      weight: 73.0,
-      category: "Adult Male -73kg",
-      phone: "+212 631 567 890",
-      email: "noureddine.tahiri@email.ma",
-      dob: "1994-02-17",
-    },
-    {
-      firstName: "Hanane",
-      lastName: "Kettani",
-      nationalId: "SE654789",
-      belt: "Purple",
-      weight: 48.0,
-      category: "Adult Female -48kg",
-      phone: "+212 632 678 901",
-      email: "hanane.kettani@email.ma",
-      dob: "2000-08-11",
-    },
-    {
-      firstName: "Said",
-      lastName: "Bouazza",
-      nationalId: "SE123789",
-      belt: "Blue",
-      weight: 90.0,
-      category: "Adult Male -90kg",
-      phone: "+212 633 789 012",
-      email: "said.bouazza@email.ma",
-      dob: "1996-05-30",
-    },
-    {
-      firstName: "Rajae",
-      lastName: "Amrani",
-      nationalId: "SE789456",
-      belt: "Black",
-      weight: 70.0,
-      category: "Adult Female -70kg",
-      phone: "+212 634 890 123",
-      email: "rajae.amrani@email.ma",
-      dob: "1993-11-19",
-    },
-    {
-      firstName: "Hamid",
-      lastName: "Bensouda",
-      nationalId: "SE456789",
-      belt: "Brown",
-      weight: 66.0,
-      category: "Adult Male -66kg",
-      phone: "+212 635 901 234",
-      email: "hamid.bensouda@email.ma",
-      dob: "1998-01-06",
-    },
-    {
-      firstName: "Siham",
-      lastName: "Zouine",
-      nationalId: "SE159753",
-      belt: "Purple",
-      weight: 55.0,
-      category: "Adult Female -55kg",
-      phone: "+212 636 012 345",
-      email: "siham.zouine@email.ma",
-      dob: "2001-03-23",
-    },
-  ];
-
-  // Berrechid Warriors Club Athletes
-  const berrechidAthletes = [
-    {
-      firstName: "Nadia",
-      lastName: "Chakir",
-      nationalId: "BR987654",
-      belt: "Black",
-      weight: 52.0,
-      category: "Adult Female -52kg",
-      phone: "+212 617 890 123",
-      email: "nadia.chakir@email.ma",
-      dob: "1999-09-12",
-    },
-    {
-      firstName: "Youssef",
-      lastName: "Alaoui",
-      nationalId: "BR789012",
-      belt: "Brown",
-      weight: 85.0,
-      category: "Adult Male -85kg",
-      phone: "+212 614 567 890",
-      email: "youssef.alaoui@email.ma",
-      dob: "2000-12-10",
-    },
-    {
-      firstName: "Samira",
-      lastName: "Benali",
-      nationalId: "BR456789",
-      belt: "Purple",
-      weight: 57.0,
-      category: "Adult Female -57kg",
-      phone: "+212 637 123 456",
-      email: "samira.benali@email.ma",
-      dob: "1997-06-18",
-    },
-    {
-      firstName: "Khalid",
-      lastName: "Mahmoudi",
-      nationalId: "BR123456",
-      belt: "Blue",
-      weight: 78.0,
-      category: "Adult Male -81kg",
-      phone: "+212 638 234 567",
-      email: "khalid.mahmoudi@email.ma",
-      dob: "1995-10-05",
-    },
-    {
-      firstName: "Zahra",
-      lastName: "Bouzid",
-      nationalId: "BR789123",
-      belt: "Black",
-      weight: 62.0,
-      category: "Adult Female -62kg",
-      phone: "+212 639 345 678",
-      email: "zahra.bouzid@email.ma",
-      dob: "1996-03-27",
-    },
-    {
-      firstName: "Mustapha",
-      lastName: "Louafi",
-      nationalId: "BR321654",
-      belt: "Brown",
-      weight: 73.0,
-      category: "Adult Male -73kg",
-      phone: "+212 640 456 789",
-      email: "mustapha.louafi@email.ma",
-      dob: "1994-08-14",
-    },
-    {
-      firstName: "Karima",
-      lastName: "Benjelloun",
-      nationalId: "BR654321",
-      belt: "Purple",
-      weight: 48.0,
-      category: "Adult Female -48kg",
-      phone: "+212 641 567 890",
-      email: "karima.benjelloun@email.ma",
-      dob: "2000-12-02",
-    },
-    {
-      firstName: "Ahmed",
-      lastName: "Slaoui",
-      nationalId: "BR987123",
-      belt: "Blue",
-      weight: 90.0,
-      category: "Adult Male -90kg",
-      phone: "+212 642 678 901",
-      email: "ahmed.slaoui@email.ma",
-      dob: "1998-04-09",
-    },
-    {
-      firstName: "Laila",
-      lastName: "Fikri",
-      nationalId: "BR159357",
-      belt: "Black",
-      weight: 70.0,
-      category: "Adult Female -70kg",
-      phone: "+212 643 789 012",
-      email: "laila.fikri@email.ma",
-      dob: "1992-07-21",
-    },
-    {
-      firstName: "Brahim",
-      lastName: "Naciri",
-      nationalId: "BR753951",
-      belt: "Brown",
-      weight: 66.0,
-      category: "Adult Male -66kg",
-      phone: "+212 644 890 123",
-      email: "brahim.naciri@email.ma",
-      dob: "1997-11-16",
-    },
-    {
-      firstName: "Fadwa",
-      lastName: "Serghini",
-      nationalId: "BR357159",
-      belt: "Purple",
-      weight: 55.0,
-      category: "Adult Female -55kg",
-      phone: "+212 645 901 234",
-      email: "fadwa.serghini@email.ma",
-      dob: "2001-01-13",
-    },
-  ];
-
-  // Mohammedia Fighters Club Athletes
-  const mohammediaAthletes = [
-    {
-      firstName: "Driss",
-      lastName: "Benali",
-      nationalId: "MH123456",
-      belt: "Black",
-      weight: 81.0,
-      category: "Adult Male -81kg",
-      phone: "+212 646 012 345",
-      email: "driss.benali@email.ma",
-      dob: "1995-05-12",
-    },
-    {
-      firstName: "Souad",
-      lastName: "Berrada",
-      nationalId: "MH654321",
-      belt: "Brown",
-      weight: 57.0,
-      category: "Adult Female -57kg",
-      phone: "+212 647 123 456",
-      email: "souad.berrada@email.ma",
-      dob: "1998-08-29",
-    },
-    {
-      firstName: "Hicham",
-      lastName: "Tounsi",
-      nationalId: "MH789456",
-      belt: "Purple",
-      weight: 73.0,
-      category: "Adult Male -73kg",
-      phone: "+212 648 234 567",
-      email: "hicham.tounsi@email.ma",
-      dob: "1996-11-07",
-    },
-    {
-      firstName: "Malika",
-      lastName: "Cherkaoui",
-      nationalId: "MH456123",
-      belt: "Blue",
-      weight: 62.0,
-      category: "Adult Female -62kg",
-      phone: "+212 649 345 678",
-      email: "malika.cherkaoui@email.ma",
-      dob: "1999-02-14",
-    },
-    {
-      firstName: "Samir",
-      lastName: "Ouali",
-      nationalId: "MH123789",
-      belt: "Black",
-      weight: 85.0,
-      category: "Adult Male -85kg",
-      phone: "+212 650 456 789",
-      email: "samir.ouali@email.ma",
-      dob: "1993-09-03",
-    },
-    {
-      firstName: "Nawal",
-      lastName: "Bennani",
-      nationalId: "MH987654",
-      belt: "Brown",
-      weight: 52.0,
-      category: "Adult Female -52kg",
-      phone: "+212 651 567 890",
-      email: "nawal.bennani@email.ma",
-      dob: "2000-06-18",
-    },
-    {
-      firstName: "Ismail",
-      lastName: "Dahbi",
-      nationalId: "MH321456",
-      belt: "Purple",
-      weight: 90.0,
-      category: "Adult Male -90kg",
-      phone: "+212 652 678 901",
-      email: "ismail.dahbi@email.ma",
-      dob: "1997-12-25",
-    },
-    {
-      firstName: "Ghizlane",
-      lastName: "Amellal",
-      nationalId: "MH654789",
-      belt: "Blue",
-      weight: 48.0,
-      category: "Adult Female -48kg",
-      phone: "+212 653 789 012",
-      email: "ghizlane.amellal@email.ma",
-      dob: "2001-03-10",
-    },
-    {
-      firstName: "Redouane",
-      lastName: "Benjelloun",
-      nationalId: "MH789123",
-      belt: "Black",
-      weight: 66.0,
-      category: "Adult Male -66kg",
-      phone: "+212 654 890 123",
-      email: "redouane.benjelloun@email.ma",
-      dob: "1994-07-28",
-    },
-    {
-      firstName: "Hayat",
-      lastName: "Lamrani",
-      nationalId: "MH456789",
-      belt: "Brown",
-      weight: 70.0,
-      category: "Adult Female -70kg",
-      phone: "+212 655 901 234",
-      email: "hayat.lamrani@email.ma",
-      dob: "1996-10-15",
-    },
-  ];
-
-  // Create all athletes
-  const allAthletesData = [
-    ...casablancaAthletes.map((a) => ({ ...a, clubId: clubs[0].id })),
-    ...settatAthletes.map((a) => ({ ...a, clubId: clubs[1].id })),
-    ...berrechidAthletes.map((a) => ({ ...a, clubId: clubs[2].id })),
-    ...mohammediaAthletes.map((a) => ({ ...a, clubId: clubs[3].id })),
-  ];
-
-  const athletes = [];
-  for (const athleteData of allAthletesData) {
-    const athlete = await prisma.athlete.upsert({
-      where: { nationalId: athleteData.nationalId },
-      update: {},
-      create: {
-        firstName: athleteData.firstName,
-        lastName: athleteData.lastName,
-        dateOfBirth: new Date(athleteData.dob),
-        nationalId: athleteData.nationalId,
-        phone: athleteData.phone,
-        email: athleteData.email,
-        belt: athleteData.belt,
-        weight: athleteData.weight,
-        category: athleteData.category,
-        clubId: athleteData.clubId,
-      },
-    });
-    athletes.push(athlete);
-  }
-
-  console.log(
-    "✅ Created athletes:",
-    athletes.map((a) => `${a.firstName} ${a.lastName}`)
-  );
-
-  // Create sample championship
-  const championship = await prisma.championship.upsert({
-    where: { id: "championship-2025-regional" },
+  // Create previous season for historical data
+  const previousSeason = await prisma.season.upsert({
+    where: { name: "2023-2024" },
     update: {},
     create: {
-      id: "championship-2025-regional",
-      name: "Casablanca-Settat Regional Championship 2025",
-      seasonId: season.id,
+      name: "2023-2024",
+      startDate: new Date("2023-09-01"),
+      endDate: new Date("2024-08-31"),
+      isActive: false,
+    },
+  });
+
+  console.log("✅ Created seasons:", {
+    current: currentSeason.name,
+    previous: previousSeason.name,
+  });
+
+  // Create realistic clubs for startup presentation
+  const clubsData = [
+    {
+      name: "Club Atlas Ju-Jitsu Casablanca",
+      address: "Quartier Maarif, Boulevard Zerktouni, Casablanca",
+      phone: "+212 522 123 456",
+      email: "atlas.jj@gmail.com",
+      president: "Ahmed Benali",
+      coach: "Karim Elmounir",
+    },
+    {
+      name: "Champions de Settat Ju-Jitsu",
+      address: "Avenue Mohammed V, Centre Ville, Settat",
+      phone: "+212 523 789 012",
+      email: "champions.settat@outlook.com",
+      president: "Fatima Zahra Alami",
+      coach: "Youssef Bennani",
+    },
+    {
+      name: "Dragon Ju-Jitsu Mohammedia",
+      address: "Zone Industrielle, Boulevard des FAR, Mohammedia",
+      phone: "+212 523 345 678",
+      email: "dragon.mohammedia@yahoo.fr",
+      president: "Rachid Tahiri",
+      coach: "Abdellah Kabbaj",
+    },
+    {
+      name: "Elite Ju-Jitsu Berrechid",
+      address: "Centre Ville, Avenue Hassan II, Berrechid",
+      phone: "+212 522 456 789",
+      email: "elite.berrechid@gmail.com",
+      president: "Noureddine Fassi",
+      coach: "Mohamed Cherkaoui",
+    },
+    {
+      name: "Phoenix Ju-Jitsu El Jadida",
+      address: "Route de Casablanca, Quartier Al Qods, El Jadida",
+      phone: "+212 523 567 890",
+      email: "phoenix.eljadida@hotmail.com",
+      president: "Samira Bennani",
+      coach: "Hassan Lahlou",
+    },
+  ];
+
+  const createdClubs = [];
+  for (const clubData of clubsData) {
+    const club = await prisma.club.create({
+      data: clubData,
+    });
+    createdClubs.push(club);
+
+    // Create club manager for each club
+    const managerEmail = `manager.${club.name
+      .toLowerCase()
+      .replace(/\s+/g, "")
+      .replace(/[^a-z0-9]/g, "")}@lrcsjj.ma`;
+
+    // Static temporary passwords based on club names for consistent testing
+    const staticPasswords: Record<string, string> = {
+      "Club Atlas Ju-Jitsu Casablanca": "atlas2025",
+      "Champions de Settat Ju-Jitsu": "champions2025",
+      "Dragon Ju-Jitsu Mohammedia": "dragon2025",
+      "Elite Ju-Jitsu Berrechid": "elite2025",
+      "Phoenix Ju-Jitsu El Jadida": "phoenix2025",
+    };
+
+    const tempPassword = staticPasswords[club.name] || "manager2025";
+
+    await prisma.clubManager.upsert({
+      where: { email: managerEmail },
+      update: {},
+      create: {
+        email: managerEmail,
+        name: `Manager ${club.name.split(" ")[0]}`,
+        clubId: club.id,
+        temporaryPassword: tempPassword,
+        isActive: true,
+      },
+    });
+  }
+
+  console.log("✅ Created clubs and managers:", createdClubs.length);
+
+  // Realistic athlete names for Moroccan context
+  const athleteNames = [
+    { firstName: "Ahmed", lastName: "Benali", gender: "M" },
+    { firstName: "Mohamed", lastName: "Alami", gender: "M" },
+    { firstName: "Youssef", lastName: "Chakir", gender: "M" },
+    { firstName: "Karim", lastName: "Fassi", gender: "M" },
+    { firstName: "Omar", lastName: "Bennani", gender: "M" },
+    { firstName: "Amine", lastName: "Tahiri", gender: "M" },
+    { firstName: "Rachid", lastName: "Kabbaj", gender: "M" },
+    { firstName: "Abdellah", lastName: "Cherkaoui", gender: "M" },
+    { firstName: "Hassan", lastName: "Lahlou", gender: "M" },
+    { firstName: "Othmane", lastName: "Sebti", gender: "M" },
+    { firstName: "Mehdi", lastName: "Berrada", gender: "M" },
+    { firstName: "Zakaria", lastName: "Ouali", gender: "M" },
+    { firstName: "Hamza", lastName: "Nejjar", gender: "M" },
+    { firstName: "Bilal", lastName: "Tazi", gender: "M" },
+    { firstName: "Adnane", lastName: "Kettani", gender: "M" },
+    { firstName: "Fatima", lastName: "Zahra", gender: "F" },
+    { firstName: "Aicha", lastName: "Bennani", gender: "F" },
+    { firstName: "Khadija", lastName: "Alaoui", gender: "F" },
+    { firstName: "Samira", lastName: "Fassi", gender: "F" },
+    { firstName: "Nadia", lastName: "Chakir", gender: "F" },
+    { firstName: "Laila", lastName: "Berrada", gender: "F" },
+    { firstName: "Zineb", lastName: "Tahiri", gender: "F" },
+    { firstName: "Meriem", lastName: "Kabbaj", gender: "F" },
+    { firstName: "Sophia", lastName: "Benali", gender: "F" },
+    { firstName: "Salma", lastName: "Cherkaoui", gender: "F" },
+    { firstName: "Yasmine", lastName: "Ouali", gender: "F" },
+    { firstName: "Dounia", lastName: "Sebti", gender: "F" },
+    { firstName: "Imane", lastName: "Nejjar", gender: "F" },
+    { firstName: "Ghita", lastName: "Tazi", gender: "F" },
+    { firstName: "Hanane", lastName: "Kettani", gender: "F" },
+  ];
+
+  // Helper functions for realistic data generation
+  function getRandomElement<T>(array: T[]): T {
+    return array[Math.floor(Math.random() * array.length)];
+  }
+
+  function generateAge(): number {
+    // Realistic age distribution for ju-jitsu clubs
+    const ageRanges = [
+      { min: 12, max: 16, weight: 0.2 }, // Youth
+      { min: 17, max: 25, weight: 0.5 }, // Prime age
+      { min: 26, max: 35, weight: 0.3 }, // Adults
+    ];
+
+    const random = Math.random();
+    let cumulative = 0;
+
+    for (const range of ageRanges) {
+      cumulative += range.weight;
+      if (random <= cumulative) {
+        return (
+          Math.floor(Math.random() * (range.max - range.min + 1)) + range.min
+        );
+      }
+    }
+    return 20; // fallback
+  }
+
+  function generateWeight(age: number, gender: string): number {
+    let base = gender === "M" ? 70 : 55;
+    if (age < 16) base -= 20;
+    else if (age < 20) base -= 10;
+
+    return Math.round(base + (Math.random() - 0.5) * 20);
+  }
+
+  function generateEmail(firstName: string, lastName: string): string {
+    const domains = ["gmail.com", "outlook.com", "yahoo.fr", "hotmail.com"];
+    return `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${getRandomElement(
+      domains
+    )}`;
+  }
+
+  function generatePhone(): string {
+    const prefixes = ["06", "07"];
+    const prefix = getRandomElement(prefixes);
+    const number = Math.floor(Math.random() * 90000000) + 10000000;
+    return `+212 ${prefix} ${
+      number
+        .toString()
+        .match(/.{1,2}/g)
+        ?.join(" ") || ""
+    }`;
+  }
+
+  function generateRealisticBelt(age: number): string {
+    // Realistic belt progression based on age and typical training progression
+    if (age < 16) {
+      return getRandomElement(["Blanche", "Jaune", "Orange", "Verte"]);
+    } else if (age < 20) {
+      return getRandomElement(["Verte", "Bleue", "Marron"]);
+    } else if (age < 25) {
+      return getRandomElement(["Bleue", "Marron", "Noire 1er Dan"]);
+    } else {
+      return getRandomElement(["Marron", "Noire 1er Dan", "Noire 2ème Dan"]);
+    }
+  }
+
+  // Create realistic athletes for each club
+  const allAthletes = [];
+  let totalAthletes = 0;
+
+  for (const club of createdClubs) {
+    // Each club has 10-20 athletes (realistic for startup league)
+    const athleteCount = Math.floor(Math.random() * 11) + 10;
+
+    for (let i = 0; i < athleteCount; i++) {
+      const athleteName = getRandomElement(athleteNames);
+      const age = generateAge();
+      const weight = generateWeight(age, athleteName.gender);
+
+      // Generate realistic birth date
+      const birthDate = new Date();
+      birthDate.setFullYear(birthDate.getFullYear() - age);
+      birthDate.setMonth(Math.floor(Math.random() * 12));
+      birthDate.setDate(Math.floor(Math.random() * 28) + 1);
+
+      const belt = generateRealisticBelt(age);
+
+      try {
+        const athlete = await prisma.athlete.create({
+          data: {
+            firstName: athleteName.firstName,
+            lastName: athleteName.lastName,
+            dateOfBirth: birthDate,
+            phone: Math.random() > 0.3 ? generatePhone() : null,
+            email:
+              Math.random() > 0.4
+                ? generateEmail(athleteName.firstName, athleteName.lastName)
+                : null,
+            belt: belt,
+            weight: weight,
+            category: age < 18 ? "Moins de 18 ans" : "Adulte",
+            clubId: club.id,
+          },
+        });
+
+        allAthletes.push(athlete);
+        totalAthletes++;
+      } catch {
+        // Skip duplicates due to unique constraints
+        console.log(
+          `⚠️ Skipped duplicate: ${athleteName.firstName} ${athleteName.lastName}`
+        );
+      }
+    }
+  }
+
+  console.log("✅ Created athletes:", totalAthletes);
+
+  // Create insurance records with CONSISTENT status between table and display
+  let totalInsurances = 0;
+  let paidInsurances = 0;
+
+  for (const athlete of allAthletes) {
+    // Current season insurance (all athletes need it)
+    const isPaidCurrent = Math.random() > 0.25; // 75% payment rate (realistic for startup)
+    await prisma.insurance.create({
+      data: {
+        athleteId: athlete.id,
+        seasonId: currentSeason.id,
+        amount: 150.0, // 150 MAD
+        isPaid: isPaidCurrent,
+        paidAt: isPaidCurrent
+          ? new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000)
+          : null,
+      },
+    });
+
+    totalInsurances++;
+    if (isPaidCurrent) paidInsurances++;
+
+    // Previous season insurance (60% have historical data)
+    if (Math.random() > 0.4) {
+      const isPaidPrevious = Math.random() > 0.1; // 90% paid for previous season
+      await prisma.insurance.create({
+        data: {
+          athleteId: athlete.id,
+          seasonId: previousSeason.id,
+          amount: 140.0, // Previous year was slightly less
+          isPaid: isPaidPrevious,
+          paidAt: isPaidPrevious ? new Date("2024-01-15") : null,
+        },
+      });
+
+      totalInsurances++;
+      if (isPaidPrevious) paidInsurances++;
+    }
+  }
+
+  console.log("✅ Created insurance records with consistent status:", {
+    total: totalInsurances,
+    paid: paidInsurances,
+    paymentRate: `${Math.round((paidInsurances / totalInsurances) * 100)}%`,
+  });
+
+  // Create realistic championships
+  const championships = [
+    {
+      name: "Championnat Régional LRCSJJ 2025",
       entryFee: 200.0,
       startDate: new Date("2025-03-15"),
       endDate: new Date("2025-03-17"),
-      location: "Casablanca Sports Complex",
-      description: "Annual regional championship for Casablanca-Settat league",
+      location: "Complexe Sportif Mohammed V, Casablanca",
+      description: "Championnat annuel de la ligue Casablanca-Settat",
     },
-  });
-
-  console.log("✅ Created championship:", championship.name);
-
-  // Create league teams
-  const team1 = await prisma.leagueTeam.upsert({
-    where: { id: "team-1st-division" },
-    update: {},
-    create: {
-      id: "team-1st-division",
-      name: "1st League Team",
-      division: "First Division",
-      category: "Mixed Adult",
-      description:
-        "Elite team representing Casablanca-Settat in national competitions",
+    {
+      name: "Coupe Casablanca-Settat Ju-Jitsu",
+      entryFee: 150.0,
+      startDate: new Date("2025-05-10"),
+      endDate: new Date("2025-05-11"),
+      location: "Salle OCP, Settat",
+      description: "Compétition inter-clubs de la région",
     },
-  });
-
-  const team2 = await prisma.leagueTeam.upsert({
-    where: { id: "team-2nd-division" },
-    update: {},
-    create: {
-      id: "team-2nd-division",
-      name: "2nd League Team",
-      division: "Second Division",
-      category: "Youth",
-      description: "Development team for young athletes",
+    {
+      name: "Tournoi de Fin d'Année",
+      entryFee: 100.0,
+      startDate: new Date("2025-06-20"),
+      endDate: new Date("2025-06-21"),
+      location: "Gymnase Municipal, Mohammedia",
+      description: "Tournoi traditionnel de clôture de saison",
     },
-  });
+  ];
 
-  console.log("✅ Created league teams:", [team1.name, team2.name]);
-
-  // Create default map configuration
-  const mapConfig = await prisma.mapConfiguration.upsert({
-    where: { id: "default-map" },
-    update: {},
-    create: {
-      id: "default-map",
-      latitude: 33.5731, // Casablanca
-      longitude: -7.5898,
-      locationName: "Complexe Sportif Mohammed V",
-      zoom: 15,
-      address: "Avenue Hassan II, Casablanca, Maroc 20000",
-      isActive: true,
-    },
-  });
-
-  console.log("✅ Created map configuration:", mapConfig.locationName);
-
-  // Create comprehensive insurance data for athletes
-  console.log("🛡️ Creating insurance records...");
-  const insuranceRecords = [];
-  for (let i = 0; i < athletes.length; i++) {
-    const athlete = athletes[i];
-    const isPaid = Math.random() > 0.3; // 70% chance of being paid
-    const insurance = await prisma.insurance.upsert({
-      where: {
-        athleteId_seasonId: {
-          athleteId: athlete.id,
-          seasonId: season.id,
-        },
-      },
-      update: {},
-      create: {
-        athleteId: athlete.id,
-        seasonId: season.id,
-        amount: 150.0,
-        isPaid: isPaid,
-        paidAt: isPaid
-          ? new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000)
-          : null, // Random date in last 30 days
+  for (const champData of championships) {
+    await prisma.championship.create({
+      data: {
+        ...champData,
+        seasonId: currentSeason.id,
       },
     });
-    insuranceRecords.push(insurance);
+  }
+
+  console.log("✅ Created championships:", championships.length);
+
+  // Create league teams for regional representation
+  const team1 = await prisma.leagueTeam.create({
+    data: {
+      name: "Équipe Première Division LRCSJJ",
+      division: "Première Division",
+      category: "Élite Adulte",
+      description:
+        "Équipe principale représentant la ligue dans les compétitions nationales",
+    },
+  });
+
+  const team2 = await prisma.leagueTeam.create({
+    data: {
+      name: "Équipe Jeunes LRCSJJ",
+      division: "Division Jeunes",
+      category: "Moins de 20 ans",
+      description:
+        "Équipe de développement pour les jeunes talents de la région",
+    },
+  });
+
+  // Select best athletes for league teams (realistic selection criteria)
+  const seniorAthletes = allAthletes
+    .filter((a) => {
+      const age =
+        new Date().getFullYear() - new Date(a.dateOfBirth).getFullYear();
+      return (
+        age >= 18 && (a.belt?.includes("Marron") || a.belt?.includes("Noire"))
+      );
+    })
+    .slice(0, 10); // Top 10 senior athletes
+
+  const juniorAthletes = allAthletes
+    .filter((a) => {
+      const age =
+        new Date().getFullYear() - new Date(a.dateOfBirth).getFullYear();
+      return (
+        age >= 16 &&
+        age < 20 &&
+        (a.belt?.includes("Bleue") || a.belt?.includes("Marron"))
+      );
+    })
+    .slice(0, 8); // Top 8 junior athletes
+
+  // Add athletes to senior team
+  for (let i = 0; i < seniorAthletes.length; i++) {
+    const athlete = seniorAthletes[i];
+    await prisma.leagueTeamMember.create({
+      data: {
+        teamId: team1.id,
+        athleteId: athlete.id,
+        clubId: athlete.clubId,
+        position: i === 0 ? "Capitaine" : "Membre",
+      },
+    });
+  }
+
+  // Add athletes to junior team
+  for (let i = 0; i < juniorAthletes.length; i++) {
+    const athlete = juniorAthletes[i];
+    await prisma.leagueTeamMember.create({
+      data: {
+        teamId: team2.id,
+        athleteId: athlete.id,
+        clubId: athlete.clubId,
+        position: i === 0 ? "Capitaine" : "Membre",
+      },
+    });
+  }
+
+  console.log("✅ Created league teams:", {
+    senior: `${team1.name} (${seniorAthletes.length} membres)`,
+    junior: `${team2.name} (${juniorAthletes.length} membres)`,
+  });
+
+  // Create map configuration for LRCSJJ headquarters
+  await prisma.mapConfiguration.upsert({
+    where: { id: "default" },
+    update: {},
+    create: {
+      id: "default",
+      latitude: 33.5731,
+      longitude: -7.5898,
+      locationName: "Siège LRCSJJ - Ligue Régionale Casablanca-Settat",
+      zoom: 13,
+      address:
+        "Complexe Sportif Mohammed V, Boulevard de la Corniche, Casablanca",
+      isActive: true,
+      updatedBy: admin1.id,
+    },
+  });
+
+  console.log("✅ Created map configuration");
+
+  // Create some realistic payment requests for demonstration
+  const samplePaymentRequests = [];
+  for (let i = 0; i < 3; i++) {
+    const club = getRandomElement(createdClubs);
+    const athleteCount = Math.floor(Math.random() * 3) + 1; // 1-3 athletes per request
+    const amount = athleteCount * 150.0; // 150 MAD per athlete
+
+    const paymentRequest = await prisma.paymentRequest.create({
+      data: {
+        clubId: club.id,
+        amount: amount,
+        currency: "MAD",
+        status: getRandomElement(["PENDING", "PAID"]),
+        expiresAt: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes from now
+      },
+    });
+
+    samplePaymentRequests.push(paymentRequest);
   }
 
   console.log(
-    `✅ Created ${insuranceRecords.length} insurance records (${
-      insuranceRecords.filter((i) => i.isPaid).length
-    } paid)`
+    "✅ Created sample payment requests:",
+    samplePaymentRequests.length
   );
 
-  // Create club managers for testing with proper model name
-  const managerPassword = await hashPassword("manager123");
-  const tempPassword = await hashPassword("temp123");
+  // Final comprehensive statistics for startup presentation
+  const stats = {
+    clubs: createdClubs.length,
+    athletes: totalAthletes,
+    insurances: totalInsurances,
+    paidInsurances: paidInsurances,
+    paymentRate: Math.round((paidInsurances / totalInsurances) * 100),
+    championships: championships.length,
+    leagueTeams: 2,
+    paymentRequests: samplePaymentRequests.length,
+    averageAthletesPerClub: Math.round(totalAthletes / createdClubs.length),
+  };
 
-  const clubManager1 = await prisma.clubManager.upsert({
-    where: { email: "manager@club-casablanca.com" },
-    update: {},
-    create: {
-      email: "manager@club-casablanca.com",
-      password: managerPassword,
-      name: "Mohammed Alaoui",
-      clubId: clubs[0].id, // Casablanca Elite
-      isActive: true,
-      temporaryPassword: null,
-    },
-  });
-
-  const clubManager2 = await prisma.clubManager.upsert({
-    where: { email: "manager@club-settat.com" },
-    update: {},
-    create: {
-      email: "manager@club-settat.com",
-      password: tempPassword,
-      name: "Fatima Bennani",
-      clubId: clubs[1].id, // Settat Champions
-      isActive: true,
-      temporaryPassword: "temp123",
-    },
-  });
-
-  const clubManager3 = await prisma.clubManager.upsert({
-    where: { email: "manager@club-berrechid.com" },
-    update: {},
-    create: {
-      email: "manager@club-berrechid.com",
-      password: managerPassword,
-      name: "Omar Tazi",
-      clubId: clubs[2].id, // Berrechid Warriors
-      isActive: true,
-      temporaryPassword: null,
-    },
-  });
-
-  const clubManager4 = await prisma.clubManager.upsert({
-    where: { email: "manager@club-mohammedia.com" },
-    update: {},
-    create: {
-      email: "manager@club-mohammedia.com",
-      password: managerPassword,
-      name: "Rachid Benjelloun",
-      clubId: clubs[3].id, // Mohammedia Fighters
-      isActive: true,
-      temporaryPassword: null,
-    },
-  });
-
-  console.log("✅ Created club managers:", {
-    manager1: clubManager1.email,
-    manager2: clubManager2.email,
-    manager3: clubManager3.email,
-    manager4: clubManager4.email,
-  });
-
-  console.log(`📊 Database Summary:`);
-  console.log(`   - ${clubs.length} clubs`);
-  console.log(`   - ${athletes.length} athletes`);
-  console.log(`   - ${insuranceRecords.length} insurance records`);
+  console.log("\n🎉 LRCSJJ Database seeded successfully!");
+  console.log("📊 Startup Statistics (Ready for Presentation):");
+  console.log(`   🏢 Clubs: ${stats.clubs}`);
   console.log(
-    `   - ${insuranceRecords.filter((i) => i.isPaid).length} paid insurance`
+    `   🥋 Athletes: ${stats.athletes} (avg ${stats.averageAthletesPerClub}/club)`
   );
-  console.log(
-    `   - ${insuranceRecords.filter((i) => !i.isPaid).length} unpaid insurance`
-  );
-  console.log(`   - 4 club managers`);
-
-  console.log("🎉 Database seed completed successfully!");
+  console.log(`   📋 Insurance Records: ${stats.insurances}`);
+  console.log(`   ✅ Paid: ${stats.paidInsurances} (${stats.paymentRate}%)`);
+  console.log(`   🏆 Championships: ${stats.championships}`);
+  console.log(`   👥 League Teams: ${stats.leagueTeams}`);
+  console.log(`   💳 Payment Requests: ${stats.paymentRequests}`);
+  console.log("\n🔐 Admin Access Credentials:");
+  console.log(`   📧 ${admin1.email} (Super Admin)`);
+  console.log(`   📧 ${admin2.email} (Secretary)`);
+  console.log(`   📧 ${admin3.email} (Developer)`);
+  console.log("\n🌟 System Ready for Professional Presentation!");
+  console.log("   • Realistic club and athlete data");
+  console.log("   • Consistent insurance payment status");
+  console.log("   • Proper league team composition");
+  console.log("   • Sample payment requests for demo");
 }
 
 main()
-  .catch((e) => {
-    console.error("❌ Seed failed:", e);
-    process.exit(1);
-  })
-  .finally(async () => {
+  .then(async () => {
     await prisma.$disconnect();
+  })
+  .catch(async (e) => {
+    console.error("❌ Seed failed:", e);
+    await prisma.$disconnect();
+    process.exit(1);
   });

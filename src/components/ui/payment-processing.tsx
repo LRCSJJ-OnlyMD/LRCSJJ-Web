@@ -40,10 +40,7 @@ import {
   createPaymentRequest,
   formatPaymentAmount,
 } from "@/lib/payment-gateway";
-import {
-  PDFGenerator,
-  type PaymentHistory,
-} from "@/lib/pdf-generator";
+import { PDFGenerator, type PaymentHistory } from "@/lib/pdf-generator";
 import { toast } from "sonner";
 
 interface PaymentItem {
@@ -191,20 +188,26 @@ export default function PaymentProcessing({
     // For now, we'll create a simple report since we don't have AthleteReport interface
     const reportData = {
       clubName: clubName,
-      athletes: Array.from(new Set(payments.map(p => p.athleteName))).map(name => ({
-        name,
-        belt: "Non spécifié",
-        age: 0,
-        weight: 0,
-        hasInsurance: payments.some(p => p.athleteName === name && p.status === "PAID"),
-        registrationDate: payments.find(p => p.athleteName === name)?.createdAt || "Non spécifié"
-      })),
+      athletes: Array.from(new Set(payments.map((p) => p.athleteName))).map(
+        (name) => ({
+          name,
+          belt: "Non spécifié",
+          age: 0,
+          weight: 0,
+          hasInsurance: payments.some(
+            (p) => p.athleteName === name && p.status === "PAID"
+          ),
+          registrationDate:
+            payments.find((p) => p.athleteName === name)?.createdAt ||
+            "Non spécifié",
+        })
+      ),
       statistics: {
         totalAthletes: totalAthletes,
         averageAge: 0,
         beltDistribution: {},
-        insuredPercentage: (paidPayments.length / totalAthletes) * 100
-      }
+        insuredPercentage: (paidPayments.length / totalAthletes) * 100,
+      },
     };
 
     PDFGenerator.downloadAthleteReport(reportData);

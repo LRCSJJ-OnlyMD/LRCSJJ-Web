@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { ArrowLeft, Eye, EyeOff, Users, UserCheck, Lock } from "lucide-react";
 import { LeagueLogo } from "@/components/logos";
+import { trpc } from "@/lib/trpc-client";
 
 export default function ClubManagerLoginPage() {
   const [email, setEmail] = useState("");
@@ -25,94 +26,74 @@ export default function ClubManagerLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [loginStep, setLoginStep] = useState<"credentials" | "change-password">(
+  const [loginStep, setLoginStep] = useState<"credentials" | "change-password" | "verification">(
     "credentials"
   );
+  const [managerId, setManagerId] = useState<string>("");
+  const [temporaryPassword, setTemporaryPassword] = useState<string>("");
+  const [codeId, setCodeId] = useState<string>("");
+  const [verificationCode, setVerificationCode] = useState<string>("");
+  const [maskedEmail, setMaskedEmail] = useState<string>("");
   const router = useRouter();
 
-  // For now, use a working implementation with proper authentication flow
-  const [isLoading, setIsLoading] = useState(false);
-
-  const loginMutation = {
-    mutate: async (data: { email: string; password: string }) => {
-      setIsLoading(true);
-      try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        // Check credentials against our test data
-        if (
-          data.email === "manager@club-casablanca.com" &&
-          data.password === "manager123"
-        ) {
-          // Regular login
-          localStorage.setItem(
-            "club-manager-token",
-            JSON.stringify({
-              token: "jwt-token-" + Date.now(),
-              email: data.email,
-              name: "Mohammed Alaoui",
-              clubId: "club-1",
-              clubName: "Club Ju-Jitsu Casablanca",
-              role: "CLUB_MANAGER",
-            })
-          );
-          toast.success("Connexion réussie!");
-          router.push("/club-manager/dashboard");
-        } else if (
-          data.email === "manager@club-rabat.com" &&
-          data.password === "temp123"
-        ) {
-          // Temporary password - needs change
-          setLoginStep("change-password");
-          toast.info("Vous devez changer votre mot de passe temporaire");
-        } else {
-          toast.error("Email ou mot de passe incorrect");
-        }
-      } catch {
-        toast.error("Erreur de connexion");
-      } finally {
-        setIsLoading(false);
+  // Use real tRPC mutations
+  const loginMutation = trpc.clubManager.initiateLogin.useMutation({
+    onSuccess: (data) => {
+      if (data.requiresPasswordReset) {
+        setManagerId(data.managerId);
+        setTemporaryPassword(password);
+        setLoginStep("change-password");
+        toast.info("Vous devez changer votre mot de passe temporaire");
+      } else if (data.requiresVerification) {
+        setCodeId(data.codeId!);
+        setMaskedEmail(data.maskedEmail!);
+        setLoginStep("verification");
+        toast.success("Code de vérification envoyé par email");
       }
     },
-    isPending: isLoading,
-  };
-
-  const changePasswordMutation = {
-    mutate: async (data: {
-      email: string;
-      currentPassword: string;
-      newPassword: string;
-    }) => {
-      setIsLoading(true);
-      try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        if (data.newPassword.length >= 8) {
-          localStorage.setItem(
-            "club-manager-token",
-            JSON.stringify({
-              token: "jwt-token-" + Date.now(),
-              email: data.email,
-              name: "Fatima Bennani",
-              clubId: "club-2",
-              clubName: "Club Ju-Jitsu Rabat",
-              role: "CLUB_MANAGER",
-            })
-          );
-          toast.success("Mot de passe changé avec succès!");
-          router.push("/club-manager/dashboard");
-        } else {
-          toast.error("Le mot de passe doit contenir au moins 8 caractères");
-        }
-      } catch {
-        toast.error("Erreur lors du changement de mot de passe");
-      } finally {
-        setIsLoading(false);
-      }
+    onError: (error) => {
+      toast.error(error.message || "Email ou mot de passe incorrect");
     },
-    isPending: isLoading,
-  };
+  });
+
+  const setPasswordMutation = trpc.clubManager.setPassword.useMutation({
+    onSuccess: () => {
+      toast.success("Mot de passe défini avec succès! Veuillez vous reconnecter.");
+      // Reset form and go back to login
+      setLoginStep("credentials");
+      setEmail("");
+      setPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setManagerId("");
+      setTemporaryPassword("");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Erreur lors du changement de mot de passe");
+    },
+  });
+
+  const completeLoginMutation = trpc.clubManager.completeLogin.useMutation({
+    onSuccess: (data) => {
+      // Store authentication token
+      localStorage.setItem(
+        "club-manager-token",
+        JSON.stringify({
+          token: data.token,
+          email: data.manager.email,
+          name: data.manager.name,
+          clubId: data.manager.clubId,
+          clubName: data.manager.clubName,
+          role: data.manager.role,
+        })
+      );
+      toast.success("Connexion réussie!");
+      router.push("/club-manager/dashboard");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Code de vérification invalide");
+    },
+  });
 
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -137,10 +118,22 @@ export default function ClubManagerLoginPage() {
       toast.error("Le mot de passe doit contenir au moins 8 caractères");
       return;
     }
-    changePasswordMutation.mutate({
-      email,
-      currentPassword: password,
+    setPasswordMutation.mutate({
+      managerId,
+      temporaryPassword,
       newPassword,
+    });
+  };
+
+  const handleVerificationSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!verificationCode || verificationCode.length !== 6) {
+      toast.error("Veuillez entrer le code de vérification à 6 chiffres");
+      return;
+    }
+    completeLoginMutation.mutate({
+      codeId,
+      verificationCode,
     });
   };
 
@@ -148,6 +141,10 @@ export default function ClubManagerLoginPage() {
     setLoginStep("credentials");
     setNewPassword("");
     setConfirmPassword("");
+    setVerificationCode("");
+    setManagerId("");
+    setTemporaryPassword("");
+    setCodeId("");
   };
 
   return (
@@ -245,7 +242,7 @@ export default function ClubManagerLoginPage() {
                   </Link>
                 </div>
               </form>
-            ) : (
+            ) : loginStep === "change-password" ? (
               <form onSubmit={handlePasswordChangeSubmit} className="space-y-4">
                 <div className="text-center space-y-3 mb-6">
                   <div className="w-16 h-16 bg-orange-50 dark:bg-orange-950/30 rounded-full flex items-center justify-center mx-auto border border-orange-200 dark:border-orange-800">
@@ -273,7 +270,7 @@ export default function ClubManagerLoginPage() {
                       placeholder="Au moins 8 caractères"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      disabled={changePasswordMutation.isPending}
+                      disabled={setPasswordMutation.isPending}
                       required
                       minLength={8}
                       className="bg-background border-border text-foreground placeholder:text-muted-foreground pr-10"
@@ -305,7 +302,7 @@ export default function ClubManagerLoginPage() {
                       placeholder="Répétez le mot de passe"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      disabled={changePasswordMutation.isPending}
+                      disabled={setPasswordMutation.isPending}
                       required
                       className="bg-background border-border text-foreground placeholder:text-muted-foreground pr-10"
                     />
@@ -358,12 +355,12 @@ export default function ClubManagerLoginPage() {
                   type="submit"
                   className="w-full bg-[#017444] hover:bg-[#017444]/90 text-white transition-all duration-300 hover-lift"
                   disabled={
-                    changePasswordMutation.isPending ||
+                    setPasswordMutation.isPending ||
                     newPassword !== confirmPassword ||
                     newPassword.length < 8
                   }
                 >
-                  {changePasswordMutation.isPending
+                  {setPasswordMutation.isPending
                     ? "Changement en cours..."
                     : "Changer le Mot de Passe"}
                 </Button>
@@ -373,7 +370,61 @@ export default function ClubManagerLoginPage() {
                   variant="ghost"
                   className="w-full text-muted-foreground hover:text-foreground"
                   onClick={handleBackToLogin}
-                  disabled={changePasswordMutation.isPending}
+                  disabled={setPasswordMutation.isPending}
+                >
+                  ← Retour à la connexion
+                </Button>
+              </form>
+            ) : (
+              <form onSubmit={handleVerificationSubmit} className="space-y-4">
+                <div className="text-center space-y-3 mb-6">
+                  <div className="w-16 h-16 bg-blue-50 dark:bg-blue-950/30 rounded-full flex items-center justify-center mx-auto border border-blue-200 dark:border-blue-800">
+                    <UserCheck className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground">
+                      Vérification Email
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Un code de vérification a été envoyé à <br />
+                      <span className="font-medium">{maskedEmail}</span>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="verificationCode" className="text-foreground">
+                    Code de Vérification
+                  </Label>
+                  <Input
+                    id="verificationCode"
+                    type="text"
+                    placeholder="123456"
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    disabled={completeLoginMutation.isPending}
+                    required
+                    maxLength={6}
+                    className="bg-background border-border text-foreground placeholder:text-muted-foreground text-center text-2xl font-mono tracking-widest"
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full bg-[#017444] hover:bg-[#017444]/90 text-white transition-all duration-300 hover-lift"
+                  disabled={completeLoginMutation.isPending || verificationCode.length !== 6}
+                >
+                  {completeLoginMutation.isPending
+                    ? "Vérification en cours..."
+                    : "Vérifier et Se Connecter"}
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="w-full text-muted-foreground hover:text-foreground"
+                  onClick={handleBackToLogin}
+                  disabled={completeLoginMutation.isPending}
                 >
                   ← Retour à la connexion
                 </Button>
@@ -388,13 +439,27 @@ export default function ClubManagerLoginPage() {
                     Contactez l&apos;administration si vous n&apos;avez pas de
                     compte
                   </p>
+                  <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <p className="text-xs font-medium text-blue-700 dark:text-blue-400 mb-1">
+                      Identifiants de test:
+                    </p>
+                    <div className="text-xs space-y-1 text-blue-600 dark:text-blue-300">
+                      <p>Email: manager.clubatlasjujitsucasablanca@lrcsjj.ma</p>
+                      <p>Mot de passe: atlas2025</p>
+                    </div>
+                  </div>
                 </div>
-              ) : (
+              ) : loginStep === "change-password" ? (
                 <div className="space-y-1">
                   <p>
                     Ce changement est obligatoire pour votre première connexion
                   </p>
                   <p className="text-xs">Choisissez un mot de passe sécurisé</p>
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  <p>Entrez le code reçu par email</p>
+                  <p className="text-xs">Le code expire dans 10 minutes</p>
                 </div>
               )}
             </div>

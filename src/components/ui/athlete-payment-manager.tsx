@@ -263,21 +263,18 @@ export function AthletePaymentManager() {
 
     setIsLoading(true);
     try {
-      // For bulk payments, we'll create a single session for the first athlete with a description
-      // that includes all selected athletes. In production, you might want to create a more
-      // sophisticated bulk payment system.
-      const firstAthlete = selectedAthletesList[0];
+      // For bulk payments, calculate the total amount for all selected athletes
       const athleteNames = selectedAthletesList.map((a) => a.name).join(", ");
 
       const paymentRequest: ClientPaymentRequest = {
-        athleteId: firstAthlete.id,
+        athleteId: "bulk-payment", // Special ID for bulk payments
         athleteName: `Paiement groupé (${selectedAthletes.size} athlètes): ${athleteNames}`,
-        clubId: firstAthlete.clubId,
-        clubName: firstAthlete.clubName,
+        clubId: selectedAthletesList[0].clubId,
+        clubName: selectedAthletesList[0].clubName,
         seasonId: selectedSeason.id,
         seasonYear: selectedSeason.year,
-        customerEmail: firstAthlete.email,
-        customerPhone: firstAthlete.phone,
+        customerEmail: selectedAthletesList[0].email,
+        customerPhone: selectedAthletesList[0].phone,
       };
 
       console.log("Bulk payment request:", paymentRequest); // Debug log
@@ -318,7 +315,7 @@ export function AthletePaymentManager() {
         return (
           <Badge
             variant="default"
-            className="bg-green-100 text-green-800 border-green-200"
+            className="bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800"
           >
             <CheckCircle className="w-3 h-3 mr-1" />
             Active
@@ -328,7 +325,7 @@ export function AthletePaymentManager() {
         return (
           <Badge
             variant="destructive"
-            className="bg-red-100 text-red-800 border-red-200"
+            className="bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800"
           >
             <XCircle className="w-3 h-3 mr-1" />
             Expiré
@@ -338,7 +335,7 @@ export function AthletePaymentManager() {
         return (
           <Badge
             variant="secondary"
-            className="bg-yellow-100 text-yellow-800 border-yellow-200"
+            className="bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800"
           >
             <AlertTriangle className="w-3 h-3 mr-1" />
             Jamais payé
@@ -354,12 +351,11 @@ export function AthletePaymentManager() {
   };
 
   const getPaymentAmount = () => {
-    return 15 * selectedAthletes.size; // $15 USD per athlete (equivalent to 150 MAD)
+    return 150 * selectedAthletes.size; // 150 MAD per athlete (correct bulk calculation)
   };
 
   const formatAmount = (amount: number) => {
-    const madEquivalent = amount * 10; // $15 USD ≈ 150 MAD
-    return `$${amount} USD (≈ ${madEquivalent} MAD)`;
+    return `${amount} MAD`; // Direct MAD display, no USD conversion
   };
 
   return (
@@ -372,8 +368,8 @@ export function AthletePaymentManager() {
             Gestion des Paiements d&apos;Assurance
           </CardTitle>
           <CardDescription>
-            Créer des paiements d&apos;assurance pour les athlètes ($15 USD ≈
-            150 MAD par an)
+            Créer des paiements d&apos;assurance pour les athlètes (150 MAD par
+            an)
           </CardDescription>
         </CardHeader>
         <CardContent>
