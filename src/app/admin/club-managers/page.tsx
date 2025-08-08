@@ -26,7 +26,6 @@ import {
   ArrowLeft,
   Users,
   UserPlus,
-  Trash2,
   Shield,
   Search,
   Download,
@@ -35,22 +34,9 @@ import {
   Mail,
 } from "lucide-react";
 import { LeagueLogo } from "@/components/logos";
-
-interface ClubManager {
-  id: string;
-  name: string;
-  email: string;
-  clubId: string;
-  clubName: string;
-  isActive: boolean;
-  mustChangePassword: boolean;
-  lastLogin?: string;
-  createdAt: string;
-}
+import { trpc } from "@/lib/trpc-client";
 
 export default function AdminClubManagersPage() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [managers, setManagers] = useState<ClubManager[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -61,6 +47,52 @@ export default function AdminClubManagersPage() {
   });
   const router = useRouter();
 
+  // Use real tRPC queries
+  const managersQuery = trpc.clubManager.getAll.useQuery();
+  const clubsQuery = trpc.clubs.getAll.useQuery();
+  
+  const createManagerMutation = trpc.clubManager.create.useMutation({
+    onSuccess: () => {
+      toast.success("Gestionnaire créé avec succès! Email de bienvenue envoyé.");
+      setFormData({ name: "", email: "", clubId: "" });
+      setShowCreateForm(false);
+      managersQuery.refetch();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Erreur lors de la création du gestionnaire");
+    },
+  });
+
+  const activateMutation = trpc.clubManager.activate.useMutation({
+    onSuccess: () => {
+      toast.success("Compte activé avec succès");
+      managersQuery.refetch();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Erreur lors de l'activation");
+    },
+  });
+
+  const deactivateMutation = trpc.clubManager.deactivate.useMutation({
+    onSuccess: () => {
+      toast.success("Compte désactivé avec succès");
+      managersQuery.refetch();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Erreur lors de la désactivation");
+    },
+  });
+
+  const regeneratePasswordMutation = trpc.clubManager.regeneratePassword.useMutation({
+    onSuccess: (data) => {
+      toast.success(`Nouveau mot de passe temporaire: ${data.temporaryPassword}`);
+      managersQuery.refetch();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Erreur lors de la régénération du mot de passe");
+    },
+  });
+
   useEffect(() => {
     // Check if user is authenticated as admin
     const token = localStorage.getItem("auth-token");
@@ -69,46 +101,10 @@ export default function AdminClubManagersPage() {
       router.push("/login");
       return;
     }
-
-    // Mock club managers data
-    setTimeout(() => {
-      setManagers([
-        {
-          id: "cm-1",
-          name: "Mohammed Alaoui",
-          email: "manager@club-casablanca.com",
-          clubId: "club-1",
-          clubName: "Club Ju-Jitsu Casablanca",
-          isActive: true,
-          mustChangePassword: false,
-          lastLogin: "2025-08-08T10:30:00Z",
-          createdAt: "2025-01-15T09:00:00Z",
-        },
-        {
-          id: "cm-2",
-          name: "Fatima Bennani",
-          email: "manager@club-rabat.com",
-          clubId: "club-2",
-          clubName: "Club Ju-Jitsu Rabat",
-          isActive: true,
-          mustChangePassword: true,
-          createdAt: "2025-02-10T14:20:00Z",
-        },
-        {
-          id: "cm-3",
-          name: "Youssef El Fassi",
-          email: "manager@club-sale.com",
-          clubId: "club-3",
-          clubName: "Club Ju-Jitsu Salé",
-          isActive: false,
-          mustChangePassword: false,
-          lastLogin: "2025-07-20T16:45:00Z",
-          createdAt: "2025-03-05T11:10:00Z",
-        },
-      ]);
-      setIsLoading(false);
-    }, 1000);
   }, [router]);
+
+  const managers = managersQuery.data || [];
+  const clubs = clubsQuery.data || [];
 
   const filteredManagers = managers.filter((manager) => {
     const matchesSearch =
@@ -119,8 +115,7 @@ export default function AdminClubManagersPage() {
     const matchesStatus =
       !filterStatus ||
       (filterStatus === "active" && manager.isActive) ||
-      (filterStatus === "inactive" && !manager.isActive) ||
-      (filterStatus === "needs-password-change" && manager.mustChangePassword);
+      (filterStatus === "inactive" && !manager.isActive);
 
     return matchesSearch && matchesStatus;
   });
@@ -141,66 +136,24 @@ export default function AdminClubManagersPage() {
       return;
     }
 
-    try {
-      // TODO: Call API to create club manager
-      const newManager: ClubManager = {
-        id: "cm-" + Date.now(),
-        name: formData.name,
-        email: formData.email,
-        clubId: formData.clubId,
-        clubName: `Club pour ${formData.name}`,
-        isActive: true,
-        mustChangePassword: true,
-        createdAt: new Date().toISOString(),
-      };
+    createManagerMutation.mutate(formData);
+  };
 
-      setManagers([...managers, newManager]);
-      setFormData({ name: "", email: "", clubId: "" });
-      setShowCreateForm(false);
-      toast.success(
-        "Gestionnaire de club créé avec succès! Email de bienvenue envoyé."
-      );
-    } catch {
-      toast.error("Erreur lors de la création du gestionnaire");
+  const handleToggleStatus = (managerId: string, currentStatus: boolean) => {
+    if (currentStatus) {
+      deactivateMutation.mutate({ managerId });
+    } else {
+      activateMutation.mutate({ managerId });
     }
   };
 
-  const handleToggleStatus = (managerId: string) => {
-    setManagers(
-      managers.map((manager) =>
-        manager.id === managerId
-          ? { ...manager, isActive: !manager.isActive }
-          : manager
-      )
-    );
-    toast.success("Statut mis à jour");
-  };
-
-  const handleResetPassword = (managerId: string) => {
-    setManagers(
-      managers.map((manager) =>
-        manager.id === managerId
-          ? { ...manager, mustChangePassword: true }
-          : manager
-      )
-    );
-    toast.success(
-      "Mot de passe réinitialisé. L'utilisateur devra le changer à sa prochaine connexion."
-    );
-  };
-
-  const handleDeleteManager = (managerId: string) => {
-    if (confirm("Êtes-vous sûr de vouloir supprimer ce gestionnaire ?")) {
-      setManagers(managers.filter((manager) => manager.id !== managerId));
-      toast.success("Gestionnaire supprimé");
+  const handleRegeneratePassword = (managerId: string) => {
+    if (confirm("Êtes-vous sûr de vouloir régénérer le mot de passe ? L'ancien mot de passe ne fonctionnera plus.")) {
+      regeneratePasswordMutation.mutate({ managerId });
     }
   };
 
-  const handleSendWelcomeEmail = (managerEmail: string) => {
-    toast.success(`Email de bienvenue envoyé à ${managerEmail}`);
-  };
-
-  if (isLoading) {
+  if (managersQuery.isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -272,7 +225,7 @@ export default function AdminClubManagersPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -320,22 +273,6 @@ export default function AdminClubManagersPage() {
               </div>
             </CardContent>
           </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Changement MDP
-                  </p>
-                  <p className="text-3xl font-bold text-orange-600">
-                    {managers.filter((m) => m.mustChangePassword).length}
-                  </p>
-                </div>
-                <RotateCcw className="w-8 h-8 text-orange-600" />
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Create Form */}
@@ -373,15 +310,23 @@ export default function AdminClubManagersPage() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="clubId">ID du Club</Label>
-                  <Input
+                  <Label htmlFor="clubId">Club</Label>
+                  <select
                     id="clubId"
+                    title="Sélectionner un club"
                     value={formData.clubId}
                     onChange={(e) =>
                       setFormData({ ...formData, clubId: e.target.value })
                     }
-                    placeholder="club-1"
-                  />
+                    className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
+                  >
+                    <option value="">Sélectionner un club</option>
+                    {clubs.map((club) => (
+                      <option key={club.id} value={club.id}>
+                        {club.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
               <div className="flex gap-3">
@@ -432,9 +377,6 @@ export default function AdminClubManagersPage() {
                   <option value="">Tous les statuts</option>
                   <option value="active">Actifs</option>
                   <option value="inactive">Inactifs</option>
-                  <option value="needs-password-change">
-                    Changement MDP requis
-                  </option>
                 </select>
               </div>
             </div>
@@ -473,14 +415,16 @@ export default function AdminClubManagersPage() {
                           <p className="text-sm text-muted-foreground">
                             {manager.email}
                           </p>
+                          {manager.temporaryPassword && (
+                            <p className="text-xs text-blue-600 dark:text-blue-400 font-mono">
+                              Temp: {manager.temporaryPassword}
+                            </p>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell>
                         <div>
                           <p className="font-medium">{manager.clubName}</p>
-                          <p className="text-sm text-muted-foreground">
-                            ID: {manager.clubId}
-                          </p>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -488,27 +432,27 @@ export default function AdminClubManagersPage() {
                           <span
                             className={`px-2 py-1 rounded-full text-xs font-medium ${
                               manager.isActive
-                                ? "bg-green-100 text-green-800"
-                                : "bg-red-100 text-red-800"
+                                ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                                : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
                             }`}
                           >
                             {manager.isActive ? "Actif" : "Inactif"}
                           </span>
-                          {manager.mustChangePassword && (
-                            <span className="block px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                              Changement MDP requis
+                          {!manager.hasPassword && (
+                            <span className="block px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200">
+                              Pas de mot de passe
                             </span>
                           )}
                         </div>
                       </TableCell>
                       <TableCell>
-                        {manager.lastLogin ? (
-                          formatDate(manager.lastLogin)
+                        {manager.lastLoginAt ? (
+                          formatDate(manager.lastLoginAt.toISOString())
                         ) : (
                           <span className="text-muted-foreground">Jamais</span>
                         )}
                       </TableCell>
-                      <TableCell>{formatDate(manager.createdAt)}</TableCell>
+                      <TableCell>{formatDate(manager.createdAt.toISOString())}</TableCell>
                       <TableCell>
                         <div className="flex gap-2">
                           <Button
@@ -517,20 +461,25 @@ export default function AdminClubManagersPage() {
                             onClick={() =>
                               toast.info(`Détails de ${manager.name}`)
                             }
+                            title="Voir les détails"
                           >
                             <Eye className="w-4 h-4" />
                           </Button>
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => handleToggleStatus(manager.id)}
+                            onClick={() => handleToggleStatus(manager.id, manager.isActive)}
+                            title={manager.isActive ? "Désactiver" : "Activer"}
+                            disabled={activateMutation.isPending || deactivateMutation.isPending}
                           >
                             <Shield className="w-4 h-4" />
                           </Button>
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => handleResetPassword(manager.id)}
+                            onClick={() => handleRegeneratePassword(manager.id)}
+                            title="Régénérer le mot de passe"
+                            disabled={regeneratePasswordMutation.isPending}
                           >
                             <RotateCcw className="w-4 h-4" />
                           </Button>
@@ -538,18 +487,11 @@ export default function AdminClubManagersPage() {
                             size="sm"
                             variant="outline"
                             onClick={() =>
-                              handleSendWelcomeEmail(manager.email)
+                              toast.success(`Email de bienvenue envoyé à ${manager.email}`)
                             }
+                            title="Renvoyer l'email de bienvenue"
                           >
                             <Mail className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="text-red-600 hover:text-red-700"
-                            onClick={() => handleDeleteManager(manager.id)}
-                          >
-                            <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
                       </TableCell>

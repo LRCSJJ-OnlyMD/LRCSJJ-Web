@@ -260,10 +260,70 @@ export const clubManagerRouter = router({
       name: manager.name,
       clubName: manager.club.name,
       isActive: manager.isActive,
+      hasPassword: !!manager.password,
+      temporaryPassword: manager.temporaryPassword, // Add this for debugging
       lastLoginAt: manager.lastLoginAt,
       createdAt: manager.createdAt,
     }));
   }),
+
+  // Activate club manager
+  activate: adminProcedure
+    .input(
+      z.object({
+        managerId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.clubManager.update({
+        where: { id: input.managerId },
+        data: { isActive: true },
+      });
+
+      return { success: true };
+    }),
+
+  // Regenerate temporary password for club manager
+  regeneratePassword: adminProcedure
+    .input(
+      z.object({
+        managerId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      // Generate new temporary password
+      const temporaryPassword = Math.random()
+        .toString(36)
+        .slice(-8)
+        .toUpperCase();
+
+      const manager = await ctx.prisma.clubManager.update({
+        where: { id: input.managerId },
+        data: {
+          temporaryPassword,
+          password: null, // Reset password so they have to set it again
+          passwordResetAt: new Date(),
+          isActive: true, // Ensure account is active
+        },
+        include: {
+          club: true,
+        },
+      });
+
+      // Send welcome email with new credentials
+      await sendClubManagerWelcomeEmail(
+        manager.email,
+        manager.name,
+        manager.club.name,
+        temporaryPassword
+      );
+
+      return {
+        success: true,
+        temporaryPassword,
+        message: "New temporary password generated and sent via email",
+      };
+    }),
 
   // Deactivate club manager
   deactivate: adminProcedure
