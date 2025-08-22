@@ -3,7 +3,9 @@
 import { FederationLogo, LeagueLogo } from "@/components/logos";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { Navbar } from "@/components/ui/navbar";
+import { Footer } from "@/components/ui/footer";
+import { AdminAccess } from "@/components/ui/admin-access";
 import Link from "next/link";
 import { Trophy, Users, Shield, ArrowRight, Quote, Star } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -20,62 +22,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
-              <LeagueLogo size="sm" />
-              <div className="hidden md:block">
-                <h1 className="text-lg font-semibold text-foreground">
-                  LRCSJJ
-                </h1>
-                <p className="text-xs text-muted-foreground">
-                  Ligue Régionale Casablanca-Settat
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-6">
-              <nav className="hidden md:flex space-x-6">
-                <Link
-                  href="/"
-                  className="text-foreground font-medium hover:text-primary transition-colors duration-200"
-                >
-                  Accueil
-                </Link>
-                <Link
-                  href="/about"
-                  className="text-muted-foreground hover:text-primary transition-colors duration-200"
-                >
-                  À Propos
-                </Link>
-                <Link
-                  href="/contact"
-                  className="text-muted-foreground hover:text-primary transition-colors duration-200"
-                >
-                  Contact
-                </Link>
-                <Link
-                  href="/club-manager/login"
-                  className="text-muted-foreground hover:text-[#017444] transition-colors duration-200"
-                >
-                  Clubs
-                </Link>
-              </nav>
-
-              <div className="flex items-center space-x-3">
-                <ThemeToggle />
-                <Link href="/login">
-                  <Button className="btn-smooth bg-primary text-primary-foreground hover:bg-primary/90">
-                    Connexion
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Hero Section */}
       <section className="pt-16 pb-20 px-4 sm:px-6 lg:px-8">
@@ -103,15 +50,19 @@ export default function HomePage() {
 
             {/* CTA buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button className="btn-smooth text-lg px-8 py-3 bg-primary text-primary-foreground hover:bg-primary/90">
-                Découvrir nos Clubs
-              </Button>
-              <Button
-                variant="outline"
-                className="btn-smooth text-lg px-8 py-3"
-              >
-                Nos Championnats
-              </Button>
+              <Link href="/contact">
+                <Button className="btn-smooth text-lg px-8 py-3 bg-primary text-primary-foreground hover:bg-primary/90">
+                  Découvrir nos Clubs
+                </Button>
+              </Link>
+              <Link href="/about">
+                <Button
+                  variant="outline"
+                  className="btn-smooth text-lg px-8 py-3"
+                >
+                  Nos Championnats
+                </Button>
+              </Link>
             </div>
           </div>
 
@@ -409,10 +360,12 @@ export default function HomePage() {
               Rejoignez une communauté de champions qui transforment leur
               passion en excellence
             </p>
-            <Button className="btn-smooth bg-primary text-primary-foreground hover:bg-primary/90">
-              Commencer Mon Parcours
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
+            <Link href="/contact">
+              <Button className="btn-smooth bg-primary text-primary-foreground hover:bg-primary/90">
+                Commencer Mon Parcours
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -451,93 +404,10 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-card border-t py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div>
-              <div className="flex items-center space-x-4 mb-6">
-                <LeagueLogo size="sm" />
-                <div>
-                  <h3 className="text-lg font-semibold text-foreground">
-                    LRCSJJ
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    Ligue Régionale Casablanca-Settat
-                  </p>
-                </div>
-              </div>
-              <p className="text-muted-foreground leading-relaxed">
-                Excellence, discipline et tradition martiale au service du
-                développement du Ju-Jitsu dans la région Casablanca-Settat.
-              </p>
-            </div>
+      <Footer />
 
-            <div>
-              <h4 className="text-lg font-semibold text-foreground mb-6">
-                Navigation
-              </h4>
-              <ul className="space-y-3">
-                <li>
-                  <Link
-                    href="/"
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    Accueil
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/about"
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    À Propos
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/contact"
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    Contact
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-lg font-semibold text-foreground mb-6">
-                Sous l&apos;égide de
-              </h4>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <FederationLogo type="main" size="sm" showLabel={false} />
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      Fédération Royale Marocaine
-                    </p>
-                    <p className="text-sm text-muted-foreground">de Ju-Jitsu</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <FederationLogo type="jjif" size="sm" showLabel={false} />
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      Ju-Jitsu International
-                    </p>
-                    <p className="text-sm text-muted-foreground">Federation</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-border mt-12 pt-8 text-center">
-            <p className="text-muted-foreground">
-              © 2025 LRCSJJ. Tous droits réservés.
-            </p>
-          </div>
-        </div>
-      </footer>
+      {/* Admin Access Component */}
+      <AdminAccess />
     </div>
   );
 }

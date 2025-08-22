@@ -137,13 +137,14 @@ async function main() {
     });
     createdClubs.push(club);
 
-    // Create club manager for each club
-    const managerEmail = `manager.${club.name
-      .toLowerCase()
-      .replace(/\s+/g, "")
-      .replace(/[^a-z0-9]/g, "")}@lrcsjj.ma`;
-
-    // Static temporary passwords based on club names for consistent testing
+    // Static emails and passwords based on club names for consistent testing
+    const staticEmails: Record<string, string> = {
+      "Club Atlas Ju-Jitsu Casablanca": "mouadoml.07@gmail.com",
+      "Champions de Settat Ju-Jitsu": "mouadoml.07@gmail.com",
+      "Dragon Ju-Jitsu Mohammedia": "mouadoml.07@gmail.com",
+      "Elite Ju-Jitsu Berrechid": "mouadoml.07@gmail.com",
+      "Phoenix Ju-Jitsu El Jadida": "mouadoml.07@gmail.com",
+    };
     const staticPasswords: Record<string, string> = {
       "Club Atlas Ju-Jitsu Casablanca": "atlas2025",
       "Champions de Settat Ju-Jitsu": "champions2025",
@@ -152,29 +153,23 @@ async function main() {
       "Phoenix Ju-Jitsu El Jadida": "phoenix2025",
     };
 
+    const managerEmail =
+      staticEmails[club.name] ||
+      `manager.${club.name
+        .toLowerCase()
+        .replace(/\s+/g, "")
+        .replace(/[^a-z0-9]/g, "")}@lrcsjj.ma`;
     const tempPassword = staticPasswords[club.name] || "manager2025";
-
-    console.log(`Creating manager for ${club.name}:`);
-    console.log(`  Email: ${managerEmail}`);
-    console.log(`  Temporary Password: ${tempPassword}`);
 
     await prisma.clubManager.upsert({
       where: { email: managerEmail },
-      update: {
-        // Update existing manager to ensure consistency
-        temporaryPassword: tempPassword,
-        isActive: true,
-        password: null, // Ensure password is null so they use temp password
-        passwordResetAt: new Date(),
-      },
+      update: {},
       create: {
         email: managerEmail,
-        name: `Manager ${club.name.split(" ")[1] || club.name.split(" ")[0]}`, // Use Atlas, Champions, etc.
+        name: `Manager ${club.name.split(" ")[0]}`,
         clubId: club.id,
         temporaryPassword: tempPassword,
         isActive: true,
-        password: null, // Explicitly set to null
-        passwordResetAt: new Date(),
       },
     });
   }

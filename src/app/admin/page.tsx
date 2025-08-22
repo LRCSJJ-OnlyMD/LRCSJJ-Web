@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -20,8 +21,32 @@ import {
   Users2,
 } from "lucide-react";
 import Link from "next/link";
+import { trpc } from "@/lib/trpc-client";
 
 export default function DashboardPage() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Fetch real statistics
+  const { data: clubs = [] } = trpc.clubs.getAll.useQuery(undefined, {
+    enabled: isAuthenticated
+  });
+  const { data: athletes = [] } = trpc.athletes.getAll.useQuery({}, {
+    enabled: isAuthenticated
+  });
+  const { data: seasons = [] } = trpc.seasons.getAll.useQuery(undefined, {
+    enabled: isAuthenticated
+  });
+  const { data: championships = [] } = trpc.championships.getAll.useQuery(undefined, {
+    enabled: isAuthenticated
+  });
+
+  useEffect(() => {
+    const token = localStorage.getItem('auth-token');
+    if (token) {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
   const managementSections = [
     {
       title: "Clubs",
@@ -29,7 +54,7 @@ export default function DashboardPage() {
       icon: Building,
       href: "/admin/clubs",
       gradient: "gradient-primary",
-      stats: "25+ clubs",
+      stats: `${clubs.length} clubs`,
     },
     {
       title: "Athlètes",
@@ -37,7 +62,7 @@ export default function DashboardPage() {
       icon: Users,
       href: "/admin/athletes",
       gradient: "gradient-accent",
-      stats: "200+ athlètes",
+      stats: `${athletes.length} athlètes`,
     },
     {
       title: "Saisons",
@@ -45,7 +70,7 @@ export default function DashboardPage() {
       icon: Calendar,
       href: "/admin/seasons",
       gradient: "gradient-primary",
-      stats: "10+ saisons",
+      stats: `${seasons.length} saisons`,
     },
     {
       title: "Championnats",
@@ -53,7 +78,7 @@ export default function DashboardPage() {
       icon: Trophy,
       href: "/admin/championships",
       gradient: "gradient-accent",
-      stats: "15+ championnats",
+      stats: `${championships.length} championnats`,
     },
     {
       title: "Assurances",

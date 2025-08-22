@@ -85,39 +85,21 @@ export const clubManagerRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      console.log(`🔐 Login attempt for: ${input.email}`);
-      
       const manager = await ctx.prisma.clubManager.findUnique({
         where: { email: input.email },
         include: { club: true },
       });
 
-      if (!manager) {
-        console.log(`❌ Manager not found: ${input.email}`);
+      if (!manager || !manager.isActive) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: "Invalid credentials",
         });
       }
 
-      if (!manager.isActive) {
-        console.log(`❌ Manager account inactive: ${input.email}`);
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "Account deactivated. Please contact administrator.",
-        });
-      }
-
-      console.log(`✅ Manager found: ${manager.email}`);
-      console.log(`   - Has password: ${!!manager.password}`);
-      console.log(`   - Has temp password: ${!!manager.temporaryPassword}`);
-      console.log(`   - Temp password: ${manager.temporaryPassword}`);
-      console.log(`   - Input password: ${input.password}`);
-      console.log(`   - Is Active: ${manager.isActive}`);
-
-      // Case 1: First time login with temporary password
-      if (manager.temporaryPassword && manager.temporaryPassword === input.password && !manager.password) {
-        console.log(`✅ First time login with temporary password`);
+      // Check if using temporary password
+      if (manager.temporaryPassword === input.password && !manager.password) {
+        // First time login with temporary password
         return {
           requiresPasswordReset: true,
           managerId: manager.id,
@@ -125,51 +107,46 @@ export const clubManagerRouter = router({
         };
       }
 
-      // Case 2: Regular login with set password
-      if (manager.password) {
-        console.log(`🔍 Checking regular password`);
-        const isValidPassword = await verifyPassword(
-          input.password,
-          manager.password
-        );
-
-        if (!isValidPassword) {
-          console.log(`❌ Invalid regular password`);
-          throw new TRPCError({
-            code: "UNAUTHORIZED",
-            message: "Invalid credentials",
-          });
-        }
-
-        console.log(`✅ Valid regular password, sending verification email`);
-        // Send email verification
-        const result = await emailVerificationService.sendVerificationCode(
-          manager.email,
-          manager.id,
-          manager.name
-        );
-
-        if (!result.success) {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: result.error || "Failed to send verification email",
-          });
-        }
-
-        return {
-          message: "Code de vérification envoyé par email",
-          codeId: result.codeId,
-          maskedEmail: manager.email.replace(/(.{2})(.*)(@.*)/, "$1***$3"),
-          requiresVerification: true,
-        };
+      // Regular password check
+      if (!manager.password) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Account not activated. Please contact administrator.",
+        });
       }
 
-      // Case 3: Account not properly activated (no password and no temp password match)
-      console.log(`❌ Account not activated - no valid password found`);
-      throw new TRPCError({
-        code: "UNAUTHORIZED",
-        message: "Account not activated. Please contact administrator.",
-      });
+      const isValidPassword = await verifyPassword(
+        input.password,
+        manager.password
+      );
+
+      if (!isValidPassword) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Invalid credentials",
+        });
+      }
+
+      // Send email verification
+      const result = await emailVerificationService.sendVerificationCode(
+        manager.email,
+        manager.id,
+        manager.name
+      );
+
+      if (!result.success) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: result.error || "Failed to send verification email",
+        });
+      }
+
+      return {
+        message: "Code de vérification envoyé par email",
+        codeId: result.codeId,
+        maskedEmail: manager.email.replace(/(.{2})(.*)(@.*)/, "$1***$3"),
+        requiresVerification: true,
+      };
     }),
 
   // Set new password for first-time login
@@ -283,70 +260,10 @@ export const clubManagerRouter = router({
       name: manager.name,
       clubName: manager.club.name,
       isActive: manager.isActive,
-      hasPassword: !!manager.password,
-      temporaryPassword: manager.temporaryPassword, // Add this for debugging
       lastLoginAt: manager.lastLoginAt,
       createdAt: manager.createdAt,
     }));
   }),
-
-  // Activate club manager
-  activate: adminProcedure
-    .input(
-      z.object({
-        managerId: z.string(),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.clubManager.update({
-        where: { id: input.managerId },
-        data: { isActive: true },
-      });
-
-      return { success: true };
-    }),
-
-  // Regenerate temporary password for club manager
-  regeneratePassword: adminProcedure
-    .input(
-      z.object({
-        managerId: z.string(),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      // Generate new temporary password
-      const temporaryPassword = Math.random()
-        .toString(36)
-        .slice(-8)
-        .toUpperCase();
-
-      const manager = await ctx.prisma.clubManager.update({
-        where: { id: input.managerId },
-        data: {
-          temporaryPassword,
-          password: null, // Reset password so they have to set it again
-          passwordResetAt: new Date(),
-          isActive: true, // Ensure account is active
-        },
-        include: {
-          club: true,
-        },
-      });
-
-      // Send welcome email with new credentials
-      await sendClubManagerWelcomeEmail(
-        manager.email,
-        manager.name,
-        manager.club.name,
-        temporaryPassword
-      );
-
-      return {
-        success: true,
-        temporaryPassword,
-        message: "New temporary password generated and sent via email",
-      };
-    }),
 
   // Deactivate club manager
   deactivate: adminProcedure

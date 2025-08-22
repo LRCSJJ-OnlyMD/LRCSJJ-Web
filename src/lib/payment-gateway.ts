@@ -163,12 +163,16 @@ export class CashPlusPaymentGateway {
   private static readonly SECRET_KEY =
     process.env.CASHPLUS_SECRET_KEY || "TEST_SECRET_CP";
 
+  // Legacy method - kept for future Cash Plus integration
   static async createPaymentCode(
-    request: PaymentRequest
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _request: PaymentRequest
   ): Promise<PaymentResponse> {
     try {
       // Cash Plus generates a payment code that users can use at agents
-      const paymentData = {
+      // In production, prepare payment data for Cash Plus API
+      /*
+      const paymentDetails = {
         merchant_id: this.MERCHANT_ID,
         amount: request.amount,
         currency: request.currency,
@@ -178,12 +182,13 @@ export class CashPlusPaymentGateway {
         customer_email: request.customerEmail,
         validity_period: 24, // hours
       };
+      */
 
       // In production, make actual API call to Cash Plus
       // const response = await fetch(`${this.CASHPLUS_API_URL}/payment/create`, {
       //   method: 'POST',
       //   headers: { 'Authorization': `Bearer ${this.API_KEY}` },
-      //   body: JSON.stringify(paymentData)
+      //   body: JSON.stringify(paymentDetails)
       // })
 
       // For now, simulate the response
@@ -212,7 +217,11 @@ export class CashPlusPaymentGateway {
     return Math.floor(10000000 + Math.random() * 90000000).toString();
   }
 
-  static async checkPaymentStatus(transactionId: string): Promise<{
+  // Legacy method - kept for future implementation
+  static async checkPaymentStatus(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _transactionId: string
+  ): Promise<{
     status: "PENDING" | "PAID" | "EXPIRED" | "FAILED";
     paidAt?: Date;
   }> {

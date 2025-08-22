@@ -510,7 +510,7 @@ export function AthleteFormDialog({
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                className="bg-[#017444] hover:bg-[#017444]/90"
               >
                 <Save className="w-4 h-4 mr-2" />
                 {isLoading ? "Enregistrement..." : "Enregistrer"}

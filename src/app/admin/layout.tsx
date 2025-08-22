@@ -1,19 +1,20 @@
-'use client'
+"use client";
 
-import { Sidebar, MobileSidebar } from '@/components/ui/sidebar'
-import { ThemeToggle } from '@/components/ui/theme-toggle'
-import { useState, useEffect } from 'react'
+import { Sidebar, MobileSidebar } from "@/components/ui/sidebar";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { NotificationBell } from "@/components/ui/notification-bell";
+import { useState, useEffect } from "react";
 
 export default function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  const [mounted, setMounted] = useState(false)
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   if (!mounted) {
     return (
@@ -44,7 +45,7 @@ export default function DashboardLayout({
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -53,7 +54,7 @@ export default function DashboardLayout({
       <div className="animate-slide-in-left">
         <Sidebar />
       </div>
-      
+
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header with animations */}
         <header className="bg-card/95 backdrop-blur-sm border-b border-border px-6 py-4 animate-fade-in-down sticky top-0 z-10">
@@ -69,18 +70,21 @@ export default function DashboardLayout({
                 </p>
               </div>
             </div>
-            
+
             {/* Theme toggle and admin info */}
             <div className="flex items-center space-x-4 animate-fade-in-left animate-stagger-2">
+              <NotificationBell />
               <div className="hidden md:block text-right">
-                <p className="text-sm font-medium text-foreground">Administrateur</p>
+                <p className="text-sm font-medium text-foreground">
+                  Administrateur
+                </p>
                 <p className="text-xs text-muted-foreground">Connecté</p>
               </div>
               <ThemeToggle />
             </div>
           </div>
         </header>
-        
+
         {/* Main content with animations */}
         <main className="flex-1 overflow-y-auto bg-background">
           <div className="animate-fade-in-up animate-stagger-3 h-full">
@@ -88,12 +92,12 @@ export default function DashboardLayout({
           </div>
         </main>
       </div>
-      
+
       {/* Animated background elements */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/5 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent/5 rounded-full blur-3xl animate-pulse animate-stagger-4"></div>
       </div>
     </div>
-  )
+  );
 }

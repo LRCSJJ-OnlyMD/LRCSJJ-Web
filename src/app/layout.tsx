@@ -14,10 +14,12 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: {
     default: "LRCSJJ - Ligue Régionale Casablanca-Settat de Ju-Jitsu",
-    template: "%s | LRCSJJ"
+    template: "%s | LRCSJJ",
   },
-  description: "Excellence, Discipline et Tradition Martiale - Sous l'égide de la Fédération Royale Marocaine de Ju-Jitsu. Découvrez notre communauté de champions et les témoignages de nos athlètes.",
-  keywords: "Ju-Jitsu, casablanca, settat, morocco, martial arts, federation, champions, témoignages, athlètes, compétitions",
+  description:
+    "Excellence, Discipline et Tradition Martiale - Sous l'égide de la Fédération Royale Marocaine de Ju-Jitsu. Découvrez notre communauté de champions et les témoignages de nos athlètes.",
+  keywords:
+    "Ju-Jitsu, casablanca, settat, morocco, martial arts, federation, champions, témoignages, athlètes, compétitions",
   authors: [{ name: "Casablanca-Settat Ju-Jitsu League" }],
   creator: "LRCSJJ",
   publisher: "Ligue Régionale Casablanca-Settat",
@@ -28,7 +30,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "LRCSJJ - Ligue Régionale Casablanca-Settat de Ju-Jitsu",
-    description: "Excellence, Discipline et Tradition Martiale - Découvrez les témoignages de nos champions",
+    description:
+      "Excellence, Discipline et Tradition Martiale - Découvrez les témoignages de nos champions",
     type: "website",
     locale: "fr_MA",
     siteName: "LRCSJJ",
@@ -44,22 +47,20 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
   icons: {
     icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-      { url: '/favicon-16x16.png', type: 'image/png', sizes: '16x16' },
-      { url: '/favicon-32x32.png', type: 'image/png', sizes: '32x32' },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-16x16.png", type: "image/png", sizes: "16x16" },
+      { url: "/favicon-32x32.png", type: "image/png", sizes: "32x32" },
     ],
-    apple: [
-      { url: '/apple-touch-icon.png', sizes: '180x180' },
-    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
   },
-  manifest: '/site.webmanifest',
+  manifest: "/site.webmanifest",
 };
 
 export default function RootLayout({
@@ -69,7 +70,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className={`${inter.variable}`} suppressHydrationWarning>
-      <body className={`${inter.className} antialiased`} suppressHydrationWarning>
+      <body
+        className={`${inter.className} antialiased`}
+        suppressHydrationWarning
+      >
         <ThemeProvider defaultTheme="system" storageKey="lrcsjj-ui-theme">
           <LanguageProvider>
             <TRPCProvider>

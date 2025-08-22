@@ -448,6 +448,15 @@ export default function ClubManagerLoginPage() {
                     Contactez l&apos;administration si vous n&apos;avez pas de
                     compte
                   </p>
+                  <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <p className="text-xs font-medium text-blue-700 dark:text-blue-400 mb-1">
+                      Identifiants de test:
+                    </p>
+                    <div className="text-xs space-y-1 text-blue-600 dark:text-blue-300">
+                      <p>Email: manager.clubatlasjujitsucasablanca@lrcsjj.ma</p>
+                      <p>Mot de passe: atlas2025</p>
+                    </div>
+                  </div>
                 </div>
               ) : loginStep === "change-password" ? (
                 <div className="space-y-1">

@@ -1,82 +1,80 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Send, CheckCircle, AlertCircle } from "lucide-react";
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Send, CheckCircle, AlertCircle } from 'lucide-react'
 
 type FormErrors = {
-  [key: string]: string;
-};
+  [key: string]: string
+}
 
 export function ContactForm() {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [submitError, setSubmitError] = useState("");
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+  const [errors, setErrors] = useState<FormErrors>({})
+  const [submitError, setSubmitError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setErrors({});
-    setSubmitError("");
-
+    e.preventDefault()
+    setIsSubmitting(true)
+    setErrors({})
+    setSubmitError('')
+    
     try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
+      const response = await fetch('/api/contact', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
-      });
-
-      const result = await response.json();
-
+      })
+      
+      const result = await response.json()
+      
       if (result.success) {
-        setSubmitted(true);
+        setSubmitted(true)
         // Reset form
-        setFormData({ name: "", email: "", subject: "", message: "" });
+        setFormData({ name: '', email: '', subject: '', message: '' })
       } else {
         if (result.errors) {
           // Handle validation errors
-          const newErrors: FormErrors = {};
+          const newErrors: FormErrors = {}
           result.errors.forEach((error: { field: string; message: string }) => {
-            newErrors[error.field] = error.message;
-          });
-          setErrors(newErrors);
+            newErrors[error.field] = error.message
+          })
+          setErrors(newErrors)
         } else {
-          setSubmitError(result.message || "Une erreur est survenue");
+          setSubmitError(result.message || 'Une erreur est survenue')
         }
       }
     } catch (error) {
-      console.error("Contact form error:", error);
-      setSubmitError("Erreur de connexion. Veuillez réessayer.");
+      console.error('Contact form error:', error)
+      setSubmitError('Erreur de connexion. Veuillez réessayer.')
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    setFormData(prev => ({
       ...prev,
-      [name]: value,
-    }));
+      [name]: value
+    }))
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
+      setErrors(prev => ({ ...prev, [name]: '' }))
     }
-  };
+  }
 
   return (
     <div className="space-y-6">
@@ -88,11 +86,10 @@ export function ContactForm() {
               Message envoyé avec succès !
             </h3>
             <p className="text-green-600 dark:text-green-400">
-              Merci pour votre message. Notre équipe vous répondra dans les plus
-              brefs délais.
+              Merci pour votre message. Notre équipe vous répondra dans les plus brefs délais.
             </p>
           </div>
-          <Button
+          <Button 
             onClick={() => setSubmitted(false)}
             className="mt-6 btn-smooth"
             variant="outline"
@@ -110,7 +107,7 @@ export function ContactForm() {
               </div>
             </div>
           )}
-
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <Label htmlFor="name">Nom complet *</Label>
@@ -121,14 +118,14 @@ export function ContactForm() {
                 required
                 value={formData.name}
                 onChange={handleInputChange}
-                className={`mt-1 ${errors.name ? "border-red-500" : ""}`}
+                className={`mt-1 ${errors.name ? 'border-red-500' : ''}`}
                 placeholder="Votre nom complet"
               />
               {errors.name && (
                 <p className="text-red-600 text-sm mt-1">{errors.name}</p>
               )}
             </div>
-
+            
             <div>
               <Label htmlFor="email">Adresse email *</Label>
               <Input
@@ -138,7 +135,7 @@ export function ContactForm() {
                 required
                 value={formData.email}
                 onChange={handleInputChange}
-                className={`mt-1 ${errors.email ? "border-red-500" : ""}`}
+                className={`mt-1 ${errors.email ? 'border-red-500' : ''}`}
                 placeholder="votre.email@exemple.com"
               />
               {errors.email && (
@@ -146,7 +143,7 @@ export function ContactForm() {
               )}
             </div>
           </div>
-
+          
           <div>
             <Label htmlFor="subject">Sujet *</Label>
             <Input
@@ -156,14 +153,14 @@ export function ContactForm() {
               required
               value={formData.subject}
               onChange={handleInputChange}
-              className={`mt-1 ${errors.subject ? "border-red-500" : ""}`}
+              className={`mt-1 ${errors.subject ? 'border-red-500' : ''}`}
               placeholder="De quoi souhaitez-vous parler ?"
             />
             {errors.subject && (
               <p className="text-red-600 text-sm mt-1">{errors.subject}</p>
             )}
           </div>
-
+          
           <div>
             <Label htmlFor="message">Message *</Label>
             <Textarea
@@ -173,19 +170,19 @@ export function ContactForm() {
               required
               value={formData.message}
               onChange={handleInputChange}
-              className={`mt-1 ${errors.message ? "border-red-500" : ""}`}
+              className={`mt-1 ${errors.message ? 'border-red-500' : ''}`}
               placeholder="Décrivez votre demande ou question en détail..."
             />
             {errors.message && (
               <p className="text-red-600 text-sm mt-1">{errors.message}</p>
             )}
           </div>
-
-          <Button
-            type="submit"
+          
+          <Button 
+            type="submit" 
             disabled={isSubmitting}
             size="lg"
-            className="w-full btn-smooth bg-primary hover:bg-primary/90 text-primary-foreground"
+            className="w-full btn-smooth bg-[#017444] hover:bg-emerald-700 text-white"
           >
             {isSubmitting ? (
               <>
@@ -202,5 +199,5 @@ export function ContactForm() {
         </form>
       )}
     </div>
-  );
+  )
 }

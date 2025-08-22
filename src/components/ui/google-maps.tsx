@@ -96,7 +96,7 @@ export function GoogleMapsEmbed({
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center space-x-2 mb-2">
-                <MapPin className="h-5 w-5 text-primary flex-shrink-0" />
+                <MapPin className="h-5 w-5 text-[#017444] flex-shrink-0" />
                 <h3 className="font-semibold text-foreground">
                   {locationName}
                 </h3>
@@ -121,7 +121,7 @@ export function GoogleMapsEmbed({
               <Button
                 variant="default"
                 size="sm"
-                className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
+                className="flex-1 bg-[#017444] hover:bg-emerald-700 text-white"
                 onClick={() => window.open(mapsUrl, "_blank")}
               >
                 <ExternalLink className="h-4 w-4 mr-2" />

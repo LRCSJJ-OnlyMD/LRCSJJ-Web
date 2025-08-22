@@ -9,7 +9,8 @@ import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { trpc } from '@/lib/trpc-client'
-import { Plus, Edit, Trash2, Eye } from 'lucide-react'
+import { Plus, Edit, Trash2, Eye, Search } from 'lucide-react'
+import { toast } from 'sonner'
 
 type Club = {
   id: string
@@ -33,6 +34,8 @@ export default function ClubsManagement() {
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false)
   const [selectedClub, setSelectedClub] = useState<Club | null>(null)
   const [editingClub, setEditingClub] = useState<Club | null>(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterCity, setFilterCity] = useState('')
   const [formData, setFormData] = useState({
     name: '',
     address: '',
@@ -65,6 +68,10 @@ export default function ClubsManagement() {
       refetchClubs()
       setIsDialogOpen(false)
       resetForm()
+      toast.success('Club créé avec succès')
+    },
+    onError: (error) => {
+      toast.error(`Erreur lors de la création: ${error.message}`)
     }
   })
 
@@ -74,12 +81,20 @@ export default function ClubsManagement() {
       setIsDialogOpen(false)
       setEditingClub(null)
       resetForm()
+      toast.success('Club modifié avec succès')
+    },
+    onError: (error) => {
+      toast.error(`Erreur lors de la modification: ${error.message}`)
     }
   })
 
   const deleteClubMutation = trpc.clubs.delete.useMutation({
     onSuccess: () => {
       refetchClubs()
+      toast.success('Club supprimé avec succès')
+    },
+    onError: (error) => {
+      toast.error(`Erreur lors de la suppression: ${error.message}`)
     }
   })
 
@@ -118,7 +133,7 @@ export default function ClubsManagement() {
   }
 
   const handleDelete = (clubId: string) => {
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce club ?')) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce club ? Cette action est irréversible.')) {
       deleteClubMutation.mutate({ id: clubId })
     }
   }
@@ -127,6 +142,28 @@ export default function ClubsManagement() {
     setSelectedClub(club)
     setIsDetailsDialogOpen(true)
   }
+
+  // Filter clubs based on search term and city filter
+  const filteredClubs = clubs.filter(club => {
+    const matchesSearch = searchTerm === '' || 
+      club.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      club.president?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      club.coach?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      club.email?.toLowerCase().includes(searchTerm.toLowerCase())
+
+    const matchesCity = filterCity === '' || 
+      club.address?.toLowerCase().includes(filterCity.toLowerCase())
+
+    return matchesSearch && matchesCity
+  })
+
+  // Get unique cities for filter dropdown
+  const cities = Array.from(new Set(
+    clubs
+      .filter(club => club.address)
+      .map(club => club.address?.split(',').pop()?.trim() || '')
+      .filter(city => city.length > 0)
+  )).sort()
 
   if (isLoading) {
     return (
@@ -359,7 +396,25 @@ export default function ClubsManagement() {
                   </div>
                 </div>
 
-                <div className="flex justify-end pt-4">
+                <div className="flex justify-end gap-2 pt-4">
+                  <Button 
+                    variant="outline"
+                    onClick={() => {
+                      // Navigate to insurance page filtered by this club
+                      window.open(`/admin/insurance?clubId=${selectedClub.id}`, '_blank')
+                    }}
+                  >
+                    Voir Assurances
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={() => {
+                      // Navigate to athletes page filtered by this club
+                      window.open(`/admin/athletes?clubId=${selectedClub.id}`, '_blank')
+                    }}
+                  >
+                    Voir Athlètes
+                  </Button>
                   <Button 
                     variant="outline" 
                     onClick={() => setIsDetailsDialogOpen(false)}
@@ -372,9 +427,59 @@ export default function ClubsManagement() {
           </DialogContent>
         </Dialog>
 
+        {/* Search and Filter Section */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="text-lg">Recherche et Filtres</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1">
+                <Label htmlFor="search">Rechercher un club</Label>
+                <div className="relative">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="search"
+                    placeholder="Nom du club, président, coach, email..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-8"
+                  />
+                </div>
+              </div>
+              <div className="w-full sm:w-48">
+                <Label htmlFor="city-filter">Filtrer par ville</Label>
+                <select
+                  id="city-filter"
+                  value={filterCity}
+                  onChange={(e) => setFilterCity(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                  title="Filtrer par ville"
+                >
+                  <option value="">Toutes les villes</option>
+                  {cities.map(city => (
+                    <option key={city} value={city}>{city}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex items-end">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSearchTerm('')
+                    setFilterCity('')
+                  }}
+                >
+                  Réinitialiser
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader>
-            <CardTitle>Clubs de la Ligue ({clubs.length})</CardTitle>
+            <CardTitle>Clubs de la Ligue ({filteredClubs.length} / {clubs.length})</CardTitle>
             <CardDescription>
               Liste complète des clubs affiliés à la ligue
             </CardDescription>
@@ -392,7 +497,7 @@ export default function ClubsManagement() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {clubs.map((club) => (
+                {filteredClubs.map((club) => (
                   <TableRow key={club.id}>
                     <TableCell className="font-medium">{club.name}</TableCell>
                     <TableCell>{club.address || '-'}</TableCell>
@@ -432,6 +537,7 @@ export default function ClubsManagement() {
                           onClick={() => handleDelete(club.id)}
                           className="text-red-600 hover:text-red-700"
                           title="Supprimer"
+                          disabled={deleteClubMutation.isPending}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -455,6 +561,22 @@ export default function ClubsManagement() {
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Créer le premier club
+                </Button>
+              </div>
+            )}
+
+            {clubs.length > 0 && filteredClubs.length === 0 && (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">Aucun club ne correspond aux critères de recherche</p>
+                <Button 
+                  variant="outline"
+                  className="mt-4"
+                  onClick={() => {
+                    setSearchTerm('')
+                    setFilterCity('')
+                  }}
+                >
+                  Réinitialiser les filtres
                 </Button>
               </div>
             )}

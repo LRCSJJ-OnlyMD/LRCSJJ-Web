@@ -37,7 +37,7 @@ export const publicProcedure = t.procedure;
 
 // Admin-only procedure
 export const adminProcedure = t.procedure.use(({ ctx, next }) => {
-  if (!ctx.admin || ctx.admin.role !== "ADMIN") {
+  if (!ctx.admin) {
     throw new TRPCError({
       code: "UNAUTHORIZED",
       message: "Admin authentication required",
@@ -57,26 +57,6 @@ export const clubManagerProcedure = t.procedure.use(({ ctx, next }) => {
     throw new TRPCError({
       code: "UNAUTHORIZED",
       message: "Club manager authentication required",
-    });
-  }
-  return next({
-    ctx: {
-      ...ctx,
-      admin: ctx.admin,
-    },
-  });
-});
-
-// Combined procedure for both admin and club manager
-export const authenticatedProcedure = t.procedure.use(({ ctx, next }) => {
-  if (
-    !ctx.admin ||
-    !ctx.admin.role ||
-    !["ADMIN", "CLUB_MANAGER"].includes(ctx.admin.role)
-  ) {
-    throw new TRPCError({
-      code: "UNAUTHORIZED",
-      message: "Authentication required",
     });
   }
   return next({

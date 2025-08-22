@@ -1,11 +1,6 @@
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
-import {
-  router,
-  adminProcedure,
-  clubManagerProcedure,
-  authenticatedProcedure,
-} from "../trpc";
+import { router, adminProcedure, clubManagerProcedure } from "../trpc";
 
 const athleteInputSchema = z.object({
   firstName: z.string().min(1),
@@ -24,7 +19,6 @@ const athleteInputSchema = z.object({
 });
 
 export const athletesRouter = router({
-  // Admin can view all athletes across all clubs
   getAll: adminProcedure
     .input(
       z.object({
@@ -170,86 +164,36 @@ export const athletesRouter = router({
     };
   }),
 
-  // Club Manager specific procedures - scoped to their club only
-  getMyClubAthletes: clubManagerProcedure
-    .input(
-      z.object({
-        search: z.string().optional(),
-        seasonId: z.string().optional(),
-        insuranceStatus: z.enum(["paid", "unpaid", "all"]).optional(),
-      })
-    )
-    .query(async ({ ctx, input }) => {
-      const clubId = ctx.admin.clubId!;
+  // Club Manager endpoints
+  getByClub: clubManagerProcedure.query(async ({ ctx }) => {
+    // Get the club manager's club ID from the token
+    const clubId = ctx.admin.clubId;
 
-      const where: Prisma.AthleteWhereInput = {
-        clubId,
-      };
-
-      if (input.search) {
-        where.OR = [
-          { firstName: { contains: input.search, mode: "insensitive" } },
-          { lastName: { contains: input.search, mode: "insensitive" } },
-          { passportNo: { contains: input.search, mode: "insensitive" } },
-          { nationalId: { contains: input.search, mode: "insensitive" } },
-        ];
-      }
-
-      return await ctx.prisma.athlete.findMany({
-        where,
-        include: {
-          club: true,
-          insurances: {
-            where: input.seasonId ? { seasonId: input.seasonId } : undefined,
-            include: {
-              season: true,
-            },
-          },
-          _count: {
-            select: {
-              insurances: true,
-              teamMembers: true,
-            },
+    return await ctx.prisma.athlete.findMany({
+      where: { clubId },
+      include: {
+        club: true,
+        insurances: {
+          include: {
+            season: true,
           },
         },
-        orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
-      });
-    }),
+      },
+      orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
+    });
+  }),
 
-  getMyClubAthleteById: clubManagerProcedure
-    .input(z.object({ id: z.string() }))
-    .query(async ({ ctx, input }) => {
-      const athlete = await ctx.prisma.athlete.findUnique({
-        where: {
-          id: input.id,
-          clubId: ctx.admin.clubId!, // Ensure athlete belongs to manager's club
-        },
-        include: {
-          club: true,
-          insurances: {
-            include: {
-              season: true,
-            },
-          },
-          teamMembers: {
-            include: {
-              team: true,
-            },
-          },
-        },
-      });
-
-      if (!athlete) {
-        throw new Error("Athlete not found or access denied");
-      }
-
-      return athlete;
-    }),
-
-  createForMyClub: clubManagerProcedure
+  createByClubManager: clubManagerProcedure
     .input(athleteInputSchema.omit({ clubId: true }))
     .mutation(async ({ ctx, input }) => {
-      return await ctx.prisma.athlete.create({
+      // Use the club manager's club ID
+      const clubId = ctx.admin.clubId;
+
+      if (!clubId) {
+        throw new Error("Club ID not found in token");
+      }
+
+      const athlete = await ctx.prisma.athlete.create({
         data: {
           firstName: input.firstName,
           lastName: input.lastName,
@@ -263,29 +207,62 @@ export const athletesRouter = router({
           belt: input.belt,
           weight: input.weight,
           category: input.category,
-          clubId: ctx.admin.clubId!, // Always use manager's club
+          clubId,
         },
         include: {
           club: true,
         },
       });
-    }),
 
-  updateMyClubAthlete: clubManagerProcedure
-    .input(athleteInputSchema.omit({ clubId: true }).extend({ id: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      const { id, ...data } = input;
-
-      // Verify athlete belongs to manager's club
-      const athlete = await ctx.prisma.athlete.findUnique({
-        where: { id, clubId: ctx.admin.clubId! },
-      });
-
-      if (!athlete) {
-        throw new Error("Athlete not found or access denied");
+      // Send notification to admin
+      try {
+        await fetch(
+          `${process.env.NEXT_PUBLIC_APP_URL}/api/trpc/notifications.create`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              json: {
+                type: "ATHLETE_ADDED",
+                title: "Nouvel athlète ajouté",
+                message: `L'athlète ${athlete.firstName} ${athlete.lastName} a été ajouté au club ${athlete.club.name}.`,
+                metadata: {
+                  athleteId: athlete.id,
+                  athleteName: `${athlete.firstName} ${athlete.lastName}`,
+                  belt: athlete.belt || "Non définie",
+                  weight: athlete.weight || "Non défini",
+                },
+                clubManagerId: ctx.admin.adminId,
+                clubId: clubId,
+              },
+            }),
+          }
+        );
+      } catch (error) {
+        console.error("Failed to send notification:", error);
       }
 
-      return await ctx.prisma.athlete.update({
+      return athlete;
+    }),
+
+  updateByClubManager: clubManagerProcedure
+    .input(athleteInputSchema.extend({ id: z.string() }).omit({ clubId: true }))
+    .mutation(async ({ ctx, input }) => {
+      const { id, ...data } = input;
+      const clubId = ctx.admin.clubId;
+
+      // Verify athlete belongs to club manager's club
+      const existingAthlete = await ctx.prisma.athlete.findFirst({
+        where: { id, clubId },
+      });
+
+      if (!existingAthlete) {
+        throw new Error("Athlete not found or not authorized");
+      }
+
+      const athlete = await ctx.prisma.athlete.update({
         where: { id },
         data: {
           ...data,
@@ -295,57 +272,86 @@ export const athletesRouter = router({
           club: true,
         },
       });
-    }),
 
-  deleteMyClubAthlete: clubManagerProcedure
-    .input(z.object({ id: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      // Verify athlete belongs to manager's club
-      const athlete = await ctx.prisma.athlete.findUnique({
-        where: { id: input.id, clubId: ctx.admin.clubId! },
-      });
-
-      if (!athlete) {
-        throw new Error("Athlete not found or access denied");
+      // Send notification to admin
+      try {
+        await fetch(
+          `${process.env.NEXT_PUBLIC_APP_URL}/api/trpc/notifications.create`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              json: {
+                type: "ATHLETE_UPDATED",
+                title: "Athlète modifié",
+                message: `Les informations de l'athlète ${athlete.firstName} ${athlete.lastName} ont été mises à jour.`,
+                metadata: {
+                  athleteId: athlete.id,
+                  athleteName: `${athlete.firstName} ${athlete.lastName}`,
+                  changes: "Informations mises à jour",
+                },
+                clubManagerId: ctx.admin.adminId,
+                clubId: clubId,
+              },
+            }),
+          }
+        );
+      } catch (error) {
+        console.error("Failed to send notification:", error);
       }
 
-      return await ctx.prisma.athlete.delete({
-        where: { id: input.id },
-      });
+      return athlete;
     }),
 
-  getMyClubStats: clubManagerProcedure.query(async ({ ctx }) => {
-    const clubId = ctx.admin.clubId!;
+  deleteByClubManager: clubManagerProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const clubId = ctx.admin.clubId;
 
-    const [totalAthletes, activeSeasonInsurances, athletesWithoutInsurance] =
-      await Promise.all([
-        ctx.prisma.athlete.count({
-          where: { clubId },
-        }),
-        ctx.prisma.insurance.count({
-          where: {
-            isPaid: true,
-            season: { isActive: true },
-            athlete: { clubId },
-          },
-        }),
-        ctx.prisma.athlete.count({
-          where: {
-            clubId,
-            insurances: {
-              none: {
-                season: { isActive: true },
-                isPaid: true,
-              },
+      // Verify athlete belongs to club manager's club
+      const existingAthlete = await ctx.prisma.athlete.findFirst({
+        where: { id: input.id, clubId },
+        include: { club: true },
+      });
+
+      if (!existingAthlete) {
+        throw new Error("Athlete not found or not authorized");
+      }
+
+      await ctx.prisma.athlete.delete({
+        where: { id: input.id },
+      });
+
+      // Send notification to admin
+      try {
+        await fetch(
+          `${process.env.NEXT_PUBLIC_APP_URL}/api/trpc/notifications.create`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
             },
-          },
-        }),
-      ]);
+            body: JSON.stringify({
+              json: {
+                type: "ATHLETE_DELETED",
+                title: "Athlète supprimé",
+                message: `L'athlète ${existingAthlete.firstName} ${existingAthlete.lastName} a été supprimé du club ${existingAthlete.club.name}.`,
+                metadata: {
+                  athleteName: `${existingAthlete.firstName} ${existingAthlete.lastName}`,
+                  clubName: existingAthlete.club.name,
+                },
+                clubManagerId: ctx.admin.adminId,
+                clubId: clubId,
+              },
+            }),
+          }
+        );
+      } catch (error) {
+        console.error("Failed to send notification:", error);
+      }
 
-    return {
-      totalAthletes,
-      activeSeasonInsurances,
-      athletesWithoutInsurance,
-    };
-  }),
+      return { success: true };
+    }),
 });

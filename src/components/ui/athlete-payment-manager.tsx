@@ -30,45 +30,27 @@ import {
   type ClientPaymentRequest,
 } from "@/lib/stripe-client";
 import { toast } from "sonner";
-import { trpc } from "@/lib/trpc-client";
 
-// Types based on Prisma schema
+// Mock data structure - in production, this would come from your database
 interface Athlete {
   id: string;
-  firstName: string;
-  lastName: string;
-  email?: string | null;
-  phone?: string | null;
+  name: string;
+  email?: string;
+  phone?: string;
   clubId: string;
-  club: {
-    id: string;
-    name: string;
-  };
-  insurances: Array<{
-    id: string;
-    isPaid: boolean;
-    paidAt?: Date | null;
-    season: {
-      id: string;
-      name: string;
-    };
-  }>;
-  category?: string | null;
-  dateOfBirth: Date;
+  clubName: string;
+  insuranceStatus: "ACTIVE" | "EXPIRED" | "NEVER_PAID";
+  lastPaymentDate?: string;
+  expiryDate?: string;
+  category: string;
+  birthDate: string;
 }
 
 interface Season {
   id: string;
+  year: string;
   name: string;
-  startDate: Date;
-  endDate: Date;
   isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  _count?: {
-    insurances: number;
-    championships: number;
-  };
 }
 
 export function AthletePaymentManager() {
@@ -82,69 +64,112 @@ export function AthletePaymentManager() {
   const [isLoading, setIsLoading] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>("");
 
-  // tRPC queries
-  const { data: seasonsData, isLoading: loadingSeasons } =
-    trpc.seasons.getAllForClubManager.useQuery();
-  const {
-    data: athletesData,
-    isLoading: loadingAthletes,
-    refetch: refetchAthletes,
-  } = trpc.athletes.getMyClubAthletes.useQuery({
-    search: searchTerm,
-    seasonId: selectedSeason?.id,
-  });
-
-  // Load data from tRPC
+  // Load mock data - replace with actual API calls
   useEffect(() => {
-    if (seasonsData) {
-      setSeasons(seasonsData);
-      const activeSeason = seasonsData.find((s) => s.isActive);
-      if (activeSeason && !selectedSeason) {
-        setSelectedSeason(activeSeason);
-      }
-    }
-  }, [seasonsData, selectedSeason]);
+    loadMockData();
+  }, []);
 
-  useEffect(() => {
-    if (athletesData) {
-      setAthletes(athletesData);
-    }
-  }, [athletesData]);
+  const loadMockData = () => {
+    // Mock seasons
+    const mockSeasons: Season[] = [
+      {
+        id: "season-2025",
+        year: "2025",
+        name: "Saison 2025",
+        isActive: true,
+      },
+      {
+        id: "season-2024",
+        year: "2024",
+        name: "Saison 2024",
+        isActive: false,
+      },
+    ];
 
-  // Refetch athletes when season changes
-  useEffect(() => {
-    if (selectedSeason) {
-      refetchAthletes();
-    }
-  }, [selectedSeason, refetchAthletes]);
+    // Mock athletes
+    const mockAthletes: Athlete[] = [
+      {
+        id: "athlete-1",
+        name: "Ahmed Benali",
+        email: "ahmed.benali@example.com",
+        phone: "+212612345678",
+        clubId: "club-1",
+        clubName: "Club Ju-Jitsu Casablanca",
+        insuranceStatus: "EXPIRED",
+        lastPaymentDate: "2024-01-15",
+        expiryDate: "2025-01-15",
+        category: "Senior",
+        birthDate: "1995-05-20",
+      },
+      {
+        id: "athlete-2",
+        name: "Fatima El Alaoui",
+        email: "fatima.elalaoui@example.com",
+        phone: "+212623456789",
+        clubId: "club-1",
+        clubName: "Club Ju-Jitsu Casablanca",
+        insuranceStatus: "ACTIVE",
+        lastPaymentDate: "2025-02-10",
+        expiryDate: "2026-02-10",
+        category: "Junior",
+        birthDate: "2000-08-15",
+      },
+      {
+        id: "athlete-3",
+        name: "Youssef Kassimi",
+        email: "youssef.kassimi@example.com",
+        phone: "+212634567890",
+        clubId: "club-1",
+        clubName: "Club Ju-Jitsu Casablanca",
+        insuranceStatus: "NEVER_PAID",
+        category: "Cadet",
+        birthDate: "2005-12-03",
+      },
+      {
+        id: "athlete-4",
+        name: "Sophia Benomar",
+        email: "sophia.benomar@example.com",
+        phone: "+212645678901",
+        clubId: "club-1",
+        clubName: "Club Ju-Jitsu Casablanca",
+        insuranceStatus: "EXPIRED",
+        lastPaymentDate: "2024-06-20",
+        expiryDate: "2025-06-20",
+        category: "Senior",
+        birthDate: "1998-03-12",
+      },
+      {
+        id: "athlete-5",
+        name: "Hassan Moukrim",
+        email: "hassan.moukrim@example.com",
+        phone: "+212656789012",
+        clubId: "club-1",
+        clubName: "Club Ju-Jitsu Casablanca",
+        insuranceStatus: "NEVER_PAID",
+        category: "Senior",
+        birthDate: "1992-11-08",
+      },
+    ];
 
-  const getAthleteInsuranceStatus = (athlete: Athlete) => {
-    if (!selectedSeason) return "UNKNOWN";
-
-    const seasonInsurance = athlete.insurances.find(
-      (ins) => ins.season.id === selectedSeason.id
-    );
-
-    if (!seasonInsurance) return "NEVER_PAID";
-    if (seasonInsurance.isPaid) return "ACTIVE";
-    return "EXPIRED";
+    setSeasons(mockSeasons);
+    setAthletes(mockAthletes);
+    setSelectedSeason(mockSeasons.find((s) => s.isActive) || mockSeasons[0]);
   };
 
   const filteredAthletes = athletes.filter((athlete) => {
-    const fullName = `${athlete.firstName} ${athlete.lastName}`;
     const matchesSearch =
-      fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      athlete.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       athlete.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      athlete.category?.toLowerCase().includes(searchTerm.toLowerCase());
+      athlete.category.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const insuranceStatus = getAthleteInsuranceStatus(athlete);
-    const matchesStatus = !filterStatus || insuranceStatus === filterStatus;
+    const matchesStatus =
+      !filterStatus || athlete.insuranceStatus === filterStatus;
 
     return matchesSearch && matchesStatus;
   });
 
   const handleAthleteSelection = (athleteId: string, checked: boolean) => {
-    console.log("Checkbox clicked:", athleteId, checked);
+    console.log("Checkbox clicked:", athleteId, checked); // Debug log
     const newSelection = new Set(selectedAthletes);
     if (checked) {
       newSelection.add(athleteId);
@@ -152,18 +177,18 @@ export function AthletePaymentManager() {
       newSelection.delete(athleteId);
     }
     setSelectedAthletes(newSelection);
-    console.log("New selection:", Array.from(newSelection));
+    console.log("New selection:", Array.from(newSelection)); // Debug log
   };
 
   const handleSelectAll = (checked: boolean) => {
-    console.log("Select all clicked:", checked);
+    console.log("Select all clicked:", checked); // Debug log
     if (checked) {
       const allIds = filteredAthletes.map((a) => a.id);
       setSelectedAthletes(new Set(allIds));
-      console.log("Selected all:", allIds);
+      console.log("Selected all:", allIds); // Debug log
     } else {
       setSelectedAthletes(new Set());
-      console.log("Deselected all");
+      console.log("Deselected all"); // Debug log
     }
   };
 
@@ -173,25 +198,22 @@ export function AthletePaymentManager() {
       return;
     }
 
-    console.log(
-      "Starting single payment for:",
-      `${athlete.firstName} ${athlete.lastName}`
-    );
+    console.log("Starting single payment for:", athlete.name); // Debug log
     setIsLoading(true);
 
     try {
       const paymentRequest: ClientPaymentRequest = {
         athleteId: athlete.id,
-        athleteName: `${athlete.firstName} ${athlete.lastName}`,
+        athleteName: athlete.name,
         clubId: athlete.clubId,
-        clubName: athlete.club.name,
+        clubName: athlete.clubName,
         seasonId: selectedSeason.id,
-        seasonYear: selectedSeason.name, // Use season name instead of year
-        customerEmail: athlete.email || undefined,
-        customerPhone: athlete.phone || undefined,
+        seasonYear: selectedSeason.year,
+        customerEmail: athlete.email,
+        customerPhone: athlete.phone,
       };
 
-      console.log("Payment request:", paymentRequest);
+      console.log("Payment request:", paymentRequest); // Debug log
       toast.loading("Création de la session de paiement...", {
         id: "payment-loading",
       });
@@ -203,15 +225,14 @@ export function AthletePaymentManager() {
       toast.dismiss("payment-loading");
 
       if (result.success) {
-        toast.success(
-          `Redirection vers le paiement pour ${athlete.firstName} ${athlete.lastName}`
-        );
+        toast.success(`Redirection vers le paiement pour ${athlete.name}`);
+        // The user will be redirected to Stripe, so we don't need to do anything else
       } else {
-        console.error("Payment error:", result.error);
+        console.error("Payment error:", result.error); // Debug log
         toast.error(result.error || "Erreur lors de la création du paiement");
       }
     } catch (error) {
-      console.error("Payment error:", error);
+      console.error("Payment error:", error); // Debug log
       toast.dismiss("payment-loading");
       toast.error("Erreur lors de la création du paiement");
     } finally {
@@ -230,34 +251,33 @@ export function AthletePaymentManager() {
       return;
     }
 
-    console.log("Starting bulk payment for:", Array.from(selectedAthletes));
+    console.log("Starting bulk payment for:", Array.from(selectedAthletes)); // Debug log
 
     const selectedAthletesList = athletes.filter((a) =>
       selectedAthletes.has(a.id)
     );
     console.log(
       "Selected athletes list:",
-      selectedAthletesList.map((a) => `${a.firstName} ${a.lastName}`)
-    );
+      selectedAthletesList.map((a) => a.name)
+    ); // Debug log
 
     setIsLoading(true);
     try {
-      const athleteNames = selectedAthletesList
-        .map((a) => `${a.firstName} ${a.lastName}`)
-        .join(", ");
+      // For bulk payments, calculate the total amount for all selected athletes
+      const athleteNames = selectedAthletesList.map((a) => a.name).join(", ");
 
       const paymentRequest: ClientPaymentRequest = {
-        athleteId: "bulk-payment",
+        athleteId: "bulk-payment", // Special ID for bulk payments
         athleteName: `Paiement groupé (${selectedAthletes.size} athlètes): ${athleteNames}`,
         clubId: selectedAthletesList[0].clubId,
-        clubName: selectedAthletesList[0].club.name,
+        clubName: selectedAthletesList[0].clubName,
         seasonId: selectedSeason.id,
-        seasonYear: selectedSeason.name, // Use season name instead of year
-        customerEmail: selectedAthletesList[0].email || undefined,
-        customerPhone: selectedAthletesList[0].phone || undefined,
+        seasonYear: selectedSeason.year,
+        customerEmail: selectedAthletesList[0].email,
+        customerPhone: selectedAthletesList[0].phone,
       };
 
-      console.log("Bulk payment request:", paymentRequest);
+      console.log("Bulk payment request:", paymentRequest); // Debug log
       toast.loading("Création de la session de paiement groupé...", {
         id: "bulk-payment-loading",
       });
@@ -272,15 +292,16 @@ export function AthletePaymentManager() {
         toast.success(
           `Redirection vers le paiement groupé pour ${selectedAthletes.size} athlètes`
         );
+        // Clear selection after successful payment initiation
         setSelectedAthletes(new Set());
       } else {
-        console.error("Bulk payment error:", result.error);
+        console.error("Bulk payment error:", result.error); // Debug log
         toast.error(
           result.error || "Erreur lors de la création du paiement groupé"
         );
       }
     } catch (error) {
-      console.error("Bulk payment error:", error);
+      console.error("Bulk payment error:", error); // Debug log
       toast.dismiss("bulk-payment-loading");
       toast.error("Erreur lors de la création du paiement groupé");
     } finally {
@@ -325,32 +346,17 @@ export function AthletePaymentManager() {
     }
   };
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString("fr-FR");
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("fr-FR");
   };
 
   const getPaymentAmount = () => {
-    return 150 * selectedAthletes.size; // 150 MAD per athlete
+    return 150 * selectedAthletes.size; // 150 MAD per athlete (correct bulk calculation)
   };
 
   const formatAmount = (amount: number) => {
-    return `${amount} MAD`;
+    return `${amount} MAD`; // Direct MAD display, no USD conversion
   };
-
-  if (loadingSeasons || loadingAthletes) {
-    return (
-      <div className="w-full max-w-6xl mx-auto space-y-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
-              <span className="ml-2">Chargement...</span>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">
@@ -541,52 +547,36 @@ export function AthletePaymentManager() {
                   />
                   <div className="space-y-1">
                     <div className="flex items-center gap-3">
-                      <p className="font-medium">
-                        {athlete.firstName} {athlete.lastName}
-                      </p>
+                      <p className="font-medium">{athlete.name}</p>
                       <span className="text-sm text-gray-500">•</span>
                       <span className="text-sm text-gray-600">
-                        {athlete.category || "Non spécifié"}
+                        {athlete.category}
                       </span>
-                      {getStatusBadge(getAthleteInsuranceStatus(athlete))}
+                      {getStatusBadge(athlete.insuranceStatus)}
                     </div>
                     <div className="text-sm text-gray-600">
                       {athlete.email && <span>{athlete.email}</span>}
                       {athlete.email && athlete.phone && <span> • </span>}
                       {athlete.phone && <span>{athlete.phone}</span>}
                     </div>
-                    {(() => {
-                      const status = getAthleteInsuranceStatus(athlete);
-                      const seasonInsurance = athlete.insurances.find(
-                        (ins) => ins.season.id === selectedSeason?.id
-                      );
-
-                      if (status === "ACTIVE" && seasonInsurance?.paidAt) {
-                        return (
-                          <div className="text-xs text-green-600">
-                            Payé le:{" "}
-                            {formatDate(new Date(seasonInsurance.paidAt))}
-                          </div>
-                        );
-                      }
-
-                      if (status === "EXPIRED" && seasonInsurance?.paidAt) {
-                        return (
-                          <div className="text-xs text-red-600">
-                            Expiré (payé le:{" "}
-                            {formatDate(new Date(seasonInsurance.paidAt))})
-                          </div>
-                        );
-                      }
-
-                      return null;
-                    })()}
+                    {athlete.insuranceStatus === "ACTIVE" &&
+                      athlete.expiryDate && (
+                        <div className="text-xs text-green-600">
+                          Expire le: {formatDate(athlete.expiryDate)}
+                        </div>
+                      )}
+                    {athlete.insuranceStatus === "EXPIRED" &&
+                      athlete.expiryDate && (
+                        <div className="text-xs text-red-600">
+                          Expiré le: {formatDate(athlete.expiryDate)}
+                        </div>
+                      )}
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-bold text-red-600">
-                    150 MAD
+                    $15 USD (≈ 150 MAD)
                   </span>
                   <Button
                     size="sm"

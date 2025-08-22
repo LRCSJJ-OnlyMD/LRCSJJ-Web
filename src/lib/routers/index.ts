@@ -8,6 +8,7 @@ import { championshipsRouter } from "./championships";
 import { leagueTeamsRouter } from "./leagueTeams";
 import { mapConfigRouter } from "./mapConfig";
 import { clubManagerRouter } from "./club-manager";
+import { notificationsRouter } from "./notifications";
 
 export const appRouter = router({
   auth: authRouter,
@@ -19,6 +20,7 @@ export const appRouter = router({
   leagueTeams: leagueTeamsRouter,
   mapConfig: mapConfigRouter,
   clubManager: clubManagerRouter,
+  notifications: notificationsRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -224,3 +224,18 @@ model MapConfiguration {
 
   @@map("map_configurations")
 }
+
+model Notification {
+  id              String   @id @default(cuid())
+  type            String   // ATHLETE_ADDED, ATHLETE_UPDATED, ATHLETE_DELETED, INSURANCE_UPDATED, PAYMENT_MADE
+  title           String
+  message         String
+  metadata        Json     @default("{}")
+  clubManagerId   String
+  clubId          String
+  isRead          Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("notifications")
+}

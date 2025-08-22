@@ -280,3 +280,159 @@ export async function testEmailConnection() {
     return false;
   }
 }
+
+export async function sendAdminNotificationEmail({
+  type,
+  title,
+  message,
+  clubName,
+  clubManagerName,
+  metadata,
+}: {
+  type: string;
+  title: string;
+  message: string;
+  clubName: string;
+  clubManagerName: string;
+  metadata?: Record<string, unknown>;
+}): Promise<boolean> {
+  try {
+    // Get the appropriate icon and color based on notification type
+    const getNotificationStyles = (type: string) => {
+      switch (type) {
+        case "ATHLETE_ADDED":
+          return { icon: "👤", color: "#22c55e", label: "Nouvel Athlète" };
+        case "ATHLETE_UPDATED":
+          return {
+            icon: "✏️",
+            color: "#3b82f6",
+            label: "Modification Athlète",
+          };
+        case "ATHLETE_DELETED":
+          return { icon: "🗑️", color: "#ef4444", label: "Suppression Athlète" };
+        case "INSURANCE_UPDATED":
+          return { icon: "🛡️", color: "#8b5cf6", label: "Assurance Modifiée" };
+        case "PAYMENT_MADE":
+          return { icon: "💳", color: "#059669", label: "Paiement Effectué" };
+        default:
+          return { icon: "📢", color: "#6b7280", label: "Notification" };
+      }
+    };
+
+    const styles = getNotificationStyles(type);
+
+    const mailOptions = {
+      from: `"LRCSJJ - Admin" <${process.env.SMTP_FROM}>`,
+      to: process.env.ADMIN_EMAIL || "admin@lrcsjj.ma",
+      subject: `[LRCSJJ] ${styles.label} - ${clubName}`,
+      html: `
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff;">
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #d62027 0%, #b91c23 100%); padding: 20px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 24px; font-weight: bold;">
+              LRCSJJ - Administration
+            </h1>
+            <p style="color: rgba(255,255,255,0.9); margin: 5px 0 0 0; font-size: 14px;">
+              Notification Système
+            </p>
+          </div>
+
+          <!-- Content -->
+          <div style="padding: 30px 20px; background: #ffffff;">
+            <!-- Notification Type Badge -->
+            <div style="text-align: center; margin-bottom: 20px;">
+              <span style="background: ${
+                styles.color
+              }; color: white; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600;">
+                ${styles.icon} ${styles.label}
+              </span>
+            </div>
+
+            <!-- Main Message -->
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid ${
+              styles.color
+            }; margin-bottom: 25px;">
+              <h2 style="color: #1f2937; margin: 0 0 10px 0; font-size: 18px;">${title}</h2>
+              <p style="color: #4b5563; margin: 0; line-height: 1.6; font-size: 16px;">${message}</p>
+            </div>
+
+            <!-- Club Information -->
+            <div style="background: #ffffff; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+              <h3 style="color: #374151; margin: 0 0 15px 0; font-size: 16px; font-weight: 600;">
+                📍 Informations du Club
+              </h3>
+              <div style="display: grid; gap: 10px;">
+                <div>
+                  <span style="color: #6b7280; font-size: 14px;">Club:</span>
+                  <span style="color: #1f2937; font-weight: 600; margin-left: 10px;">${clubName}</span>
+                </div>
+                <div>
+                  <span style="color: #6b7280; font-size: 14px;">Gestionnaire:</span>
+                  <span style="color: #1f2937; font-weight: 600; margin-left: 10px;">${clubManagerName}</span>
+                </div>
+                <div>
+                  <span style="color: #6b7280; font-size: 14px;">Date:</span>
+                  <span style="color: #1f2937; font-weight: 600; margin-left: 10px;">${new Date().toLocaleString(
+                    "fr-FR"
+                  )}</span>
+                </div>
+              </div>
+            </div>
+
+            ${
+              metadata && Object.keys(metadata).length > 0
+                ? `
+            <!-- Additional Details -->
+            <div style="background: #fef3c7; border: 1px solid #fbbf24; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+              <h4 style="color: #92400e; margin: 0 0 10px 0; font-size: 14px; font-weight: 600;">
+                📋 Détails Supplémentaires
+              </h4>
+              <div style="color: #78350f; font-size: 14px; line-height: 1.5;">
+                ${Object.entries(metadata)
+                  .map(
+                    ([key, value]) =>
+                      `<div><strong>${key}:</strong> ${value}</div>`
+                  )
+                  .join("")}
+              </div>
+            </div>
+            `
+                : ""
+            }
+
+            <!-- Action Button -->
+            <div style="text-align: center; margin: 25px 0;">
+              <a href="${process.env.NEXT_PUBLIC_APP_URL}/admin" 
+                 style="background: #d62027; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block; transition: all 0.3s ease;">
+                🔗 Accéder au Tableau de Bord
+              </a>
+            </div>
+
+            <!-- Note -->
+            <div style="background: #eff6ff; border: 1px solid #3b82f6; padding: 15px; border-radius: 8px; margin-top: 20px;">
+              <p style="margin: 0; color: #1e40af; font-size: 14px; line-height: 1.5;">
+                <strong>💡 Information:</strong> Cette notification a été générée automatiquement par le système LRCSJJ. 
+                Vous pouvez consulter tous les détails dans votre tableau de bord administrateur.
+              </p>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div style="background: #1f2937; padding: 20px; text-align: center;">
+            <p style="color: #9ca3af; margin: 0; font-size: 12px;">
+              © 2025 LRCSJJ - Ligue Régionale Casablanca-Settat de Ju-Jitsu<br>
+              Email: <a href="mailto:admin@lrcsjj.ma" style="color: #60a5fa;">admin@lrcsjj.ma</a> | Tél: +212 522 123 456
+            </p>
+          </div>
+        </div>
+      `,
+    };
+
+    const result = await transporter.sendMail(mailOptions);
+    console.log("📧 Admin notification email sent:", result.messageId);
+    return true;
+  } catch (error) {
+    console.error("❌ Admin notification email failed:", error);
+    return false;
+  }
+}

@@ -1,50 +1,47 @@
-import { z } from "zod";
-import {
-  router,
-  adminProcedure,
-  clubManagerProcedure,
-  publicProcedure,
-} from "../trpc";
+import { z } from 'zod'
+import { router, adminProcedure, publicProcedure } from '../trpc'
 
 const clubInputSchema = z.object({
   name: z.string().min(1),
   address: z.string().optional(),
   phone: z.string().optional(),
-  email: z.string().email().optional().or(z.literal("")),
+  email: z.string().email().optional().or(z.literal('')),
   president: z.string().optional(),
-  coach: z.string().optional(),
-});
+  coach: z.string().optional()
+})
 
 export const clubsRouter = router({
   // Public endpoint to get all clubs (for public display)
-  getAll: publicProcedure.query(async ({ ctx }) => {
-    return await ctx.prisma.club.findMany({
-      orderBy: { name: "asc" },
-      include: {
-        _count: {
-          select: {
-            athletes: true,
-          },
-        },
-      },
-    });
-  }),
+  getAll: publicProcedure
+    .query(async ({ ctx }) => {
+      return await ctx.prisma.club.findMany({
+        orderBy: { name: 'asc' },
+        include: {
+          _count: {
+            select: {
+              athletes: true
+            }
+          }
+        }
+      })
+    }),
 
-  // Admin endpoints - can access all clubs
-  getAllWithDetails: adminProcedure.query(async ({ ctx }) => {
-    return await ctx.prisma.club.findMany({
-      orderBy: { name: "asc" },
-      include: {
-        _count: {
-          select: {
-            athletes: true,
-            teamMembers: true,
-            championships: true,
-          },
-        },
-      },
-    });
-  }),
+  // Admin endpoints
+  getAllWithDetails: adminProcedure
+    .query(async ({ ctx }) => {
+      return await ctx.prisma.club.findMany({
+        orderBy: { name: 'asc' },
+        include: {
+          _count: {
+            select: {
+              athletes: true,
+              teamMembers: true,
+              championships: true
+            }
+          }
+        }
+      })
+    }),
 
   getById: adminProcedure
     .input(z.object({ id: z.string() }))
@@ -52,16 +49,24 @@ export const clubsRouter = router({
       return await ctx.prisma.club.findUnique({
         where: { id: input.id },
         include: {
-          athletes: true,
+          athletes: {
+            include: {
+              insurances: {
+                include: {
+                  season: true
+                }
+              }
+            }
+          },
           _count: {
             select: {
               athletes: true,
               teamMembers: true,
-              championships: true,
-            },
-          },
-        },
-      });
+              championships: true
+            }
+          }
+        }
+      })
     }),
 
   create: adminProcedure
@@ -74,62 +79,55 @@ export const clubsRouter = router({
           phone: input.phone,
           email: input.email || null,
           president: input.president,
-          coach: input.coach,
-        },
-      });
+          coach: input.coach
+        }
+      })
     }),
 
   update: adminProcedure
     .input(clubInputSchema.extend({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const { id, ...data } = input;
+      const { id, ...data } = input
       return await ctx.prisma.club.update({
         where: { id },
         data: {
           ...data,
-          email: data.email || null,
-        },
-      });
+          email: data.email || null
+        }
+      })
     }),
 
   delete: adminProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      return await ctx.prisma.club.delete({
-        where: { id: input.id },
-      });
-    }),
+      try {
+        // Check if club exists first
+        const existingClub = await ctx.prisma.club.findUnique({
+          where: { id: input.id },
+          include: {
+            _count: {
+              select: {
+                athletes: true,
+                teamMembers: true,
+                championships: true
+              }
+            }
+          }
+        })
 
-  // Club Manager procedures - scoped to their club only
-  getMyClub: clubManagerProcedure.query(async ({ ctx }) => {
-    const clubId = ctx.admin.clubId!;
+        if (!existingClub) {
+          throw new Error('Club non trouvé')
+        }
 
-    return await ctx.prisma.club.findUnique({
-      where: { id: clubId },
-      include: {
-        athletes: true,
-        _count: {
-          select: {
-            athletes: true,
-            teamMembers: true,
-            championships: true,
-          },
-        },
-      },
-    });
-  }),
+        // Delete the club (cascade will handle related records)
+        const deletedClub = await ctx.prisma.club.delete({
+          where: { id: input.id }
+        })
 
-  updateMyClub: clubManagerProcedure
-    .input(clubInputSchema.omit({ name: true })) // Club managers can't change club name
-    .mutation(async ({ ctx, input }) => {
-      const clubId = ctx.admin.clubId!;
-
-      return await ctx.prisma.club.update({
-        where: { id: clubId },
-        data: {
-          ...input,
-          email: input.email || null,
-        },
-      });
-    }),
-});
+        return deletedClub
+      } catch (error) {
+        console.error('Erreur lors de la suppression du club:', error)
+        throw error
+      }
+    })
+})
