@@ -16,17 +16,8 @@ import {
   Quote,
 } from "lucide-react";
 import { PersonAvatar, FederationLogo } from "@/components/logos";
-import { useEffect, useState } from "react";
 
 export default function AboutPage() {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
-
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
@@ -520,34 +511,62 @@ export default function AboutPage() {
             Nos Affiliations
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card className="card-smooth">
-              <CardContent className="p-8 text-center">
-                <div className="mb-6">
-                  <FederationLogo type="main" size="lg" />
+              <CardContent className="p-6 text-center">
+                <div className="mb-4">
+                  <FederationLogo type="main" size="md" />
                 </div>
-                <h3 className="text-xl font-semibold text-foreground mb-3">
+                <h3 className="text-lg font-semibold text-foreground mb-2">
                   Fédération Royale Marocaine
                 </h3>
-                <p className="text-muted-foreground">
-                  Membre officiel de la Fédération Royale Marocaine de Ju-Jitsu,
-                  garantissant notre légitimité et notre conformité aux
-                  standards nationaux.
+                <p className="text-sm text-muted-foreground">
+                  Membre officiel de la FRMJJ, garantissant notre légitimité et
+                  conformité aux standards nationaux.
                 </p>
               </CardContent>
             </Card>
 
             <Card className="card-smooth">
-              <CardContent className="p-8 text-center">
-                <div className="mb-6">
-                  <FederationLogo type="jjif" size="lg" />
+              <CardContent className="p-6 text-center">
+                <div className="mb-4">
+                  <FederationLogo type="northAfrica" size="md" />
                 </div>
-                <h3 className="text-xl font-semibold text-foreground mb-3">
-                  Ju-Jitsu International Federation
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  Union Nord-Africaine
                 </h3>
-                <p className="text-muted-foreground">
-                  Reconnaissance internationale par la JJIF, nous permettant de
-                  participer aux compétitions mondiales et d&apos;appliquer les
+                <p className="text-sm text-muted-foreground">
+                  Membre de l&apos;UNAJJ, renforçant nos liens avec les pays
+                  voisins du Maghreb.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="card-smooth">
+              <CardContent className="p-6 text-center">
+                <div className="mb-4">
+                  <FederationLogo type="africa" size="md" />
+                </div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  Union Africaine
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Membre de la JJAU, participant au développement du Ju-Jitsu en
+                  Afrique.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="card-smooth">
+              <CardContent className="p-6 text-center">
+                <div className="mb-4">
+                  <FederationLogo type="jjif" size="md" />
+                </div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  Fédération Internationale
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Reconnaissance JJIF pour les compétitions mondiales et
                   règlements internationaux.
                 </p>
               </CardContent>

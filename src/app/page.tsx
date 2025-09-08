@@ -8,17 +8,8 @@ import { Footer } from "@/components/ui/footer";
 import { AdminAccess } from "@/components/ui/admin-access";
 import Link from "next/link";
 import { Trophy, Users, Shield, ArrowRight, Quote, Star } from "lucide-react";
-import { useEffect, useState } from "react";
 
 export default function HomePage() {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
-
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
@@ -67,12 +58,18 @@ export default function HomePage() {
           </div>
 
           {/* Logos showcase */}
-          <div className="flex justify-center items-center space-x-12 mb-16 animate-slide-up">
+          <div className="flex justify-center items-center space-x-8 mb-16 animate-slide-up flex-wrap gap-y-6">
             <div className="opacity-60 hover:opacity-100 transition-all duration-300 hover-lift">
               <LeagueLogo size="lg" />
             </div>
             <div className="opacity-60 hover:opacity-100 transition-all duration-300 hover-lift">
               <FederationLogo type="main" size="lg" />
+            </div>
+            <div className="opacity-60 hover:opacity-100 transition-all duration-300 hover-lift">
+              <FederationLogo type="northAfrica" size="lg" />
+            </div>
+            <div className="opacity-60 hover:opacity-100 transition-all duration-300 hover-lift">
+              <FederationLogo type="africa" size="lg" />
             </div>
             <div className="opacity-60 hover:opacity-100 transition-all duration-300 hover-lift">
               <FederationLogo type="jjif" size="lg" />
