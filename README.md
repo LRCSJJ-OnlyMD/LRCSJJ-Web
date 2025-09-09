@@ -10,9 +10,9 @@
 
 **A modern, secure, and multilingual full-stack web application for the regional Ju-Jitsu League of Casablanca-Settat under the Royal Moroccan Federation.**
 
-*Features enterprise-grade authentication with Email 2FA verification, comprehensive league management, and real-time club administration.*
+*Features comprehensive league management, multilingual support (Arabic, French, English), and showcases all federation affiliations including FRMJJ, UNAJJ, JJAU, and JJIF.*
 
-[🚀 Demo](#-demo) • [📖 Documentation](#-getting-started) • [🛠 Tech Stack](#-tech-stack) • [🔐 Security](#-authentication--security)
+[🚀 Quick Start](#-getting-started) • [📖 Documentation](#-project-structure) • [🛠 Tech Stack](#-tech-stack) • [🏅 Federations](#-federation-affiliations)
 
 ---
 
@@ -29,25 +29,21 @@
 - [🗄 Database Schema](#-database-schema)
 - [📋 Available Scripts](#-available-scripts)
 - [🌐 Deployment](#-deployment)
+- [� Federation Affiliations](#-federation-affiliations)
 - [🌍 Internationalization](#-internationalization)
-- [🗺️ Google Maps Integration](#-google-maps-integration)
-- [🏅 Federation Compliance](#-federation-compliance)
 - [🧪 Testing](#-testing)
 - [🐛 Troubleshooting](#-troubleshooting)
 - [🤝 Contributing](#-contributing)
 - [📄 License](#-license)
 
-## 🚀 Demo
+## 🚀 Quick Start
 
 ### 🌐 Live Application
 - **Public Website**: Modern responsive design with multilingual support
 - **Admin Dashboard**: Comprehensive league management with real-time KPIs
-- **Club Manager Portal**: Dedicated club management interface with authentication
+- **Club Manager Portal**: Dedicated club management interface
 
-### 🔐 Test Credentials
-
-#### Admin Access
-```
+### ⚡ Development Setup
 Email: admin@lrcsjj.ma
 Password: AdminPass2025!
 URL: /admin
@@ -437,14 +433,27 @@ Language switching is available in the navigation header with automatic persiste
 - **Dark Mode Support** - Maps adapt to theme automatically
 - **Mobile Optimization** - Touch-friendly map interactions
 
-## 🏅 Federation Compliance
+## 🏅 Federation Affiliations
 
-The platform displays official logos and links for:
-- **Casablanca-Settat Regional League** - Primary organization
-- **Royal Moroccan Ju-Jitsu Federation** - National federation
-- **North African Union of Ju-Jitsu** - Regional body
-- **African Union of Ju-Jitsu** - Continental organization
-- **JJIF (International Ju-Jitsu Federation)** - World governing body
+The platform proudly showcases all official federation logos and affiliations:
+
+### 🇲🇦 National Level
+- **FRMJJ (Fédération Royale Marocaine de Ju-Jitsu)** - National governing body
+- Primary federation overseeing all Moroccan Ju-Jitsu activities
+
+### 🌍 Regional & Continental
+- **UNAJJ (Union Nord-Africaine de Ju-Jitsu)** - North African regional federation
+- **JJAU (Ju-Jitsu African Union)** - Continental African federation
+
+### 🌐 International
+- **JJIF (Ju-Jitsu International Federation)** - World governing body
+- Global standards and international competition regulations
+
+### 📍 League Position
+- **LRCSJJ (Ligue Régionale Casablanca-Settat de Ju-Jitsu)** - Regional league
+- Operates under FRMJJ authority with international recognition
+
+*All federation logos are prominently displayed throughout the website, particularly on the homepage hero section, footer, and about page affiliations section.*
 
 ## 🐛 Troubleshooting
 
