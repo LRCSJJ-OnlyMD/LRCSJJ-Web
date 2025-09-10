@@ -35,7 +35,10 @@ export class StripeClientService {
       // Validate request first
       const validation = this.validatePaymentRequest(paymentRequest);
       if (!validation.isValid) {
-        console.error("Validation failed:", validation.errors); // Debug log
+        // Log validation errors for debugging
+        if (process.env.NODE_ENV === "development") {
+          console.error("Payment validation failed:", validation.errors);
+        }
         return {
           success: false,
           error: validation.errors.join(", "),
@@ -53,11 +56,15 @@ export class StripeClientService {
         body: JSON.stringify(paymentRequest),
       });
 
-      console.log("API Response status:", response.status); // Debug log
+      if (process.env.NODE_ENV === "development") {
+        console.log("API Response status:", response.status);
+      }
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("API Error response:", errorText); // Debug log
+        if (process.env.NODE_ENV === "development") {
+          console.error("API Error response:", errorText);
+        }
         throw new Error(
           `HTTP error! status: ${response.status}, body: ${errorText}`
         );

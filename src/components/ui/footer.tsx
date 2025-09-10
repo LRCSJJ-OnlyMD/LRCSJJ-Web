@@ -73,6 +73,27 @@ export function Footer() {
                 </div>
               </div>
               <div className="flex items-center space-x-3">
+                <FederationLogo
+                  type="northAfrica"
+                  size="sm"
+                  showLabel={false}
+                />
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    Union Nord-Africaine
+                  </p>
+                  <p className="text-sm text-muted-foreground">de Ju-Jitsu</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3">
+                <FederationLogo type="africa" size="sm" showLabel={false} />
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    Ju-Jitsu African Union
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3">
                 <FederationLogo type="jjif" size="sm" showLabel={false} />
                 <div>
                   <p className="text-sm text-muted-foreground">
