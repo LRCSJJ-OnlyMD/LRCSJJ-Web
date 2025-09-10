@@ -8,16 +8,16 @@ import {
   StripeClientService,
   type ClientPaymentRequest,
 } from "@/lib/stripe-client";
-import { Button } from "./button";
+import { Button } from "@/components/ui/primitives/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "./card";
-import { Badge } from "./badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
+} from "@/components/ui/primitives/card";
+import { Badge } from "@/components/ui/primitives/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/primitives/tabs";
 import {
   CreditCard,
   Shield,

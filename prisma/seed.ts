@@ -1,11 +1,18 @@
 import { PrismaClient } from "@prisma/client";
-import { hashPassword } from "../src/lib/auth";
+import { hashPassword } from "../src/lib/auth.js";
 import dotenv from "dotenv";
 
 // Load environment variables
 dotenv.config();
 
 const prisma = new PrismaClient();
+
+// Type assertion to force TypeScript to recognize post method
+type PrismaClientWithPost = PrismaClient & {
+  post: any;
+};
+
+const prismaWithPost = prisma as PrismaClientWithPost;
 
 async function main() {
   console.log(
@@ -403,16 +410,18 @@ async function main() {
     },
   ];
 
+  const createdChampionships = [];
   for (const champData of championships) {
-    await prisma.championship.create({
+    const championship = await prisma.championship.create({
       data: {
         ...champData,
         seasonId: currentSeason.id,
       },
     });
+    createdChampionships.push(championship);
   }
 
-  console.log("✅ Created championships:", championships.length);
+  console.log("✅ Created championships:", createdChampionships.length);
 
   // Create league teams for regional representation
   const team1 = await prisma.leagueTeam.create({
@@ -533,6 +542,102 @@ async function main() {
     samplePaymentRequests.length
   );
 
+  // Create sample posts/achievements
+  const samplePosts = [
+    // Featured Achievement Posts
+    {
+      title: "Médaille d'Or au Championnat National 2024",
+      content:
+        "Notre athlète Youssef Bennani a remporté la médaille d'or dans la catégorie -73kg au Championnat National de Ju-Jitsu 2024. Une performance exceptionnelle qui place notre ligue parmi les meilleures du Maroc.",
+      type: "ACHIEVEMENT" as const,
+      medalType: "GOLD" as const,
+      competitionLevel: "NATIONAL" as const,
+      athleteName: "Youssef Bennani",
+      clubName: "Club Atlas Casablanca",
+      featured: true,
+      championshipId: createdChampionships[0].id,
+    },
+    {
+      title: "Victoire Historique au Tournoi International",
+      content:
+        "Fatima Zahra El Amrani décroche la médaille d'argent au prestigieux tournoi international de ju-jitsu organisé à Paris. Une première pour notre région !",
+      type: "ACHIEVEMENT" as const,
+      medalType: "SILVER" as const,
+      competitionLevel: "INTERNATIONAL" as const,
+      athleteName: "Fatima Zahra El Amrani",
+      clubName: "Dragon Fighters Settat",
+      featured: true,
+      championshipId: createdChampionships[1].id,
+    },
+    {
+      title: "Championnat Régional 2024 - Résultats Exceptionnels",
+      content:
+        "Notre ligue a brillé au championnat régional avec 12 médailles au total : 4 or, 5 argent et 3 bronze. Un record historique pour la LRCSJJ !",
+      type: "CHAMPIONSHIP_RESULT" as const,
+      competitionLevel: "REGIONAL" as const,
+      featured: true,
+      championshipId: createdChampionships[2].id,
+    },
+    // Regular News Posts
+    {
+      title: "Ouverture des Inscriptions Saison 2024-2025",
+      content:
+        "Les inscriptions pour la nouvelle saison sont maintenant ouvertes. Rejoignez-nous pour une année riche en compétitions et en développement technique.",
+      type: "NEWS" as const,
+      featured: false,
+    },
+    {
+      title: "Stage Technique avec Maître Tanaka",
+      content:
+        "Un stage exceptionnel avec le maître japonais Hiroshi Tanaka aura lieu le mois prochain. Inscriptions limitées à 30 participants.",
+      type: "NEWS" as const,
+      featured: false,
+    },
+    // More Achievements
+    {
+      title: "Bronze au Championnat Universitaire",
+      content:
+        "Ahmed Cherkaoui remporte la médaille de bronze au championnat universitaire national. Félicitations pour cette belle performance !",
+      type: "ACHIEVEMENT" as const,
+      medalType: "BRONZE" as const,
+      competitionLevel: "NATIONAL" as const,
+      athleteName: "Ahmed Cherkaoui",
+      clubName: "Samuraï Club Mohammedia",
+      featured: false,
+      championshipId: createdChampionships[0].id,
+    },
+    {
+      title: "Nouvelle Salle d'Entraînement à Casablanca",
+      content:
+        "Inauguration de notre nouvelle salle d'entraînement équipée des dernières technologies. Un espace moderne pour nos athlètes.",
+      type: "NEWS" as const,
+      featured: false,
+    },
+    {
+      title: "Médaille de Participation - Tournoi des Jeunes",
+      content:
+        "Nos jeunes talents ont participé avec brio au tournoi régional des moins de 16 ans. L'avenir de notre ju-jitsu est entre de bonnes mains !",
+      type: "ACHIEVEMENT" as const,
+      medalType: "PARTICIPATION" as const,
+      competitionLevel: "REGIONAL" as const,
+      athleteName: "Plusieurs jeunes athlètes",
+      featured: false,
+    },
+  ];
+
+  const createdPosts = [];
+  for (const postData of samplePosts) {
+    const post = await prismaWithPost.post.create({
+      data: {
+        ...postData,
+        adminId: admin1.id,
+      },
+    });
+    createdPosts.push(post);
+  }
+
+  console.log("✅ Created sample posts:", createdPosts.length);
+
   // Final comprehensive statistics for startup presentation
   const stats = {
     clubs: createdClubs.length,
@@ -540,9 +645,10 @@ async function main() {
     insurances: totalInsurances,
     paidInsurances: paidInsurances,
     paymentRate: Math.round((paidInsurances / totalInsurances) * 100),
-    championships: championships.length,
+    championships: createdChampionships.length,
     leagueTeams: 2,
     paymentRequests: samplePaymentRequests.length,
+    posts: createdPosts.length,
     averageAthletesPerClub: Math.round(totalAthletes / createdClubs.length),
   };
 
@@ -556,7 +662,8 @@ async function main() {
   console.log(`   ✅ Paid: ${stats.paidInsurances} (${stats.paymentRate}%)`);
   console.log(`   🏆 Championships: ${stats.championships}`);
   console.log(`   👥 League Teams: ${stats.leagueTeams}`);
-  console.log(`   💳 Payment Requests: ${stats.paymentRequests}`);
+  console.log(`   � Posts: ${stats.posts}`);
+  console.log(`   �💳 Payment Requests: ${stats.paymentRequests}`);
   console.log("\n🔐 Admin Access Credentials:");
   console.log(`   📧 ${admin1.email} (Super Admin)`);
   console.log(`   📧 ${admin2.email} (Secretary)`);

@@ -2,6 +2,7 @@
 // Handles checkout redirection and payment status
 
 import { loadStripe } from "@stripe/stripe-js";
+import { logger } from "./logger";
 
 // Initialize Stripe client-side
 const stripePromise = loadStripe(
@@ -30,22 +31,30 @@ export class StripeClientService {
     error?: string;
   }> {
     try {
-      console.log("Starting checkout process for:", paymentRequest); // Debug log
+      logger.debug("Starting Stripe checkout process", {
+        feature: "payment",
+        action: "initiate_checkout",
+        athleteId: paymentRequest.athleteId,
+      });
 
       // Validate request first
       const validation = this.validatePaymentRequest(paymentRequest);
       if (!validation.isValid) {
-        // Log validation errors for debugging
-        if (process.env.NODE_ENV === "development") {
-          console.error("Payment validation failed:", validation.errors);
-        }
+        logger.warn("Payment validation failed", {
+          feature: "payment",
+          action: "validation_failed",
+          errors: validation.errors.join(", "),
+        });
         return {
           success: false,
           error: validation.errors.join(", "),
         };
       }
 
-      console.log("Calling create-session API..."); // Debug log
+      logger.debug("Calling Stripe create-session API", {
+        feature: "payment",
+        action: "api_call",
+      });
 
       // Create payment session on server
       const response = await fetch("/api/payments/create-session", {
@@ -56,25 +65,41 @@ export class StripeClientService {
         body: JSON.stringify(paymentRequest),
       });
 
-      if (process.env.NODE_ENV === "development") {
-        console.log("API Response status:", response.status);
-      }
+      logger.debug("Payment API request completed", {
+        feature: "payment",
+        action: "api_request_complete",
+        status: response.status,
+      });
 
       if (!response.ok) {
         const errorText = await response.text();
-        if (process.env.NODE_ENV === "development") {
-          console.error("API Error response:", errorText);
-        }
+        logger.error("Payment API request failed", {
+          feature: "payment",
+          action: "api_error",
+          status: response.status,
+          statusText: response.statusText,
+          error: errorText,
+        });
         throw new Error(
           `HTTP error! status: ${response.status}, body: ${errorText}`
         );
       }
 
       const data = await response.json();
-      console.log("API Response data:", data); // Debug log
+      logger.debug("Payment API response received", {
+        feature: "payment",
+        action: "api_response",
+        hasData: !!data,
+        success: data.success,
+        hasSessionId: !!data.sessionId,
+      });
 
       if (!data.success || !data.sessionId) {
-        console.error("API returned error:", data.error); // Debug log
+        logger.error("Payment API returned error", {
+          feature: "payment",
+          action: "api_validation_error",
+          error: data.error,
+        });
         return {
           success: false,
           error:
@@ -83,26 +108,37 @@ export class StripeClientService {
         };
       }
 
-      console.log("Loading Stripe..."); // Debug log
+      logger.debug("Loading Stripe.js", {
+        feature: "payment",
+        action: "load_stripe",
+      });
 
       // Get Stripe instance
       const stripe = await stripePromise;
       if (!stripe) {
-        console.error("Failed to load Stripe"); // Debug log
+        logger.error("Failed to load Stripe instance", {
+          feature: "payment",
+          action: "stripe_load_error",
+        });
         return {
           success: false,
           error: "Erreur de chargement de Stripe",
         };
       }
 
-      console.log(
-        "Redirecting to Stripe checkout with session ID:",
-        data.sessionId
-      ); // Debug log
+      logger.debug("Redirecting to Stripe checkout", {
+        feature: "payment",
+        action: "redirect_to_checkout",
+        sessionId: data.sessionId.substring(0, 10) + "...",
+      });
 
       // Option 1: Use direct URL redirect (more reliable for VS Code browser)
       if (data.paymentUrl) {
-        console.log("Using direct URL redirect to:", data.paymentUrl); // Debug log
+        logger.debug("Using direct URL redirect", {
+          feature: "payment",
+          action: "direct_url_redirect",
+          hasPaymentUrl: true,
+        });
         window.location.href = data.paymentUrl;
         return { success: true };
       }
@@ -113,17 +149,29 @@ export class StripeClientService {
       });
 
       if (error) {
-        console.error("Stripe checkout error:", error); // Debug log
+        logger.error("Stripe checkout redirect error", {
+          feature: "payment",
+          action: "stripe_redirect_error",
+          error: error.message,
+          errorType: error.type,
+        });
         return {
           success: false,
           error: error.message || "Erreur de redirection vers le paiement",
         };
       }
 
-      console.log("Successfully initiated Stripe checkout"); // Debug log
+      logger.info("Stripe checkout initiated successfully", {
+        feature: "payment",
+        action: "checkout_success",
+      });
       return { success: true };
     } catch (error) {
-      console.error("Stripe checkout error:", error);
+      logger.error("Stripe checkout process failed", {
+        feature: "payment",
+        action: "checkout_error",
+        error: error instanceof Error ? error.message : String(error),
+      });
       return {
         success: false,
         error: "Erreur lors de la redirection vers le paiement",
@@ -153,7 +201,12 @@ export class StripeClientService {
         error: data.error,
       };
     } catch (error) {
-      console.error("Payment status check error:", error);
+      logger.error("Payment status check failed", {
+        feature: "payment",
+        action: "status_check_error",
+        sessionId: sessionId?.substring(0, 10) + "...",
+        error: error instanceof Error ? error.message : String(error),
+      });
       return {
         success: false,
         status: "failed",
@@ -218,7 +271,12 @@ export class StripeClientService {
         payments: formattedPayments,
       };
     } catch (error) {
-      console.error("Payment history error:", error);
+      logger.error("Payment history retrieval failed", {
+        feature: "payment",
+        action: "history_error",
+        athleteId,
+        error: error instanceof Error ? error.message : String(error),
+      });
       return {
         success: false,
         payments: [],
@@ -264,7 +322,12 @@ export class StripeClientService {
         paymentId: data.paymentId,
       };
     } catch (error) {
-      console.error("Insurance status check error:", error);
+      logger.error("Insurance status check failed", {
+        feature: "insurance",
+        action: "status_check_error",
+        athleteId,
+        error: error instanceof Error ? error.message : String(error),
+      });
       return {
         hasValidInsurance: false,
         error: "Erreur lors de la vérification du statut de l'assurance",

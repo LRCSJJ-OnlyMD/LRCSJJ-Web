@@ -9,6 +9,7 @@ import { leagueTeamsRouter } from "./leagueTeams";
 import { mapConfigRouter } from "./mapConfig";
 import { clubManagerRouter } from "./club-manager";
 import { notificationsRouter } from "./notifications";
+import { postsRouter } from "./posts";
 
 export const appRouter = router({
   auth: authRouter,
@@ -21,6 +22,7 @@ export const appRouter = router({
   mapConfig: mapConfigRouter,
   clubManager: clubManagerRouter,
   notifications: notificationsRouter,
+  posts: postsRouter,
 });
 
 export type AppRouter = typeof appRouter;

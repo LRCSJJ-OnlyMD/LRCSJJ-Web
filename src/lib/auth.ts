@@ -4,6 +4,10 @@ import { NextRequest } from "next/server";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
+if (!JWT_SECRET) {
+  throw new Error("JWT_SECRET environment variable is required");
+}
+
 export interface JWTPayload {
   adminId: string;
   email: string;
@@ -35,7 +39,8 @@ export async function verifyPassword(
 export function generateToken(
   payload: Omit<JWTPayload, "iat" | "exp">
 ): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" });
+  // Use 2 hours instead of 7 days for better security
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: "2h" });
 }
 
 export function verifyToken(token: string): JWTPayload {

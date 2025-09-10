@@ -4,18 +4,18 @@
 // Create payments for individual athletes or bulk payments
 
 import React, { useState, useEffect } from "react";
-import { Button } from "./button";
+import { Button } from "@/components/ui/primitives/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "./card";
-import { Input } from "./input";
-import { Label } from "./label";
-import { Badge } from "./badge";
-import { Checkbox } from "./checkbox";
+} from "@/components/ui/primitives/card";
+import { Input } from "@/components/ui/primitives/input";
+import { Label } from "@/components/ui/primitives/label";
+import { Badge } from "@/components/ui/primitives/badge";
+import { Checkbox } from "@/components/ui/primitives/checkbox";
 import {
   Users,
   CreditCard,

@@ -1,7 +1,8 @@
-import nodemailer from "nodemailer";
+import { logger } from "./logger";
+import { createTransport } from "nodemailer";
 
 // Email configuration
-const transporter = nodemailer.createTransport({
+const transporter = createTransport({
   host: process.env.SMTP_HOST,
   port: parseInt(process.env.SMTP_PORT || "587"),
   secure: false, // true for 465, false for other ports
@@ -40,10 +41,18 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
     };
 
     const result = await transporter.sendMail(mailOptions);
-    console.log("📧 Email sent successfully:", result.messageId);
+    logger.info("Email sent successfully", {
+      feature: "email",
+      action: "send_success",
+      messageId: result.messageId,
+    });
     return true;
   } catch (error) {
-    console.error("❌ Email sending failed:", error);
+    logger.error("Email sending failed", {
+      feature: "email",
+      action: "send_error",
+      error: error instanceof Error ? error.message : String(error),
+    });
     return false;
   }
 }
@@ -168,8 +177,12 @@ export async function sendContactNotificationEmail(data: ContactEmailData) {
     const adminResult = await transporter.sendMail(adminMailOptions);
     const userResult = await transporter.sendMail(userMailOptions);
 
-    console.log("📧 Admin email sent:", adminResult.messageId);
-    console.log("📧 User confirmation email sent:", userResult.messageId);
+    logger.info("Contact form emails sent successfully", {
+      feature: "contact",
+      action: "emails_sent",
+      adminMessageId: adminResult.messageId,
+      userMessageId: userResult.messageId,
+    });
 
     return {
       success: true,
@@ -177,7 +190,11 @@ export async function sendContactNotificationEmail(data: ContactEmailData) {
       userMessageId: userResult.messageId,
     };
   } catch (error) {
-    console.error("❌ Email sending failed:", error);
+    logger.error("Contact form email sending failed", {
+      feature: "contact",
+      action: "email_error",
+      error: error instanceof Error ? error.message : String(error),
+    });
     throw error;
   }
 }
@@ -262,10 +279,18 @@ export async function sendClubManagerWelcomeEmail(
     };
 
     const result = await transporter.sendMail(mailOptions);
-    console.log("📧 Club manager welcome email sent:", result.messageId);
+    logger.info("Club manager welcome email sent", {
+      feature: "email",
+      action: "welcome_email_sent",
+      messageId: result.messageId,
+    });
     return true;
   } catch (error) {
-    console.error("❌ Club manager welcome email failed:", error);
+    logger.error("Club manager welcome email failed", {
+      feature: "email",
+      action: "welcome_email_error",
+      error: error instanceof Error ? error.message : String(error),
+    });
     return false;
   }
 }
@@ -273,10 +298,17 @@ export async function sendClubManagerWelcomeEmail(
 export async function testEmailConnection() {
   try {
     await transporter.verify();
-    console.log("✅ Email configuration is valid");
+    logger.info("Email configuration verified successfully", {
+      feature: "email",
+      action: "config_verified",
+    });
     return true;
   } catch (error) {
-    console.error("❌ Email configuration error:", error);
+    logger.error("Email configuration verification failed", {
+      feature: "email",
+      action: "config_error",
+      error: error instanceof Error ? error.message : String(error),
+    });
     return false;
   }
 }
@@ -429,10 +461,18 @@ export async function sendAdminNotificationEmail({
     };
 
     const result = await transporter.sendMail(mailOptions);
-    console.log("📧 Admin notification email sent:", result.messageId);
+    logger.info("Admin notification email sent", {
+      feature: "email",
+      action: "admin_notification_sent",
+      messageId: result.messageId,
+    });
     return true;
   } catch (error) {
-    console.error("❌ Admin notification email failed:", error);
+    logger.error("Admin notification email failed", {
+      feature: "email",
+      action: "admin_notification_error",
+      error: error instanceof Error ? error.message : String(error),
+    });
     return false;
   }
 }

@@ -1,8 +1,8 @@
 "use client";
 
 import { trpc } from "@/lib/trpc-client";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/primitives/card";
+import { Button } from "@/components/ui/primitives/button";
 import { MapPin, ExternalLink, Navigation, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -54,6 +54,11 @@ export function GoogleMapsEmbed({
 
   const { latitude, longitude, locationName, address } = mapConfig;
 
+  // Google Maps URL for embedding (using search format which works without API key)
+  const embedUrl = `https://www.google.com/maps?q=${latitude},${longitude}&hl=fr&z=${
+    mapConfig.zoom || 15
+  }&output=embed`;
+
   // Google Maps direct link for "Open in Maps" button
   const mapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}&z=${
     mapConfig.zoom || 15
@@ -65,33 +70,24 @@ export function GoogleMapsEmbed({
   return (
     <Card className={cn("overflow-hidden shadow-lg", className)}>
       <CardContent className="p-0">
-        {/* Map Preview */}
-        <div className="relative bg-muted/30">
-          <div
-            className="w-full h-80 bg-muted/50 cursor-pointer hover:opacity-90 transition-opacity duration-300 relative"
-            onClick={() => window.open(mapsUrl, "_blank")}
-          >
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+        {/* Google Maps Iframe */}
+        <div className="relative">
+          <iframe
+            width="100%"
+            height="320"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            src={embedUrl}
+            className="w-full h-80 border-0"
+            title={`Carte Google Maps - ${locationName}`}
+            allow="geolocation"
+          />
 
-            {/* Map Icon Overlay */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center text-white">
-                <div className="w-16 h-16 bg-[#d62027] rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-pulse">
-                  <MapPin className="h-8 w-8 text-white" />
-                </div>
-                <h4 className="text-lg font-semibold mb-2">{locationName}</h4>
-                <p className="text-sm opacity-90">
-                  Cliquez pour ouvrir Google Maps
-                </p>
-              </div>
-            </div>
-
-            {/* Google Maps Logo */}
-            <div className="absolute bottom-4 right-4 bg-card border border-border rounded px-2 py-1 shadow-lg">
-              <span className="text-xs font-medium text-foreground">
-                Google Maps
-              </span>
-            </div>
+          {/* Overlay for better interaction */}
+          <div className="absolute top-2 right-2 bg-card/90 backdrop-blur-sm rounded-lg px-3 py-1 shadow-md border border-border">
+            <span className="text-xs font-medium text-foreground">
+              Google Maps
+            </span>
           </div>
         </div>
 
@@ -129,7 +125,7 @@ export function GoogleMapsEmbed({
                 onClick={() => window.open(mapsUrl, "_blank")}
               >
                 <ExternalLink className="h-4 w-4 mr-2" />
-                Ouvrir dans Maps
+                Ouvrir dans Google Maps
               </Button>
 
               <Button
@@ -139,7 +135,7 @@ export function GoogleMapsEmbed({
                 onClick={() => window.open(directionsUrl, "_blank")}
               >
                 <Navigation className="h-4 w-4 mr-2" />
-                Itinéraire
+                Obtenir l&apos;itinéraire
               </Button>
             </div>
           )}

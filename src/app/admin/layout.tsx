@@ -1,8 +1,8 @@
 "use client";
 
-import { Sidebar, MobileSidebar } from "@/components/ui/sidebar";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { NotificationBell } from "@/components/ui/notification-bell";
+import { Sidebar, MobileSidebar } from "@/components/ui/layout/sidebar";
+import { ThemeToggle } from "@/components/ui/theme/theme-toggle";
+import { NotificationBell } from "@/components/shared/notifications/notification-bell";
 import { useState, useEffect } from "react";
 
 export default function DashboardLayout({

@@ -1,13 +1,13 @@
 'use client'
 
 import { useLanguage } from '@/lib/language-context'
-import { Button } from './button'
+import { Button } from '@/components/ui/primitives/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from './dropdown-menu'
+} from '@/components/ui/primitives/dropdown-menu'
 import { Globe } from 'lucide-react'
 
 const languages = [

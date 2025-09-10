@@ -46,15 +46,6 @@ export function LeagueLogo({ size = 'md', className, showText = false }: LeagueL
             onError={() => setImageError(true)}
           />
         )}
-        {/* Fallback placeholder initials */}
-        <span className={cn(
-          'absolute inset-0 flex items-center justify-center text-white font-bold',
-          size === 'sm' ? 'text-xs' : 
-          size === 'md' ? 'text-sm' : 
-          size === 'lg' ? 'text-lg' : 'text-xl'
-        )}>
-          JJ
-        </span>
       </div>
       
       {showText && (

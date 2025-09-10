@@ -2,42 +2,46 @@
 // Follows SOLID principles: Single Responsibility, Dependency Injection
 // Production-ready implementation with proper error handling
 
-import { sendEmail } from './email'
+import { logger } from "./logger";
+import { sendEmail } from "./email";
 
 interface VerificationCode {
-  code: string
-  email: string
-  adminId: string
-  expiresAt: Date
-  attempts: number
+  code: string;
+  email: string;
+  adminId: string;
+  expiresAt: Date;
+  attempts: number;
 }
 
 // In-memory storage for verification codes (in production, use Redis or database)
-const verificationCodes = new Map<string, VerificationCode>()
-const MAX_ATTEMPTS = 3
-const CODE_EXPIRY_MINUTES = 10
+const verificationCodes = new Map<string, VerificationCode>();
+const MAX_ATTEMPTS = 3;
+const CODE_EXPIRY_MINUTES = 10;
 
 export class EmailVerificationService {
-  
   /**
    * Generate a secure 6-digit verification code
    */
   private generateCode(): string {
-    return Math.floor(100000 + Math.random() * 900000).toString()
+    return Math.floor(100000 + Math.random() * 900000).toString();
   }
 
   /**
    * Send verification code via email
    */
-  async sendVerificationCode(email: string, adminId: string, adminName: string): Promise<{
-    success: boolean
-    error?: string
-    codeId?: string
+  async sendVerificationCode(
+    email: string,
+    adminId: string,
+    adminName: string
+  ): Promise<{
+    success: boolean;
+    error?: string;
+    codeId?: string;
   }> {
     try {
-      const code = this.generateCode()
-      const codeId = `${email}-${Date.now()}`
-      const expiresAt = new Date(Date.now() + CODE_EXPIRY_MINUTES * 60 * 1000)
+      const code = this.generateCode();
+      const codeId = `${email}-${Date.now()}`;
+      const expiresAt = new Date(Date.now() + CODE_EXPIRY_MINUTES * 60 * 1000);
 
       // Store verification code
       verificationCodes.set(codeId, {
@@ -45,102 +49,117 @@ export class EmailVerificationService {
         email,
         adminId,
         expiresAt,
-        attempts: 0
-      })
+        attempts: 0,
+      });
 
       // Send email
       const emailSent = await sendEmail({
         to: email,
-        subject: 'Code de Vérification - Administration LRCSJJ',
-        html: this.generateEmailTemplate(code, adminName, CODE_EXPIRY_MINUTES)
-      })
+        subject: "Code de Vérification - Administration LRCSJJ",
+        html: this.generateEmailTemplate(code, adminName, CODE_EXPIRY_MINUTES),
+      });
 
       if (!emailSent) {
-        verificationCodes.delete(codeId)
+        verificationCodes.delete(codeId);
         return {
           success: false,
-          error: 'Échec de l\'envoi de l\'email de vérification'
-        }
+          error: "Échec de l'envoi de l'email de vérification",
+        };
       }
 
-      console.log(`✅ Verification email sent to ${email}`)
-      
+      logger.info("Verification email sent successfully", {
+        feature: "email_verification",
+        action: "email_sent",
+        email,
+        codeId,
+      });
+
       return {
         success: true,
-        codeId
-      }
+        codeId,
+      };
     } catch (error) {
-      console.error('Email verification failed:', error)
+      logger.error("Email verification failed", {
+        feature: "email_verification",
+        action: "send_error",
+        email,
+        error: error instanceof Error ? error.message : String(error),
+      });
       return {
         success: false,
-        error: 'Erreur interne lors de l\'envoi de l\'email'
-      }
+        error: "Erreur interne lors de l'envoi de l'email",
+      };
     }
   }
 
   /**
    * Verify the provided code
    */
-  verifyCode(codeId: string, providedCode: string): {
-    success: boolean
-    error?: string
-    adminId?: string
+  verifyCode(
+    codeId: string,
+    providedCode: string
+  ): {
+    success: boolean;
+    error?: string;
+    adminId?: string;
   } {
-    const stored = verificationCodes.get(codeId)
+    const stored = verificationCodes.get(codeId);
 
     if (!stored) {
       return {
         success: false,
-        error: 'Code de vérification invalide ou expiré'
-      }
+        error: "Code de vérification invalide ou expiré",
+      };
     }
 
     // Check expiry
     if (new Date() > stored.expiresAt) {
-      verificationCodes.delete(codeId)
+      verificationCodes.delete(codeId);
       return {
         success: false,
-        error: 'Code de vérification expiré'
-      }
+        error: "Code de vérification expiré",
+      };
     }
 
     // Check attempts
     if (stored.attempts >= MAX_ATTEMPTS) {
-      verificationCodes.delete(codeId)
+      verificationCodes.delete(codeId);
       return {
         success: false,
-        error: 'Trop de tentatives. Veuillez recommencer la connexion.'
-      }
+        error: "Trop de tentatives. Veuillez recommencer la connexion.",
+      };
     }
 
     // Increment attempts
-    stored.attempts++
+    stored.attempts++;
 
     // Verify code
     if (stored.code !== providedCode) {
       return {
         success: false,
-        error: `Code incorrect. ${MAX_ATTEMPTS - stored.attempts} tentatives restantes.`
-      }
+        error: `Code incorrect. ${
+          MAX_ATTEMPTS - stored.attempts
+        } tentatives restantes.`,
+      };
     }
 
     // Success - clean up
-    verificationCodes.delete(codeId)
-    
+    verificationCodes.delete(codeId);
+
     return {
       success: true,
-      adminId: stored.adminId
-    }
+      adminId: stored.adminId,
+    };
   }
 
   /**
    * Clean up expired codes
    */
   cleanupExpiredCodes(): void {
-    const now = new Date()
+    const now = new Date();
     for (const [codeId, data] of verificationCodes.entries()) {
       if (now > data.expiresAt) {
-        verificationCodes.delete(codeId)
+        verificationCodes.delete(codeId);
       }
     }
   }
@@ -148,7 +167,11 @@ export class EmailVerificationService {
   /**
    * Generate HTML email template
    */
-  private generateEmailTemplate(code: string, adminName: string, expiryMinutes: number): string {
+  private generateEmailTemplate(
+    code: string,
+    adminName: string,
+    expiryMinutes: number
+  ): string {
     return `
     <!DOCTYPE html>
     <html>
@@ -210,14 +233,14 @@ export class EmailVerificationService {
       </div>
     </body>
     </html>
-    `
+    `;
   }
 }
 
 // Singleton instance
-export const emailVerificationService = new EmailVerificationService()
+export const emailVerificationService = new EmailVerificationService();
 
 // Clean up expired codes every 5 minutes
 setInterval(() => {
-  emailVerificationService.cleanupExpiredCodes()
-}, 5 * 60 * 1000)
+  emailVerificationService.cleanupExpiredCodes();
+}, 5 * 60 * 1000);

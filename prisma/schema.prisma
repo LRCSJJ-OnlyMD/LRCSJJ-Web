@@ -22,6 +22,8 @@ model Admin {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  posts Post[]
+
   @@map("admins")
 }
 
@@ -158,6 +160,7 @@ model Championship {
 
   season Season              @relation(fields: [seasonId], references: [id], onDelete: Cascade)
   clubs  ClubChampionship[]
+  posts  Post[]
 
   @@map("championships")
 }
@@ -238,4 +241,41 @@ model Notification {
   updatedAt       DateTime @updatedAt
 
   @@map("notifications")
+}
+
+model Post {
+  id               String   @id @default(cuid())
+  title            String
+  content          String   @db.Text
+  type             String   // ACHIEVEMENT, NEWS, CHAMPIONSHIP_RESULT
+  championshipId   String?
+  medalType        String?  // GOLD, SILVER, BRONZE, PARTICIPATION
+  competitionLevel String?  // REGIONAL, NATIONAL, INTERNATIONAL
+  athleteName      String?
+  clubName         String?
+  isPublished      Boolean  @default(true)
+  featured         Boolean  @default(false)
+  adminId          String   // Who created the post
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  championship Championship? @relation(fields: [championshipId], references: [id])
+  admin        Admin         @relation(fields: [adminId], references: [id])
+  images       PostImage[]
+
+  @@map("posts")
+}
+
+model PostImage {
+  id        String   @id @default(cuid())
+  postId    String
+  url       String   // Cloudinary URL
+  publicId  String   // Cloudinary public ID for deletion
+  caption   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@map("post_images")
 }

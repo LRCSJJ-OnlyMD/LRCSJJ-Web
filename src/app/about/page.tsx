@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Navbar } from "@/components/ui/navbar";
-import { Footer } from "@/components/ui/footer";
+import { Button } from "@/components/ui/primitives/button";
+import { Card, CardContent } from "@/components/ui/primitives/card";
+import { Navbar } from "@/components/ui/layout/navbar";
+import { Footer } from "@/components/ui/layout/footer";
 import {
   Trophy,
   Users,
@@ -15,7 +15,7 @@ import {
   Award,
   Quote,
 } from "lucide-react";
-import { PersonAvatar, FederationLogo } from "@/components/logos";
+import { PersonAvatar, FederationLogo } from "@/components/shared/logos";
 
 export default function AboutPage() {
   return (

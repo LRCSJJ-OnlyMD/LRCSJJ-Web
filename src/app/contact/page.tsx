@@ -1,7 +1,7 @@
-import { ContactForm } from "@/components/ui/contact-form";
-import { GoogleMapsEmbed } from "@/components/ui/google-maps";
-import { Navbar } from "@/components/ui/navbar";
-import { Footer } from "@/components/ui/footer";
+import { ContactForm } from "@/components/ui/forms/contact-form";
+import { GoogleMapsEmbed } from "@/components/ui/maps/google-maps";
+import { Navbar } from "@/components/ui/layout/navbar";
+import { Footer } from "@/components/ui/layout/footer";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
 
 export default function ContactPage() {

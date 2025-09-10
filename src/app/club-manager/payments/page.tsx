@@ -3,16 +3,16 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/primitives/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from "@/components/ui/primitives/card";
+import { Input } from "@/components/ui/primitives/input";
+import { Label } from "@/components/ui/primitives/label";
 import {
   Table,
   TableBody,
@@ -20,12 +20,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/primitives/table";
 import { toast } from "sonner";
-import { StripePaymentProcessing } from "@/components/ui/stripe-payment-processing";
-import { AthletePaymentManager } from "@/components/ui/athlete-payment-manager";
-import { PaymentDetailsDialog } from "@/components/ui/payment-details-dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { StripePaymentProcessing } from "@/components/shared/payments/stripe-payment-processing";
+import { AthletePaymentManager } from "@/components/shared/payments/athlete-payment-manager";
+import { PaymentDetailsDialog } from "@/components/shared/payments/payment-details-dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/primitives/tabs";
 import {
   ArrowLeft,
   CreditCard,
@@ -41,7 +41,7 @@ import {
   Search,
   FileText,
 } from "lucide-react";
-import { LeagueLogo } from "@/components/logos";
+import { LeagueLogo } from "@/components/shared/logos";
 
 interface PaymentRequest {
   id: string;

@@ -3,13 +3,13 @@
 import * as React from 'react'
 import { Moon, Sun, Monitor } from 'lucide-react'
 import { useTheme } from '@/lib/theme-provider'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/primitives/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+} from '@/components/ui/primitives/dropdown-menu'
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme()

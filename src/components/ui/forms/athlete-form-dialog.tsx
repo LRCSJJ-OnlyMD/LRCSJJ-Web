@@ -1,25 +1,25 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Button } from "./button";
-import { Card, CardContent, CardHeader, CardTitle } from "./card";
-import { Input } from "./input";
-import { Label } from "./label";
+import { Button } from "@/components/ui/primitives/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/primitives/card";
+import { Input } from "@/components/ui/primitives/input";
+import { Label } from "@/components/ui/primitives/label";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "./dialog";
+} from "@/components/ui/primitives/dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./select";
-import { Textarea } from "./textarea";
+} from "@/components/ui/primitives/select";
+import { Textarea } from "@/components/ui/primitives/textarea";
 import { toast } from "sonner";
 import { UserPlus, Edit, Save, X } from "lucide-react";
 

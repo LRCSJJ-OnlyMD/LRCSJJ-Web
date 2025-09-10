@@ -3,14 +3,14 @@
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/primitives/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/components/ui/primitives/card";
 import { CheckCircle, Download, ArrowLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 

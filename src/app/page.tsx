@@ -1,11 +1,11 @@
 "use client";
 
-import { FederationLogo, LeagueLogo } from "@/components/logos";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Navbar } from "@/components/ui/navbar";
-import { Footer } from "@/components/ui/footer";
-import { AdminAccess } from "@/components/ui/admin-access";
+import { FederationLogo, LeagueLogo } from "@/components/shared/logos";
+import { Button } from "@/components/ui/primitives/button";
+import { Card, CardContent } from "@/components/ui/primitives/card";
+import { Navbar } from "@/components/ui/layout/navbar";
+import { Footer } from "@/components/ui/layout/footer";
+import { AdminAccess } from "@/components/shared/auth/admin-access";
 import Link from "next/link";
 import { Trophy, Users, Shield, ArrowRight, Quote, Star } from "lucide-react";
 
@@ -172,6 +172,16 @@ export default function HomePage() {
                 </p>
               </CardContent>
             </Card>
+          </div>
+
+          {/* CTA to Posts Page */}
+          <div className="text-center mt-12">
+            <Link href="/posts">
+              <Button className="btn-smooth text-lg px-8 py-3 bg-primary text-primary-foreground hover:bg-primary/90">
+                Voir Toutes nos Réalisations
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

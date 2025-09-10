@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { LeagueLogo } from '@/components/logos/LeagueLogo'
+import { LeagueLogo } from '@/components/shared/logos/LeagueLogo'
 
 export function SplashScreen() {
   const [isVisible, setIsVisible] = useState(true)

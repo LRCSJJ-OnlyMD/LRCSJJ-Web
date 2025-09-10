@@ -2,8 +2,8 @@
 
 import { useState, useRef } from 'react'
 import Image from 'next/image'
-import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/primitives/button'
+import { Label } from '@/components/ui/primitives/label'
 import { uploadToCloudinary, getOptimizedImageUrl } from '@/lib/cloudinary'
 import { Upload, X, Camera } from 'lucide-react'
 

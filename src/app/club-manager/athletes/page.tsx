@@ -3,17 +3,17 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/primitives/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { AthleteFormDialog } from "@/components/ui/athlete-form-dialog";
+} from "@/components/ui/primitives/card";
+import { Input } from "@/components/ui/primitives/input";
+import { Label } from "@/components/ui/primitives/label";
+import { AthleteFormDialog } from "@/components/ui/forms/athlete-form-dialog";
 import {
   Table,
   TableBody,
@@ -21,7 +21,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/primitives/table";
 import { toast } from "sonner";
 import {
   ArrowLeft,
@@ -34,7 +34,7 @@ import {
   Download,
   Eye,
 } from "lucide-react";
-import { LeagueLogo } from "@/components/logos";
+import { LeagueLogo } from "@/components/shared/logos";
 
 interface Athlete {
   id: string;

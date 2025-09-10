@@ -2,13 +2,13 @@
 
 import { useState } from 'react'
 import { trpc } from '@/lib/trpc-client'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/primitives/button'
+import { Input } from '@/components/ui/primitives/input'
+import { Label } from '@/components/ui/primitives/label'
+import { Card } from '@/components/ui/primitives/card'
 import { toast } from 'sonner'
 import { MapPin, Globe, Settings, Plus, Trash2, CheckCircle, Circle } from 'lucide-react'
-import { GoogleMapsEmbed } from '@/components/ui/google-maps'
+import { GoogleMapsEmbed } from '@/components/ui/maps/google-maps'
 
 interface MapConfiguration {
   id: string

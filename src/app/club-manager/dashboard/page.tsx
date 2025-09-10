@@ -3,14 +3,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/primitives/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/components/ui/primitives/card";
 import { toast } from "sonner";
 import {
   ArrowLeft,
@@ -23,7 +23,7 @@ import {
   UserPlus,
   LogOut,
 } from "lucide-react";
-import { LeagueLogo } from "@/components/logos";
+import { LeagueLogo } from "@/components/shared/logos";
 
 export default function ClubManagerDashboard() {
   const [isLoading, setIsLoading] = useState(true);
